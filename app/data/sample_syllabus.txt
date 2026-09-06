@@ -1,0 +1,857 @@
+# UPSC Mains Optional Subjects — Sample Syllabus Corpus
+# Aligned with SuperKalam / official UPSC list: 48 optionals (25 core + 23 literature)
+# Source reference: https://superkalam.com/upsc-mains/optional-syllabus/how-many-optional-subject-in-upsc-choices
+# Used for subject_probe phase RAG retrieval. Each section is tagged by subject name for hybrid search.
+#
+# SuperKalam most popular (high success rate): Sociology, Geography, Anthropology, PSIR,
+# Public Administration, History, Mathematics, Commerce & Accountancy, Economics, Philosophy, Hindi Literature
+
+================================================================================
+PUBLIC ADMINISTRATION
+================================================================================
+
+## Paper I — Administrative Theory
+
+### Meaning, Scope and Significance
+Public Administration is the study of how government policies are formulated and implemented. Scope includes personnel, finance, organisation, methods, and public relations. Significance: bridge between politics and policy delivery; instrument of socio-economic change in developing societies like India.
+
+### Evolution of Public Administration
+- Pre-modern: Kautilya's Arthashastra — espionage, revenue, civil service ethics
+- Woodrow Wilson (1887): politics-administration dichotomy — administration as science, politics as choice
+- Goodnow: politics makes policy, administration executes; three-fold authority (legislative, executive, judicial)
+- Gulick & Urwick POSDCORB: Planning, Organising, Staffing, Directing, Coordinating, Reporting, Budgeting
+- New Public Administration (1960s–70s): Waldo, value-neutrality critique, social equity, relevance to developing nations
+
+### Scientific Management and Human Relations
+- Frederick Taylor: time-motion studies, piece-rate, functional foremanship, "one best way"
+- Henri Fayol: 14 principles — unity of command, scalar chain, esprit de corps
+- Max Weber: legal-rational authority, ideal-type bureaucracy — hierarchy, specialization, impersonality, written rules, career system
+- Critiques of Weber: Gouldner (ritualism), Merton (goal displacement), Crozier (bureaucratic dysfunction)
+- Elton Mayo & Hawthorne experiments: informal groups, social needs, morale affect productivity
+- Human Relations School: McGregor Theory X vs Theory Y; Maslow hierarchy of needs in workplace
+
+### Organisational Behaviour and Decision-Making
+- Chester Barnard: cooperative systems, zone of indifference, executive functions (provide system, induce participation, sustain morale)
+- Herbert Simon: bounded rationality, satisficing (not maximizing), administrative behaviour as decision chains
+- Chris Argyris: personality vs organisation conflict; mature employee vs immature organisation design
+- Rensis Likert: four systems of management (exploitative → participative)
+
+### Comparative and Development Administration
+- Fred Riggs: prismatic society, sala model (fused, diffracted, prismatic); ecology of public administration
+- Development administration: goal-oriented, change-agent role, distinction from maintenance administration
+- Ferrel Heady: contextual factors — colonial legacy, political culture, level of development
+
+### New Public Management (NPM)
+- Origins: UK (Thatcher), NZ reforms, Osborne & Gaebler "Reinventing Government"
+- Principles: customer orientation, market mechanisms, performance contracts, agencification, output over input
+- Tools: contracting out, PPP, user charges, benchmarking, KPIs, executive agencies
+- Criticisms: equity erosion, short-termism, fragmentation, "hollowing out" of state capacity
+- India: Second ARC recommendations, mission mode projects, outcome budgeting
+
+### New Public Service and Governance
+- Denhardt & Denhardt: serve citizens not customers; democracy in workplace; value people not just productivity
+- Governance paradigm: networks, multi-actor, co-production, steering not rowing
+- Rhodes: policy networks, differentiated polity, hollow state
+- Good governance: World Bank pillars — participation, rule of law, transparency, responsiveness, consensus, equity, effectiveness, accountability
+
+### Accountability and Control
+- Types: political (ministerial responsibility), legal (judicial review, tribunals), administrative (hierarchy, audit), social (media, RTI, civil society)
+- Legislative control: questions, debates, committees (PAC, Estimates, Department-related)
+- Executive control: internal audit, vigilance, performance appraisal
+- Judicial control: writ jurisdiction, judicial activism, PIL
+- Ombudsman models: Swedish, French Cour des Comptes, India's Lokpal/Lokayukta debate
+
+### Ethics in Administration
+- Nolan Committee (UK): selflessness, integrity, objectivity, accountability, openness, honesty, leadership
+- Second ARC on ethics: code of ethics, code of conduct, conflict of interest, whistleblower protection
+- Indian context: RTI, citizen charters, e-governance for transparency
+- Compassionate bureaucracy: welfare delivery, last-mile gaps, empathy in disaster and health administration
+
+## Paper II — Indian Administration
+
+### Constitutional Framework
+- Part XIV (Arts 308–323): services under Union and States
+- Art 310: doctrine of pleasure; Art 311: safeguards — inquiry, reasonable opportunity
+- Art 312: All-India Services; Art 315–323: UPSC and SPSC
+- Federal structure: Union List, State List, Concurrent List; administrative federalism
+
+### Evolution of Indian Administration
+- Legacy: Indian Civil Service (ICS), Montagu-Chelmsford, Government of India Act 1935
+- Sardar Patel and integration of princely states; continuity vs change debate post-1947
+- Administrative reforms: Gorwala Committee, Appleby reports, Kothari Committee, Hota Committee
+
+### Union Government
+- President: formal head; ordnance-making; pardoning power
+- Prime Minister: keystone of cabinet; coordination, policy direction
+- Council of Ministers: collective responsibility (Art 75); inner cabinet vs full cabinet
+- Cabinet Secretariat: coordination, crisis management, cabinet committees
+- Principal Secretary to PM: role in policy prioritisation
+
+### Civil Services
+- Recruitment: UPSC — CSE, IFoS, Engineering Services, combined medical; lateral entry debate
+- Training: LBSNAA Mussoorie (foundation), phase-wise training, mid-career, foreign training
+- Performance: APAR system, 360-degree feedback debates, outcome vs process metrics
+- All-India Services: IAS, IPS, IFoS — cadre system, deputation, empanelment
+- Central Services: IRS, IFS (Foreign), IAAS, etc.
+- Issues: generalists vs specialists, domain expertise, attrition to private sector
+
+### Central Secretariat System
+- Ministries vs Departments; attached and subordinate offices
+- Secretary as administrative head; desk officer system
+- File movement, noting, channel of submission
+- PMO: advisory, monitoring, priority projects (PRAGATI)
+
+### Planning and Policy
+- Planning Commission (1950–2014): Five-Year Plans, plan federalism, Gadgil formula
+- NITI Aayog (2015–): cooperative federalism, competitive federalism, SDGs, Aspirational Districts
+- Decentralised planning: district plans, convergence with MPLADS/MLALADS debates
+
+### State Administration
+- Governor: constitutional head; discretionary powers
+- Chief Minister and Council of Ministers
+- Chief Secretary: head of state administration; coordination across departments
+- Secretariat at state level; directorates; field formations
+
+### District Administration
+- District Collector/DM: revenue, magisterial, developmental roles — historical evolution
+- Unified vs specialised district administration debates
+- District Planning Committee (Art 243ZD); DRDA, line department coordination
+- Crisis role: disasters, elections, law and order
+
+### Local Government
+- 73rd Amendment (1992): Panchayati Raj — Gram Sabha, three tiers, Eleventh Schedule, State Election Commission, State Finance Commission
+- 74th Amendment: Urban local bodies — municipalities, Twelfth Schedule
+- Devolution: functions, funds, functionaries (3F) — uneven across states
+- PRI capacity: Sarpanch model, women reservation, PESA (Schedule Areas)
+
+### Public Sector Undertakings
+- Rationale: commanding heights, strategic sectors, employment
+- Disinvestment policy: strategic sale vs minority stake; CPSE categorisation (Maharatna, Navratna, Miniratna)
+- Autonomy packages; Navratna status criteria
+- Air India privatisation, LIC IPO — policy shifts
+
+### Law and Order
+- Police under State List; IPS cadre; dual control (CM/Home Minister vs DGP)
+- Police reforms: National Police Commission, Prakash Singh judgment (2006) — fixed tenure, State Security Commission
+- Central agencies: CBI, NIA, NCB — federal tensions
+- Community policing, SMART policing, cyber crime cells
+
+### Welfare Administration
+- Health: NHM, Ayushman Bharat, primary health centres, ASHA workers
+- Education: SSA, RTE Act, mid-day meal, NEP 2020 implementation gaps
+- Social justice: SC/ST welfare, disability rights, gender budgeting
+- MGNREGA: rights-based welfare, last-mile delivery, DBT linkage
+
+### Financial Administration
+- Finance Commission (Art 280): vertical and horizontal devolution
+- GST Council: cooperative federalism model
+- CAG: audit of receipts and expenditure; PAC follow-up
+- FRBM Act: fiscal discipline, escape clauses
+
+## Key Thinkers — Public Administration
+- Woodrow Wilson: politics-administration dichotomy
+- Max Weber: bureaucracy, authority types (traditional, charismatic, legal-rational)
+- Frederick Taylor, Henri Fayol: classical organisation theory
+- Elton Mayo: human relations, Hawthorne effect
+- Chester Barnard: cooperative systems
+- Herbert Simon: bounded rationality, administrative man
+- Dwight Waldo: New Public Administration
+- Fred Riggs: ecological and prismatic models
+- Vincent Ostrom: public choice, polycentric governance
+- Osborne & Gaebler: reinventing government
+
+## Contemporary Issues — Public Administration
+- E-governance: Digital India, UMANG, DigiLocker, faceless assessment (tax)
+- Citizen charters: Sevottam model, quality standards in service delivery
+- RTI Act 2005: transparency, Section 8 exemptions, PIO responsibilities
+- Administrative reforms: Second ARC (2005–09) — 15 reports, ethics, local governance, conflict resolution
+- Cooperative vs competitive federalism: NITI indices, GST, disaster management
+- Lateral entry: domain experts in joint secretary roles — debate on merit vs UPSC route
+- Mission Karmayogi: iGOT platform, capacity building for civil servants
+- AI and governance: predictive policing, algorithmic accountability, data protection (DPDP Act)
+
+================================================================================
+HISTORY
+================================================================================
+
+## Ancient India
+- Indus Valley Civilisation: town planning (Mohenjo-daro, Harappa), trade, script, decline theories (Aryan invasion vs climate)
+- Vedic period: Rigvedic vs later Vedic society; varna system origins; janapadas and mahajanapadas
+- Buddhism and Jainism: causes of rise, doctrines, Ashoka and spread of Buddhism
+- Mauryan Empire: Chandragupta, Kautilya, Ashoka's dhamma, administration
+- Gupta period: golden age debates; art, science (Aryabhata), feudalism debate (RS Sharma vs critics)
+- South Indian kingdoms: Cholas (local self-government, temple architecture), Pallavas, Cheras
+
+## Medieval India
+- Delhi Sultanate: Slave, Khilji, Tughlaq, Sayyid, Lodi dynasties; iqta system
+- Mughal Empire: Babur to Aurangzeb; mansabdari, jagirdari, zabt (land revenue under Akbar)
+- Akbar: sulh-i-kul, ibadat khana, Din-i-Ilahi debates
+- Aurangzeb: religious policy, Deccan campaigns, empire fragmentation
+- Bhakti and Sufi movements: Kabir, Nanak, Chishti silsila — social reform dimensions
+- Vijayanagara and Bahmani kingdoms; Marathas under Shivaji — swarajya, ashtapradhan
+
+## Modern India (1757–1857)
+- Decline of Mughals; emergence of regional powers
+- British expansion: Plassey (1757), Buxar (1764), subsidiary alliance (Wellesley), doctrine of lapse (Dalhousie)
+- Economic impact: deindustrialisation (Dadabhai Naoroji drain theory), land revenue systems (Permanent Settlement, Ryotwari, Mahalwari)
+- Revolt of 1857: causes, centres, leaders, nature (mutiny vs first war of independence — Savarkar vs colonial historiography)
+- Post-1857: Crown rule, Queen's Proclamation, Indian Councils Acts
+
+## Freedom Struggle (1858–1947)
+- Early nationalism: INC founding (1885), Moderates vs Extremists (Surat split 1907)
+- Revolutionary movement: Bhagat Singh, HSRA, Ghadar Party
+- Gandhian era: Champaran, Non-Cooperation, Civil Disobedience, Quit India; constructive programme
+- Muslim League; Lucknow Pact; Khilafat movement
+- Constitutional developments: Morley-Minto, Montagu-Chelmsford, Simon Commission, Round Table Conferences, Govt of India Act 1935
+- Partition: Cabinet Mission, Mountbatten Plan, Radcliffe line — historiographical debates
+
+## Post-Independence India
+- Integration of states; linguistic reorganisation (States Reorganisation Commission 1956)
+- Nehruvian era: planning, NAM, Panchsheel, 1962 war
+- Green Revolution; bank nationalisation; Emergency (1975–77)
+- Liberalisation 1991: Rao-Manmohan reforms
+- Historiography: Cambridge, nationalist, Marxist (colonial mode of production), subaltern studies (Ranajit Guha)
+
+## World History (UPSC relevant themes)
+- Industrial Revolution: causes, social impact, imperialism link
+- French Revolution: causes, phases, legacy for nationalism and rights
+- Russian Revolution 1917: Bolsheviks, Lenin, impact on colonies
+- World Wars: causes, consequences, Treaty of Versailles, rise of fascism
+- Cold War: containment, NAM, decolonisation, collapse of USSR
+- UN and post-WWII order; human rights discourse
+
+================================================================================
+GEOGRAPHY
+================================================================================
+
+## Physical Geography
+- Geomorphology: endogenic (folding, faulting, volcanism) vs exogenic (weathering, erosion) forces
+- Plate tectonics: Pangaea, divergent/convergent/transform boundaries; Himalayas formation
+- Climatology: Koppen classification; Indian monsoon — mechanism (ITCZ, Tibet heating, ENSO, IOD)
+- Oceanography: currents, El Niño-La Niña, sea level rise
+- Biogeography: ecosystems, biodiversity hotspots (Western Ghats, Eastern Himalayas, Sundarbans)
+
+## Indian Geography
+- Physiographic divisions: Himalayas, Indo-Gangetic plain, peninsular plateau, coastal plains, islands
+- Rivers: Himalayan (perennial) vs peninsular; interlinking debate; Ganga rejuvenation
+- Soils: alluvial, black (regur), red, laterite — crop association
+- Agriculture: green revolution regions; cropping patterns; MSP, e-NAM
+- Minerals: coal (Jharkhand-Chhattisgarh), iron ore, bauxite; rare earths
+- Energy: thermal vs renewable; solar potential (Rajasthan, Gujarat); nuclear plants
+
+## Human and Economic Geography
+- Population: census trends, demographic dividend, ageing in South India
+- Urbanisation: Census 2011 definitions; smart cities; slums and informal sector
+- Migration: rural-urban, distress migration, remittances (Kerala, Bihar)
+- Regional planning: NCR, DMIC corridor, Bharatmala, Sagarmala
+- Disaster geography: floods (Brahmaputra), cyclones (Odisha, Andhra), earthquakes (Himalayan belt), landslides
+
+## Geographical Techniques
+- Remote sensing and GIS in planning
+- Cartography: thematic maps, topographic sheets
+- Census and NSSO data interpretation for policy
+
+================================================================================
+POLITICAL SCIENCE AND INTERNATIONAL RELATIONS
+================================================================================
+
+## Political Theory
+- State, sovereignty, citizenship — liberal, communitarian, pluralist views
+- Justice: Rawls (veil of ignorance), Nozick (minimal state), Amartya Sen (capabilities approach)
+- Liberty: negative vs positive liberty (Isaiah Berlin)
+- Equality, rights, democracy — deliberative (Habermas), participatory models
+- Indian political thought: Gandhi (swaraj, trusteeship), Ambedkar (annihilation of caste), Tagore, Vivekananda
+
+## Indian Government and Politics
+- Constitution: salient features, federalism with unitary bias, secularism, fundamental rights vs DPSP
+- Parliament: Lok Sabha, Rajya Sabha, law-making, committees, anti-defection (Tenth Schedule)
+- Judiciary: independence, judicial review, basic structure (Kesavananda), PIL
+- Federalism: Centre-State relations, inter-state councils, finance commission
+- Party system: Congress dominance, coalition era, regional parties
+- Elections: ECI, Model Code, electoral bonds debate, one nation one election proposal
+
+## Comparative Politics
+- Models: liberal democracy, authoritarianism, theocracy
+- State in developing societies: overload, legitimacy crises
+- Social movements: Chipko, Narmada, anti-corruption (Anna Hazare), CAA protests
+
+## International Relations
+- Theories: realism (Morgenthau, Mearsheimer), liberalism (Keohane), constructivism
+- Cold War and post-Cold War order; unipolar moment vs multipolarity
+- India's foreign policy: Nehru (NAM, Panchsheel), Indira (1971, nuclear), liberalisation era Look East/Act East
+- Neighbourhood: Pakistan, China (border, BRI, QUAD context), Bangladesh, Sri Lanka, Nepal
+- Multilateral: UN reform, G20, BRICS, SCO, WTO, climate negotiations (Paris Agreement)
+- Security: nuclear doctrine (no first use), terrorism, cyber warfare, maritime security (Indo-Pacific)
+
+================================================================================
+SOCIOLOGY
+================================================================================
+
+## Sociological Thinkers
+- Karl Marx: historical materialism, class struggle, alienation, base-superstructure
+- Emile Durkheim: social facts, division of labour, suicide study, religion as collective conscience
+- Max Weber: social action (verstehen), Protestant ethic, authority types, bureaucracy
+- Talcott Parsons: AGIL, structural functionalism
+- Robert K Merton: manifest/latent functions, anomie, middle-range theory
+- G H Mead and symbolic interactionism
+- Indian thinkers: M N Srinivas (sanskritisation, dominant caste), Andre Beteille, Louis Dumont (homohierarchicus)
+
+## Indian Society
+- Caste: Varna vs jati; caste-class overlap; reservation politics; creamy layer
+- Class: agrarian classes (Patnaik), industrial working class, middle class growth
+- Family and kinship: joint family decline, changing marriage patterns
+- Religion and secularism: communalism vs religious pluralism
+- Rural and urban: village studies (village surveys), slums, informal economy
+- Women: patriarchy, labour force participation, SHGs, domestic violence Act
+- Tribes: ST classification, PESA, displacement and forest rights (FRA 2006)
+- Social change: modernisation, westernisation, sanskritisation, globalisation impact
+
+## Sociology — Methods and Concepts
+- Qualitative vs quantitative research; participant observation
+- Social stratification and mobility
+- Deviance and social control
+- Education and socialisation; role of media
+
+================================================================================
+ANTHROPOLOGY
+================================================================================
+
+## Physical Anthropology
+- Human evolution: Australopithecus to Homo sapiens; Out of Africa theory
+- Genetics: Mendel, population genetics, genetic markers in Indian populations
+- Race vs cline debates; biological vs cultural definitions of humanity
+
+## Social-Cultural Anthropology
+- Culture, kinship terminologies (Dravidian, Hawaiian systems in India)
+- Marriage: endogamy, exogamy, dowry debates
+- Religion and magic (Malinowski functionalism)
+- Fieldwork tradition: Malinowski, Radcliffe-Brown, structural-functionalism
+- Symbolic anthropology: Clifford Geertz
+
+## Indian Anthropology
+- Tribal zones: Central India, Northeast — cultural zones (Elwin, Verrier Elwin debates on integration)
+- Constitutional safeguards: Fifth and Sixth Schedules
+- Negrito, Australoid, Mongoloid, Caucasoid elements in Indian population debates
+- Development-induced displacement; tribal rights
+
+## Archaeological Anthropology
+- Prehistoric cultures: Palaeolithic, Mesolithic, Neolithic in Indian subcontinent
+- Indus and post-Harappan cultures
+
+================================================================================
+ECONOMICS
+================================================================================
+
+## Microeconomics
+- Demand and supply; elasticity; consumer surplus
+- Production, costs, market structures: perfect competition, monopoly, oligopoly
+- Market failure: externalities, public goods, asymmetric information
+- Game theory basics: Nash equilibrium, prisoner's dilemma
+
+## Macroeconomics
+- National income accounting: GDP, GNP, GVA; constant vs current prices
+- IS-LM; AD-AS framework
+- Inflation: demand-pull, cost-push; CPI, WPI; Phillips curve
+- Unemployment types: frictional, structural, cyclical, disguised (Lewis model)
+- Monetary policy: RBI tools — repo, reverse repo, CRR, SLR, open market operations
+- Fiscal policy: deficit (revenue, fiscal, primary), FRBM, multiplier effect
+
+## Indian Economy
+- Planning to reforms: licence raj, 1991 liberalisation, LPG
+- Agriculture: MSP, procurement, APMC reforms, doubling farmers' income
+- Industry: Make in India, PLI schemes, MSME sector
+- Services: IT sector, gig economy
+- Banking: NPA crisis, IBC 2016, NBFC regulation
+- External sector: BoP, rupee convertibility, FDI vs FPI
+- Poverty: Tendulkar vs Rangarajan lines; multidimensional poverty index
+- Inequality: Gini coefficient, wealth concentration debates
+- Tax: GST structure, direct vs indirect ratio
+
+## Development Economics
+- Harrod-Domar, Solow model, endogenous growth
+- Human development index; Amartya Sen capabilities
+- Sustainable development; SDGs; climate economics
+
+================================================================================
+PSYCHOLOGY
+================================================================================
+
+## Cognitive Psychology
+- Sensation, perception, attention, memory (STM, LTM — Atkinson-Shiffrin)
+- Thinking, problem-solving, creativity
+- Language and communication
+
+## Developmental Psychology
+- Piaget: cognitive stages (sensorimotor to formal operational)
+- Erikson: psychosocial stages
+- Kohlberg: moral development
+- Attachment (Bowlby, Ainsworth)
+
+## Social Psychology
+- Attitudes, prejudice, stereotypes; group dynamics
+- Conformity (Asch), obedience (Milgram), bystander effect
+- Leadership styles; interpersonal attraction
+
+## Clinical and Applied
+- Abnormal psychology: anxiety, depression, schizophrenia — DSM categories overview
+- Therapies: CBT, psychoanalysis basics
+- Organisational psychology: motivation theories (Maslow, Herzberg)
+- Educational psychology: learning theories (classical conditioning — Pavlov, operant — Skinner)
+
+## Indian Psychology
+- Yoga and consciousness; indigenous concepts — gunas, triguna personality
+- Mental health policy: NMHP, decriminalisation of suicide (2017)
+
+================================================================================
+PHILOSOPHY
+================================================================================
+
+## Western Philosophy
+- Plato: theory of forms, philosopher king, cave allegory
+- Aristotle: four causes, virtue ethics, golden mean
+- Descartes: cogito, mind-body dualism
+- Kant: categorical imperative, critique of pure reason (phenomena vs noumena)
+- Utilitarianism: Bentham, Mill (greatest happiness)
+- Existentialism: Sartre, Camus — freedom, absurdity
+
+## Indian Philosophy
+- Orthodox schools: Nyaya (logic), Vaisheshika (atomism), Samkhya (purusha-prakriti), Yoga (Patanjali), Mimamsa, Vedanta (Advaita — Shankara, Vishishtadvaita — Ramanuja, Dvaita — Madhva)
+- Heterodox: Buddhism (four noble truths, anatta, nirvana), Jainism (ahimsa, syadvada)
+- Ethics: dharma, karma, moksha; Gandhi's truth and non-violence as philosophical praxis
+- Secularism debate: Indian vs Western models (Rajeev Bhargava)
+
+## Logic and Ethics
+- Deductive vs inductive reasoning; fallacies
+- Meta-ethics: emotivism, prescriptivism
+- Applied ethics: bioethics, environmental ethics, war and peace
+
+================================================================================
+LAW
+================================================================================
+
+## Constitutional Law
+- Basic structure doctrine; amendments (24th, 42nd, 44th, 73rd, 74th, 101st GST)
+- Fundamental rights: Art 14–32; reasonable restrictions; Art 21 expansion (privacy — Puttaswamy)
+- DPSP vs FR balance; uniform civil code debate
+- Emergency provisions: Art 352, 356, 360
+
+## Administrative Law
+- Rule of law; natural justice (audi alteram partem, nemo judex)
+- Judicial review; writs (habeas corpus, mandamus, certiorari, prohibition, quo warranto)
+- Tribunals; administrative discretion
+
+## International Law
+- Sources: treaty, custom, general principles
+- ICJ; UN Charter; humanitarian law (Geneva Conventions)
+- Law of the sea (UNCLOS); extradition and asylum
+
+## Criminal and Civil (overview)
+- IPC major offences; CrPC due process; evidence Act basics
+- Contract Act essentials; tort negligence
+- Environmental law: NGT, EPA 1986, Forest Conservation Act
+
+================================================================================
+AGRICULTURE
+================================================================================
+
+## Agronomy and Crop Science
+- Cereals: rice (kharif), wheat (rabi); HYV seeds; C3 vs C4 plants
+- Pulses, oilseeds — import dependency
+- Horticulture and floriculture export potential
+
+## Soil and Water
+- Soil health cards; micronutrient deficiencies
+- Irrigation: canal, drip, sprinkler; PMKSY; groundwater crisis (Punjab, Rajasthan)
+- Watershed management; rainwater harvesting
+
+## Agricultural Economics and Policy
+- MSP crops; procurement vs deficiency payment debates
+- APMC and Model APMC Act 2003; e-NAM
+- Contract farming Act 2020 debates; farmer protests context
+- WTO: Amber box, Green box; food subsidy limits
+- Doubling farmers' income committee (Ashok Dalwai)
+- Kisan Credit Card; crop insurance (PMFBY)
+
+## Animal Husbandry and Allied
+- White revolution; Operation Flood (Amul model)
+- Blue revolution (fisheries); poultry sector
+- Livestock and methane — climate link
+
+## Agricultural Extension and Technology
+- KVKs; ICAR role; Krishi Vigyan Kendras
+- Precision farming; drones; soil testing labs
+- GM crops debate: Bt cotton success; Bt brinjal moratorium
+
+================================================================================
+ANIMAL HUSBANDRY AND VETERINARY SCIENCES
+================================================================================
+
+## Paper I — Animal Nutrition and Physiology
+- Ruminant vs non-ruminant digestion; rumen microbiology
+- Essential nutrients: proteins, energy, minerals, vitamins; feed formulation
+- Avian nutrition; pig nutrition; feed conservation (silage, hay)
+- Animal physiology: reproduction (estrus cycle, AI), lactation, endocrine system
+- Growth and development; stress physiology
+
+## Paper II — Livestock Production and Health
+- Cattle breeds: indigenous (Gir, Sahiwal) vs exotic crossbreds; buffaloes (Murrah)
+- Poultry: broilers, layers; hatchery management; disease control (ND, IBD)
+- Sheep and goat rearing; piggery; fisheries and aquaculture basics
+- Veterinary epidemiology: zoonoses (brucellosis, anthrax, rabies)
+- Vaccination schedules; AMR (antimicrobial resistance) in livestock
+- Dairy technology: pasteurisation, milk cooperatives (Amul model)
+- Animal welfare; Prevention of Cruelty to Animals Act
+- One Health approach linking human-animal-environment health
+
+================================================================================
+BOTANY
+================================================================================
+
+## Paper I — Microbiology and Plant Pathology
+- Plant cell ultrastructure; organelles; cell division (mitosis, meiosis)
+- Enzymes: kinetics, inhibition; photosynthesis (C3, C4, CAM pathways)
+- Respiration: glycolysis, Krebs cycle, ETC
+- Plant hormones: auxins, gibberellins, cytokinins, ABA, ethylene
+- Microbiology: bacteria, viruses, fungi; sterilisation methods
+- Plant pathology: host-parasite interaction; rusts, smuts, blights; IPM
+
+## Paper II — Plant Systematics and Ecology
+- Taxonomy: binomial nomenclature; Bentham and Hooker classification
+- Angiosperm families: Fabaceae, Poaceae, Solanaceae — economic importance
+- Plant geography: floristic regions of India
+- Ecology: ecosystems, succession, food chains, biogeochemical cycles
+- Biodiversity: hotspots; conservation strategies (in-situ, ex-situ)
+- Biotechnology: tissue culture, micropropagation, transgenic plants
+- Ethnobotany; medicinal plants (neem, tulsi, ashwagandha)
+
+================================================================================
+CHEMISTRY
+================================================================================
+
+## Paper I — Physical and Inorganic Chemistry
+- Atomic structure: quantum numbers, orbitals, periodic trends
+- Chemical bonding: VSEPR, hybridisation, MOT
+- Thermodynamics: enthalpy, entropy, Gibbs free energy, spontaneity
+- Chemical kinetics: rate laws, Arrhenius equation, catalysis
+- Electrochemistry: Nernst equation, corrosion, batteries, fuel cells
+- Coordination chemistry: Werner theory, crystal field theory, isomerism
+- Main group elements: s-block, p-block trends; d-block transition metals
+- Organometallics; bioinorganic (haemoglobin, chlorophyll)
+
+## Paper II — Organic Chemistry and Applications
+- IUPAC nomenclature; isomerism (structural, stereoisomerism)
+- Reaction mechanisms: SN1/SN2, E1/E2, electrophilic/nucleophilic substitution
+- Aromaticity; electrophilic substitution in benzene
+- Carbonyl chemistry: aldehydes, ketones, carboxylic acids
+- Biomolecules: carbohydrates, proteins, lipids, nucleic acids
+- Polymers: addition vs condensation; biodegradable plastics
+- Environmental chemistry: greenhouse gases, ozone depletion, green chemistry
+- Analytical methods: spectroscopy (UV, IR, NMR basics), chromatography
+
+================================================================================
+CIVIL ENGINEERING
+================================================================================
+
+## Paper I — Engineering Mechanics and Structures
+- Statics: forces, moments, equilibrium, trusses
+- Strength of materials: stress-strain, bending, torsion, columns
+- Structural analysis: SFD/BMD, indeterminate structures, moment distribution
+- RCC design: beams, slabs, columns — IS 456 provisions
+- Steel structures: connections, plate girders, roof trusses — IS 800
+- Pre-stressed concrete: concepts and applications
+
+## Paper II — Geotechnical, Transportation, Environmental
+- Soil mechanics: classification, permeability, consolidation, shear strength
+- Foundation engineering: shallow and deep foundations, retaining walls
+- Surveying: levelling, theodolite, total station, GIS basics
+- Transportation: highway geometric design, pavement design, traffic engineering
+- Hydraulics: open channel flow, pumps, water distribution
+- Environmental engineering: water treatment, sewage treatment, solid waste management
+- Construction management: CPM/PERT, estimation, contracts
+
+================================================================================
+COMMERCE AND ACCOUNTANCY
+================================================================================
+
+## Paper I — Accounting and Finance
+- Accounting standards (Ind AS convergence); double-entry system
+- Partnership accounts; company accounts — shares, debentures, amalgamation
+- Cost accounting: marginal costing, standard costing, variance analysis
+- Financial management: capital budgeting (NPV, IRR), working capital, dividend policy
+- Financial markets: SEBI, stock exchanges, mutual funds, derivatives basics
+- Corporate governance: Companies Act 2013; independent directors; audit committee
+- Taxation overview: direct tax (income tax slabs), GST structure
+
+## Paper II — Organisation and Auditing
+- Organisational behaviour: motivation (Maslow, Herzberg), leadership, teams
+- Human resource management: recruitment, training, performance appraisal
+- Marketing management: 4Ps, segmentation, branding, digital marketing
+- Business environment: liberalisation, FDI, Make in India
+- Auditing: types (statutory, internal), audit report, vouching, verification
+- Business ethics and corporate social responsibility
+- Insolvency and Bankruptcy Code (IBC) 2016 — resolution process
+
+================================================================================
+ELECTRICAL ENGINEERING
+================================================================================
+
+## Paper I — Circuits and Machines
+- Network theorems: Thevenin, Norton, superposition, maximum power transfer
+- AC circuits: phasors, resonance, power factor correction
+- Transformers: equivalent circuit, efficiency, regulation, three-phase
+- DC machines: construction, characteristics, speed control
+- Induction motors: slip, torque-slip curve, starting methods
+- Synchronous machines: alternators, power angle, parallel operation
+
+## Paper II — Power Systems and Electronics
+- Power generation: thermal, hydro, nuclear, renewable integration
+- Transmission: line parameters, sag, insulators, HVDC
+- Distribution: feeders, load flow basics, smart grid
+- Power electronics: rectifiers, inverters, choppers, SMPS
+- Control systems: transfer functions, Bode plots, stability (Routh-Hurwitz)
+- Measurements: bridges, CT/PT, energy meters
+- Protection: circuit breakers, relays, grounding
+
+================================================================================
+GEOLOGY
+================================================================================
+
+## Paper I — Physical Geology and Geomorphology
+- Earth interior: crust, mantle, core; seismic waves; plate tectonics
+- Minerals: silicates, ore minerals; crystallography basics
+- Igneous, sedimentary, metamorphic rocks — classification and origin
+- Geomorphology: weathering, erosion, fluvial/glacial/arid landforms
+- Structural geology: folds, faults, joints; strike and dip
+- Remote sensing and GIS in geological mapping
+
+## Paper II — Indian Geology and Economic Geology
+- Stratigraphy: geological time scale; Indian stratigraphic divisions
+- Palaeontology: index fossils; evolution of life
+- Economic geology: coal, petroleum, iron, manganese, bauxite deposits in India
+- Hydrogeology: aquifers, groundwater exploration, artificial recharge
+- Engineering geology: dams, tunnels, landslides, earthquake hazard
+- Environmental geology: mining impacts, climate proxies, sea level change
+- GSI role; National Mineral Policy
+
+================================================================================
+MANAGEMENT
+================================================================================
+
+## Paper I — Management Theory and OB
+- Evolution of management thought: scientific, administrative, behavioural, quantitative
+- Planning: MBO, strategic planning, SWOT, BCG matrix, Porter's five forces
+- Organising: span of control, delegation, centralisation vs decentralisation
+- Leading: leadership styles (transformational, transactional), motivation theories
+- Controlling: PERT/CPM, benchmarking, TQM, Six Sigma
+- Organisational behaviour: personality, perception, attitudes, group dynamics
+- Organisational culture and change management (Kotter's 8 steps)
+
+## Paper II — Operations, HR, Marketing, Strategy
+- Operations management: capacity planning, inventory (EOQ), supply chain
+- HRM: job analysis, selection, training, compensation, industrial relations
+- Marketing: STP, product lifecycle, consumer behaviour, services marketing
+- Financial management for managers: ratio analysis, budgeting, break-even
+- Entrepreneurship: startups, MSME, innovation, IPR basics
+- Business ethics; CSR; ESG investing trends
+- Indian industry: PLI schemes, disinvestment, ease of doing business
+
+================================================================================
+MATHEMATICS
+================================================================================
+
+## Paper I
+- Linear Algebra: vector spaces, linear transformations, matrices, eigenvalues, eigenvectors, Cayley-Hamilton theorem
+- Calculus: limits, continuity, differentiability, Riemann integration, sequences and series
+- Analytic Geometry: straight lines, circles, conics (ellipse, parabola, hyperbola) in Cartesian and polar coordinates
+- Ordinary Differential Equations: first and second order ODEs, linear equations with constant coefficients, Laplace transforms
+- Dynamics and Statics: rectilinear motion, projectiles, work-energy, equilibrium of particles and rigid bodies
+- Vector Analysis: gradient, divergence, curl, line/surface/volume integrals, Green's, Stokes', Gauss theorems
+
+## Paper II
+- Algebra: groups, subgroups, rings, fields, homomorphism, polynomial rings
+- Real Analysis: completeness of R, uniform convergence, Riemann-Stieltjes integral
+- Complex Analysis: analytic functions, Cauchy-Riemann equations, Cauchy integral theorem, residues
+- Linear Programming: simplex method, duality, transportation and assignment problems
+- Partial Differential Equations: classification, heat/wave/Laplace equations
+- Numerical Analysis: interpolation, numerical integration, root-finding, linear systems
+- Mechanics and Fluid Dynamics: Lagrange's equations, Euler equations, Navier-Stokes (basics), inviscid flow
+
+================================================================================
+MECHANICAL ENGINEERING
+================================================================================
+
+## Paper I — Thermodynamics and Manufacturing
+- Thermodynamics: laws, entropy, Carnot cycle, steam tables, gas turbines
+- Heat transfer: conduction, convection, radiation; heat exchangers
+- IC engines: Otto, Diesel cycles; fuel injection; emissions
+- Manufacturing: casting, welding, machining, CNC basics
+- Engineering materials: ferrous/non-ferrous alloys, heat treatment, composites
+- Machine design: shafts, keys, couplings, bearings, fatigue
+
+## Paper II — Fluid Mechanics and Machine Design
+- Fluid mechanics: Bernoulli, Reynolds number, boundary layer, pumps, turbines
+- Strength of materials: combined stresses, theories of failure, thick cylinders
+- Theory of machines: gears, cams, flywheels, governors, balancing
+- Refrigeration and air-conditioning: vapour compression cycle, COP
+- Power plants: Rankine cycle, boilers, condensers, cogeneration
+- Renewable energy: wind turbines, solar thermal systems
+
+================================================================================
+MEDICAL SCIENCE
+================================================================================
+
+## Paper I — Basic Sciences and General Medicine
+- Human anatomy: gross anatomy of major systems; neuroanatomy basics
+- Human physiology: cardiovascular, respiratory, renal, endocrine, GI systems
+- Biochemistry: enzymes, metabolism, acid-base balance
+- Pathology: inflammation, neoplasia, haematology, systemic pathology
+- Microbiology: bacteria, viruses, fungi; sterilisation; antibiotics mechanism
+- Pharmacology: ANS, CVS drugs, antibiotics, analgesics, adverse effects
+- General medicine: diabetes, hypertension, TB, malaria, HIV/AIDS
+- Community medicine: epidemiology, immunisation schedule, national health programmes (NHM, Ayushman Bharat)
+
+## Paper II — Surgery, Paediatrics, Gynaecology, ENT, Ophthalmology
+- General surgery: wounds, infections, tumours, hernia, appendicitis, trauma
+- Orthopaedics: fractures, dislocations, arthritis
+- Paediatrics: growth monitoring, IMNCI, congenital disorders, vaccination
+- Obstetrics and gynaecology: antenatal care, labour, contraception, PC-PNDT Act
+- ENT and ophthalmology: common disorders (cataract, glaucoma, CSOM)
+- Forensic medicine: post-mortem, injuries, medical ethics, MTP Act
+- Psychiatry: depression, schizophrenia, substance abuse — basics
+- Recent advances: telemedicine, generic drugs policy, organ transplantation ethics
+
+================================================================================
+PHYSICS
+================================================================================
+
+## Paper I — Classical and Modern Physics
+- Mechanics: Newton's laws, conservation laws, rotational dynamics, gravitation
+- Waves and optics: interference, diffraction, polarisation, lasers
+- Thermodynamics and statistical physics: kinetic theory, entropy, Maxwell-Boltzmann
+- Electromagnetism: Gauss law, Ampere law, Faraday induction, Maxwell equations
+- Quantum mechanics: photoelectric effect, de Broglie waves, Schrödinger equation (basics), uncertainty principle
+- Atomic and nuclear physics: Bohr model, radioactivity, nuclear fission/fusion
+- Solid state physics: band theory, semiconductors, p-n junction, superconductivity (basics)
+
+## Paper II — Applied Physics and Electronics
+- Electronics: diodes, transistors, amplifiers, logic gates, digital circuits
+- Oscillators and communication: modulation (AM/FM), fibre optics
+- Special relativity: time dilation, mass-energy equivalence
+- Particle physics: standard model overview, accelerators
+- Astrophysics: stars, black holes, cosmology basics
+- Lasers and photonics applications
+- Physics in daily life: MRI, GPS, renewable energy physics
+
+================================================================================
+STATISTICS
+================================================================================
+
+## Paper I — Probability and Statistical Inference
+- Probability: axioms, conditional probability, Bayes theorem, random variables
+- Distributions: binomial, Poisson, normal, exponential, gamma
+- Sampling: SRS, stratified, cluster sampling; sampling distribution
+- Estimation: point and interval estimation; method of moments, MLE
+- Hypothesis testing: z, t, chi-square tests; p-value; Type I/II errors
+- Correlation and regression: Pearson, Spearman; multiple regression basics
+- Design of experiments: CRD, RBD, factorial designs
+
+## Paper II — Applied Statistics and Demography
+- Time series: trend, seasonality, ARIMA basics
+- Index numbers: Laspeyres, Paasche, Fisher; CPI, WPI, GDP deflator
+- Official statistics: NSSO, Census, NFHS — role in policy
+- Demography: fertility, mortality, migration; population projection; sex ratio
+- Econometrics: OLS, heteroscedasticity, autocorrelation (overview)
+- Statistical quality control: control charts, acceptance sampling
+- Big data and machine learning in official statistics (overview)
+
+================================================================================
+ZOOLOGY
+================================================================================
+
+## Paper I — Non-Chordates and Genetics
+- Classification of animal kingdom; protozoa to arthropoda
+- Cell biology: mitosis, meiosis, cell cycle regulation
+- Genetics: Mendelian laws, linkage, crossing over, sex-linked inheritance
+- Molecular biology: DNA structure, replication, transcription, translation
+- Evolution: Darwin, natural selection, speciation, Hardy-Weinberg equilibrium
+- Physiology: digestion, circulation, excretion, osmoregulation in animals
+- Ethology: innate vs learned behaviour; imprinting, altruism
+
+## Paper II — Chordates and Applied Zoology
+- Vertebrate diversity: fishes, amphibians, reptiles, birds, mammals
+- Comparative anatomy: heart, brain, kidney across vertebrates
+- Embryology: gametogenesis, fertilisation, gastrulation, organogenesis
+- Parasitology: malaria (Plasmodium), filariasis, host-parasite co-evolution
+- Immunology: innate and adaptive immunity; vaccines; monoclonal antibodies
+- Biotechnology: recombinant DNA, PCR, gene therapy, CRISPR ethics
+- Wildlife conservation: Project Tiger, CITES, biodiversity Act
+- Fisheries and sericulture; apiculture economic zoology
+
+================================================================================
+LITERATURE OPTIONAL SUBJECTS (23 Languages — SuperKalam / UPSC List)
+================================================================================
+# Paper I & II each: literary history, critical appreciation, authors, movements, translation.
+# Popular on SuperKalam: Hindi Literature, English Literature, Sanskrit, Tamil, Telugu, Bengali.
+
+## Hindi Literature
+- Bhakti kal: Kabir, Surdas, Tulsidas, Meera — sagun/nirgun streams
+- Riti kal: Bihari, Keshavdas; shringar rasa
+- Bhartendu Yug: Bharatendu Harishchandra — modern Hindi prose birth
+- Dwivedi Yug: Maithilisharan Gupt, Jayashankar Prasad, Sumitranandan Pant, Suryakant Tripathi Nirala, Mahadevi Verma
+- Chhayavad vs Prayogvad vs Nai Kavita
+- Aadhunik gadya: Premchand (Godan, Sewasadan), Yashpal, Phanishwarnath Renu (Maila Anchal), Rahi Masoom Raza
+- Dalit and women writing: Om Prakash Valmiki, Mahasweta Devi (translations)
+- Literary criticism: Vishwanath Prasad Khandelwal; Western influence on Hindi criticism
+
+## English Literature
+- Chaucer, Shakespeare (tragedy, comedy), Metaphysical poets (Donne)
+- Augustan age: Pope, Swift; Romanticism: Wordsworth, Coleridge, Byron, Shelley, Keats
+- Victorian: Dickens, Hardy, Browning, Tennyson; Modernism: Eliot, Woolf, Joyce
+- American: Whitman, Frost, Hemingway, Morrison
+- Indian writing in English: R.K. Narayan, Mulk Raj Anand, Raja Rao, Arundhati Roy, Amitav Ghosh
+- Literary theory: formalism, structuralism, post-colonial (Said), feminism
+
+## Sanskrit Literature
+- Vedic literature: Rigveda hymns, Upanishads (Brihadaranyaka, Chandogya)
+- Epics: Mahabharata (Bhagavad Gita), Ramayana (Valmiki)
+- Classical drama: Kalidasa (Abhijnanashakuntalam, Meghaduta)
+- Poetics: Bharata's Natyashastra; Anandavardhana dhvani theory
+- Philosophical prose: Shankara, Patanjali Yoga Sutra
+- Later Sanskrit: Banabhatta (Kadambari), historical kavya
+
+## Bengali Literature
+- Medieval: Charyapada, Mangal kavya (Chandidas)
+- Bengal Renaissance: Bankim Chandra (Anandamath), Rabindranath Tagore (Gitanjali, Gora, Ghare-Baire)
+- Kazi Nazrul Islam; Sarat Chandra Chattopadhyay
+- Modern: Jibanananda Das, Buddhadeb Bose, Sunil Gangopadhyay
+- Partition literature; cinema-literature interface (Satyajit Ray)
+
+## Tamil Literature
+- Sangam literature: akam/puram poetry; Thirukkural (Thiruvalluvar)
+- Bhakti: Nayanmars, Alvars
+- Modern: Subramania Bharati, Bharathidasan
+- Dravidian movement and Tamil identity in literature
+- Contemporary: Jayakanthan, Ambai
+
+## Telugu Literature
+- Nannaya, Tikkana, Errana — Mahabharata translation tradition
+- Kavitrayam; Srinatha; Potana Bhagavatam
+- Modern: Gurazada Apparao (Kanyasulkam), Sri Sri (Mahaprasthanam)
+- Telangana movement in literature
+
+## Marathi Literature
+- Sant literature: Dnyaneshwar, Tukaram, Eknath
+- Modern novel: Vishnu Sakharam Khandekar, P.L. Deshpande
+- Dalit literature: Namdeo Dhasal, Anna Bhau Sathe
+
+## Urdu Literature
+- Ghazal tradition: Ghalib, Mir Taqi Mir, Faiz Ahmed Faiz
+- Progressive Writers' Movement
+- Novel: Premchand (Urdu), Qurratulain Hyder (Aag Ka Darya)
+- Marsiya; modern poetry: Iqbal, Firaq Gorakhpuri
+
+## Other Literature Optionals (UPSC Paper A languages)
+- Assamese: Sankardev, Madhav Kandali Ramayana, Laxminath Bezbaroa
+- Bodo, Dogri, Gujarati, Kannada, Kashmiri, Konkani, Maithili, Malayalam
+- Manipuri, Nepali, Odia, Punjabi, Santali, Sindhi
+- Each paper tests: history of literature, major authors/works, poetic forms, critical terms, comparative context with Indian and world literature

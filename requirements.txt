@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+langgraph
+langchain
+langchain-groq
+langchain-huggingface
+chromadb==1.5.9
+rank-bm25
+redis
+python-dotenv
+pydantic
+httpx
+pdfplumber
+sentence-transformers
+python-multipart
+langfuse

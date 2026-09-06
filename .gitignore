@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets — single root .env for backend + frontend
+.env
+.env.*
+!.env.example
+web/.env*
+
+# Redis dump (never commit)
+dump.rdb
+*.rdb
+
+# Local data & caches
+data/chroma/*
+!data/chroma/.gitkeep
+data/uploads/*
+!data/uploads/.gitkeep
+*.sqlite3
+
+# Node / Next.js
+web/node_modules/
+web/.next/
+web/out/
+web/.turbo/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS & IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# HuggingFace cache (optional local)
+.cache/

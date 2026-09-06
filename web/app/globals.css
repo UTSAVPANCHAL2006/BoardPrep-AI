@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --accent: #d4a054;
+  --surface: #1a2332;
+  --teal: #3bb8b0;
+}
+
+body {
+  @apply bg-navy-deep text-slate-100 antialiased;
+}
+
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ambient-bg::before,
+.ambient-bg::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+.ambient-bg::before {
+  width: 480px;
+  height: 480px;
+  top: -8%;
+  right: -4%;
+  background: rgba(212, 160, 84, 0.1);
+  animation: float 8s ease-in-out infinite;
+}
+.ambient-bg::after {
+  width: 420px;
+  height: 420px;
+  bottom: 8%;
+  left: -6%;
+  background: rgba(59, 184, 176, 0.08);
+  animation: float 10s ease-in-out 3s infinite;
+}
+
+@layer components {
+  .glass-card {
+    @apply relative overflow-hidden rounded-2xl border border-white/[0.07] bg-navy-card/85 p-6 shadow-card backdrop-blur-xl;
+  }
+  .glass-card::before {
+    content: "";
+    @apply pointer-events-none absolute inset-0 rounded-2xl;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, transparent 55%);
+  }
+
+  .gradient-border {
+    @apply relative rounded-2xl p-[1px];
+    background: linear-gradient(135deg, rgba(212, 160, 84, 0.45), rgba(59, 184, 176, 0.25));
+  }
+  .gradient-border > .inner {
+    @apply rounded-2xl bg-navy-card/95 backdrop-blur-xl;
+  }
+
+  .btn-primary {
+    @apply relative overflow-hidden rounded-xl bg-gradient-to-r from-saffron to-saffron-light px-6 py-3 font-semibold text-navy-deep shadow-glow transition-all duration-300 hover:shadow-glow-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none;
+  }
+  .btn-primary::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    animation: shimmer 2.5s linear infinite;
+  }
+
+  .btn-secondary {
+    @apply rounded-xl border border-india-green/30 bg-india-green/10 px-6 py-3 font-semibold text-india-green transition hover:border-india-green/50 hover:bg-india-green/15 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-ghost {
+    @apply rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300 backdrop-blur-sm transition hover:border-saffron/35 hover:bg-white/10 hover:text-white;
+  }
+
+  .btn-icon {
+    @apply flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 transition hover:border-saffron/35 hover:text-saffron;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-saffron/90;
+  }
+
+  .question-text {
+    @apply font-display text-xl font-medium leading-relaxed text-slate-50 md:text-2xl;
+  }
+
+  .ca-briefing-hero {
+    @apply relative overflow-hidden rounded-3xl border border-white/10 bg-navy-card/90 p-6 shadow-card backdrop-blur-xl md:p-8;
+  }
+  .ca-briefing-hero__glow {
+    @apply pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-60;
+    background: radial-gradient(circle, rgba(212, 160, 84, 0.22), transparent 70%);
+  }
+
+  .ca-pill {
+    @apply rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400;
+  }
+  .ca-pill--live {
+    @apply border-india-green/30 bg-india-green/10 text-india-green;
+  }
+
+  .voice-player-shell {
+    @apply mt-5 rounded-2xl border border-white/10 bg-black/20 p-5;
+  }
+  .voice-progress-track {
+    @apply h-1.5 overflow-hidden rounded-full bg-white/10;
+  }
+  .voice-progress-fill {
+    @apply h-full rounded-full bg-gradient-to-r from-india-green via-saffron to-saffron-light transition-all duration-150;
+  }
+
+  .voice-wave {
+    @apply flex h-5 items-end gap-0.5;
+  }
+  .voice-wave span {
+    @apply w-0.5 rounded-full bg-slate-600;
+    height: 6px;
+  }
+  .voice-wave--live span {
+    @apply bg-india-green;
+    animation: voice-bar 0.9s ease-in-out infinite alternate;
+  }
+
+  .study-progress-bar {
+    @apply rounded-2xl border border-white/10 bg-navy-card/80 p-5 backdrop-blur-xl;
+  }
+  .study-progress-track {
+    @apply h-2 overflow-hidden rounded-full bg-white/10;
+  }
+  .study-progress-fill {
+    @apply h-full rounded-full bg-gradient-to-r from-india-green via-saffron to-saffron-light transition-all duration-700 ease-out;
+  }
+  .study-streak-badge {
+    @apply flex items-center gap-2 rounded-xl border border-saffron/20 bg-saffron/5 px-4 py-2;
+  }
+  .study-tip-banner {
+    @apply flex items-start gap-3 rounded-2xl border border-india-green/20 bg-india-green/5 px-5 py-4;
+  }
+  .study-value-card {
+    @apply rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-center transition hover:border-saffron/20;
+  }
+  .article-card--done {
+    @apply border-india-green/20 bg-india-green/[0.03];
+  }
+  .article-card--active {
+    @apply ring-2 ring-saffron/40 shadow-glow;
+  }
+  .exam-badge {
+    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider;
+  }
+  .exam-badge--prelims {
+    @apply border border-emerald-500/30 bg-emerald-500/10 text-emerald-300;
+  }
+  .exam-badge--mains {
+    @apply border border-saffron/30 bg-saffron/10 text-saffron;
+  }
+  .next-story-cta {
+    @apply mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-india-green/30 bg-india-green/10 py-3.5 text-sm font-semibold text-india-green transition hover:border-india-green/50 hover:bg-india-green/15;
+  }
+
+  .ca-article-detail {
+    @apply relative overflow-hidden rounded-3xl border border-white/10 bg-navy-card/90 p-6 shadow-card backdrop-blur-xl md:p-8;
+  }
+  .ca-detail-section {
+    @apply mt-6 rounded-xl border border-white/[0.06] bg-black/20 p-5;
+  }
+  .ca-detail-heading {
+    @apply text-xs font-bold uppercase tracking-widest text-saffron;
+  }
+  .ca-concept-card {
+    @apply rounded-xl border border-white/[0.06] bg-white/[0.03] p-4;
+  }
+  .gs-tag {
+    @apply rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-medium text-slate-400;
+  }
+  .gs-tag--gs1 {
+    @apply border-blue-500/25 bg-blue-500/10 text-blue-300;
+  }
+  .gs-tag--gs2 {
+    @apply border-purple-500/25 bg-purple-500/10 text-purple-300;
+  }
+  .gs-tag--gs3 {
+    @apply border-emerald-500/25 bg-emerald-500/10 text-emerald-300;
+  }
+  .gs-tag--gs4 {
+    @apply border-amber-500/25 bg-amber-500/10 text-amber-300;
+  }
+  .gs-tag--prelims {
+    @apply border-saffron/30 bg-saffron/10 text-saffron;
+  }
+}
+
+@keyframes voice-bar {
+  0% { height: 6px; opacity: 0.5; }
+  100% { height: 18px; opacity: 1; }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-navy-border;
+}
