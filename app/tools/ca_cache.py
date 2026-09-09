@@ -11,9 +11,27 @@ logger = get_logger(__name__)
 _IST = ZoneInfo("Asia/Kolkata")
 _memory_bundles: dict[str, str] = {}
 _memory_explains: dict[str, str] = {}
-_memory_jobs: set[str] = {}
-_memory_pipeline_done: set[str] = {}
+_memory_jobs: set[str] = set()
+_memory_pipeline_done: set[str] = set()
 _redis_warned = False
+_redis_full_logged = False
+
+
+def is_redis_memory_error(err: Exception) -> bool:
+    msg = f"{type(err).__name__}: {err}".lower()
+    return any(
+        token in msg
+        for token in (
+            "oom",
+            "maxmemory",
+            "memory limit",
+            "out of memory",
+            "cannot allocate",
+            "command not allowed when used memory",
+            "read only",
+            "readonly",
+        )
+    )
 
 
 def india_today() -> date:
@@ -27,6 +45,22 @@ class CaCache:
         self._url = REDIS_URL
         self._client = None
         self._use_memory = False
+        self._writes_blocked = False
+
+    def writes_enabled(self) -> bool:
+        return not self._writes_blocked and not self._use_memory
+
+    def is_storage_full(self) -> bool:
+        return self._writes_blocked
+
+    def _block_writes(self, err: Exception, op: str) -> None:
+        global _redis_full_logged
+        self._writes_blocked = True
+        if not _redis_full_logged:
+            _redis_full_logged = True
+            logger.error(
+                f"Redis storage full — CA cache writes stopped for this process ({op}): {err}"
+            )
 
     async def connect(self):
         if self._client is not None:
@@ -86,7 +120,7 @@ class CaCache:
             deleted += 1
         return deleted
 
-    async def set_bundle(self, articles: list[EnrichedArticle], day: date | None = None) -> None:
+    async def set_bundle(self, articles: list[EnrichedArticle], day: date | None = None) -> bool:
         await self.connect()
         key = self.key(day)
         cleared = await self._clear_explains_for_day(day)
@@ -95,12 +129,22 @@ class CaCache:
             _memory_bundles[key] = payload
             if cleared:
                 logger.info(f"CA explain cache cleared before bundle store: {cleared} keys")
-            return
-        await self._client.setex(key, CA_BUNDLE_TTL_SECONDS, payload)
-        logger.info(
-            f"CA cache stored: {key} ({len(articles)} articles, TTL {CA_BUNDLE_TTL_SECONDS}s"
-            f"{f', cleared {cleared} stale voice keys' if cleared else ''})"
-        )
+            return True
+        if self._writes_blocked:
+            return False
+        try:
+            await self._client.setex(key, CA_BUNDLE_TTL_SECONDS, payload)
+            logger.info(
+                f"CA cache stored: {key} ({len(articles)} articles, TTL {CA_BUNDLE_TTL_SECONDS}s"
+                f"{f', cleared {cleared} stale voice keys' if cleared else ''})"
+            )
+            return True
+        except Exception as e:
+            if is_redis_memory_error(e):
+                self._block_writes(e, "set_bundle")
+            else:
+                logger.warning(f"CA bundle cache write failed: {e}")
+            return False
 
     async def delete_bundle(self, day: date | None = None) -> None:
         await self.connect()
@@ -116,8 +160,11 @@ class CaCache:
 
     async def clear_all(self) -> dict[str, int]:
         """Delete every CA bundle + briefing/voice key (fixes story/audio mismatch)."""
+        global _redis_full_logged
         await self.connect()
         deleted = {"bundles": 0, "explains": 0}
+        self._writes_blocked = False
+        _redis_full_logged = False
         if self._use_memory:
             deleted["bundles"] = len(_memory_bundles)
             deleted["explains"] = len(_memory_explains)
@@ -162,14 +209,24 @@ class CaCache:
             return key in _memory_pipeline_done
         return bool(await self._client.get(key))
 
-    async def mark_daily_pipeline_done(self, day: date | None = None) -> None:
+    async def mark_daily_pipeline_done(self, day: date | None = None) -> bool:
         await self.connect()
         key = self.pipeline_done_key(day)
         if self._use_memory:
             _memory_pipeline_done.add(key)
-            return
-        await self._client.setex(key, 172800, "1")
-        logger.info(f"Daily CA pipeline marked done: {key}")
+            return True
+        if self._writes_blocked:
+            return False
+        try:
+            await self._client.setex(key, 172800, "1")
+            logger.info(f"Daily CA pipeline marked done: {key}")
+            return True
+        except Exception as e:
+            if is_redis_memory_error(e):
+                self._block_writes(e, "mark_daily_pipeline_done")
+            else:
+                logger.warning(f"Daily CA pipeline done flag write failed: {e}")
+            return False
 
     async def clear_daily_pipeline_done(self, day: date | None = None) -> None:
         await self.connect()
@@ -203,15 +260,25 @@ class CaCache:
 
     async def set_explain(
         self, article_index: int, payload: dict, day: date | None = None, language: str = "hi"
-    ) -> None:
+    ) -> bool:
         await self.connect()
         key = self.explain_key(article_index, language, day)
         raw = json.dumps(payload)
         if self._use_memory:
             _memory_explains[key] = raw
-            return
-        await self._client.setex(key, CA_BUNDLE_TTL_SECONDS, raw)
-        logger.info(f"CA explain cached: {key}")
+            return True
+        if self._writes_blocked:
+            return False
+        try:
+            await self._client.setex(key, CA_BUNDLE_TTL_SECONDS, raw)
+            logger.info(f"CA explain cached: {key}")
+            return True
+        except Exception as e:
+            if is_redis_memory_error(e):
+                self._block_writes(e, "set_explain")
+            else:
+                logger.warning(f"CA explain cache write failed ({key}): {e}")
+            return False
 
     async def count_ready_audio(
         self, article_count: int, day: date | None = None, language: str = "hi"

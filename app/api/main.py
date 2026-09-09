@@ -201,7 +201,11 @@ async def build_and_cache_explain(
 
         dumped = payload.model_dump()
         if audio and not briefing.get("is_fallback"):
-            await ca_cache.set_explain(article_index, dumped, language=lang.code)
+            cached_ok = await ca_cache.set_explain(article_index, dumped, language=lang.code)
+            if not cached_ok and ca_cache.is_storage_full():
+                logger.warning(
+                    f"CA explain not cached — Redis full (index={article_index}, lang={lang.code})"
+                )
         elif audio and briefing.get("is_fallback"):
             logger.warning("CA explain not cached — generic fallback voice only")
         elif audio_error:
@@ -220,6 +224,9 @@ async def _prewarm_language_voices(articles: list, language: str, *, force: bool
             logger.info(f"CA voices already in Redis ({lang.code} {ready}/{len(articles)})")
             return
     for i, article in enumerate(articles):
+        if ca_cache.is_storage_full():
+            logger.warning(f"CA prewarm stopped — Redis storage full ({lang.code} at index {i})")
+            break
         try:
             await build_and_cache_explain(
                 article, i, "daily-ca-prewarm", force=force, language=lang.code, use_llm=True
@@ -489,6 +496,9 @@ async def prewarm_all_languages_background(articles: list, force: bool = False) 
         _ca_prewarm_running = True
     try:
         for lang in CA_VOICE_LANGUAGES:
+            if ca_cache.is_storage_full():
+                logger.error("CA batch prewarm aborted — Redis storage full")
+                break
             logger.info(f"CA batch prewarm starting: {lang.name} ({lang.code})")
             await _prewarm_language_voices(articles, lang.code, force=force)
         ready = await count_languages_ready(articles)
@@ -545,6 +555,9 @@ async def schedule_full_daily_pipeline(*, force_fetch: bool = False, force_voice
     async def run() -> None:
         global _daily_pipeline_running
         try:
+            if ca_cache.is_storage_full():
+                logger.error("Daily CA pipeline skipped — Redis storage full")
+                return
             logger.info(f"Daily CA pipeline started (fetch={force_fetch}, force_voice={force_voice})")
             if force_fetch:
                 articles = await ensure_daily_ca_bundle("manual-pipeline", force=True)
@@ -553,6 +566,9 @@ async def schedule_full_daily_pipeline(*, force_fetch: bool = False, force_voice
                 if not articles or ca_bundle_is_stale(articles):
                     articles = await ensure_daily_ca_bundle("manual-pipeline", force=False)
             await prewarm_all_languages_background(articles, force=force_voice)
+            if ca_cache.is_storage_full():
+                logger.error("Daily CA pipeline stopped early — Redis storage full")
+                return
             articles = await ca_cache.get_bundle() or articles
             if articles and await all_languages_ready(articles):
                 await ca_cache.mark_daily_pipeline_done()
@@ -873,6 +889,7 @@ class PrewarmStatusResponse(BaseModel):
     prewarm_running: bool
     pipeline_running: bool = False
     pipeline_done_today: bool = False
+    redis_storage_full: bool = False
     languages_ready: dict[str, int] = Field(default_factory=dict)
     cache_backend: str = ""
 
@@ -951,6 +968,7 @@ async def prewarm_status(language: str = DEFAULT_CA_VOICE_LANG):
         prewarm_running=_ca_prewarm_running,
         pipeline_running=_daily_pipeline_running,
         pipeline_done_today=await ca_cache.is_daily_pipeline_done(),
+        redis_storage_full=ca_cache.is_storage_full(),
         languages_ready=langs_ready,
         cache_backend="memory" if ca_cache._use_memory else "redis",
     )
