@@ -8,6 +8,7 @@ from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
 from app.common.utils import llm_message_text, parse_json_response
 from app.config.ca_languages import DEFAULT_CA_VOICE_LANG, CaVoiceLanguage, resolve_ca_language
+from app.config.config import CA_USE_LLM_BRIEFING
 from app.prompts.ca_briefing_prompt import build_ca_briefing_prompts
 from app.schema.interview import EnrichedArticle
 
@@ -122,6 +123,84 @@ class CaBriefingTool:
             "key_concepts": article.key_concepts,
         }
 
+    def teacher_briefing_from_article(self, article: EnrichedArticle, lang: CaVoiceLanguage) -> dict:
+        """Article-specific voice script when LLM is unavailable — uses enriched notes, not generic filler."""
+        highlights = [h.strip() for h in (article.key_highlights or []) if h and h.strip()]
+        concepts = article.key_concepts or {}
+        gs_tags = [t for t in (article.gs_tags or []) if t.lower() != "prelims"]
+        gs_link = ", ".join(gs_tags[:2]) or "General Studies"
+        prelims = highlights[1] if len(highlights) > 1 else (highlights[0] if highlights else article.title)
+        mains = clip_text(
+            article.detailed_insights or (highlights[2] if len(highlights) > 2 else ""),
+            180,
+        )
+        interview_tip = "State the fact, then explain why it matters for India."
+        briefing_text = clip_text(article.detailed_insights or (highlights[0] if highlights else article.title), 280)
+
+        if lang.code == "hi":
+            parts = ["नमस्कार, आज की महत्वपूर्ण खबर पर बात करते हैं।"]
+            if article.source:
+                parts.append(f"यह {article.source} की रिपोर्ट है।")
+            if highlights:
+                parts.append("मुख्य बातें सुनिए।")
+                ordinals = ("पहली", "दूसरी", "तीसरी", "चौथी")
+                for i, point in enumerate(highlights[:4]):
+                    label = ordinals[i] if i < len(ordinals) else "अगली"
+                    parts.append(f"{label} बात — {point}.")
+            elif article.detailed_insights:
+                parts.append(clip_text(article.detailed_insights, 320))
+            for name, meaning in list(concepts.items())[:2]:
+                parts.append(f"{name} — {meaning}.")
+            parts.append(f"यूपीएससी में इसे {gs_link} के तहत रखें।")
+            parts.append(
+                "प्रीलिम्स में तथ्य याद रखें, मेन्स में भारत पर असर लिखें, "
+                "और इंटरव्यू में अपनी राय साफ़ रखें।"
+            )
+            voice = " ".join(parts)
+            for eng, dev in _LATIN_TO_DEVANAGARI.items():
+                voice = re.sub(rf"\b{re.escape(eng)}\b", dev, voice, flags=re.IGNORECASE)
+        elif lang.allow_latin:
+            parts = ["Let's walk through today's important story."]
+            if article.source:
+                parts.append(f"This report is from {article.source}.")
+            if highlights:
+                parts.append("Key points:")
+                for point in highlights[:4]:
+                    parts.append(point + ".")
+            elif article.detailed_insights:
+                parts.append(clip_text(article.detailed_insights, 320))
+            for name, meaning in list(concepts.items())[:2]:
+                parts.append(f"{name}: {meaning}.")
+            parts.append(f"Place this under {gs_link} for UPSC.")
+            parts.append("Remember facts for Prelims, India's angle for Mains, and a clear view for Interview.")
+            voice = " ".join(parts)
+        else:
+            base = self.fallback_briefing(article, lang)
+            base["is_fallback"] = False
+            base["briefing_voice"] = clip_text(
+                " ".join(highlights[:3]) or article.detailed_insights or article.title,
+                900,
+            )
+            return base
+
+        if len(voice.strip()) < 80:
+            return self.fallback_briefing(article, lang)
+
+        return {
+            "briefing_text": briefing_text,
+            "briefing_voice": clip_text(voice, 1200),
+            "is_fallback": False,
+            "voice_language": lang.code,
+            "prelims_pointer": clip_text(prelims, 140),
+            "mains_angle": mains or "Link the event to India's policy interest and regional context.",
+            "gs_link": gs_link,
+            "interview_tip": interview_tip,
+            "article_title": article.title,
+            "gs_tags": article.gs_tags,
+            "key_highlights": article.key_highlights,
+            "key_concepts": article.key_concepts,
+        }
+
     def merge_llm(self, article: EnrichedArticle, data: dict, lang: CaVoiceLanguage) -> dict:
         base = self.fallback_briefing(article, lang)
         voice = repair_voice_script((data.get("briefing_voice") or "").strip(), lang)
@@ -187,13 +266,17 @@ class CaBriefingTool:
         language: str = DEFAULT_CA_VOICE_LANG,
     ) -> dict:
         lang = resolve_ca_language(language)
+        if not CA_USE_LLM_BRIEFING:
+            logger.info(f"CaBriefingTool template-only mode ({lang.code}): {article.title[:60]}")
+            return self.teacher_briefing_from_article(article, lang)
+
         try:
             logger.info(f"CaBriefingTool started ({lang.code}): {article.title[:60]}")
             if not self.llm:
-                return self.fallback_briefing(article, lang)
+                return self.teacher_briefing_from_article(article, lang)
             if groq_is_cooling():
-                logger.warning(f"CaBriefingTool skipping Groq ({lang.code}) — cooldown, using fallback voice")
-                return self.fallback_briefing(article, lang)
+                logger.warning(f"CaBriefingTool skipping Groq ({lang.code}) — cooldown, using template voice")
+                return self.teacher_briefing_from_article(article, lang)
 
             highlights = article.key_highlights or []
             concepts = article.key_concepts or {}
@@ -232,27 +315,27 @@ class CaBriefingTool:
                     continue
                 except asyncio.TimeoutError:
                     logger.warning(f"CaBriefingTool LLM timed out after {_LLM_TIMEOUT_SEC}s ({lang.code})")
-                    return self.fallback_briefing(article, lang)
+                    return self.teacher_briefing_from_article(article, lang)
                 except Exception as e:
                     last_err = e
                     if isinstance(e, TimeoutError) or "timeout" in type(e).__name__.lower():
                         logger.warning(f"CaBriefingTool LLM timed out ({lang.code})")
-                        return self.fallback_briefing(article, lang)
+                        return self.teacher_briefing_from_article(article, lang)
                     if groq_error_is_rate_limit(e):
                         groq_mark_limited(e)
-                        logger.warning("CaBriefingTool Groq rate limit — using fallback")
-                        return self.fallback_briefing(article, lang)
+                        logger.warning("CaBriefingTool Groq rate limit — using template voice")
+                        return self.teacher_briefing_from_article(article, lang)
                     if "model_not_found" in str(e).lower() or "404" in str(e):
                         logger.error(f"CaBriefingTool Groq model missing: {e}")
-                        return self.fallback_briefing(article, lang)
+                        return self.teacher_briefing_from_article(article, lang)
                     err_label = type(e).__name__
                     err_msg = str(e).strip() or "no message"
                     logger.warning(f"CaBriefingTool invoke failed [{err_label}]: {err_msg}, retry {attempt + 1}")
                     continue
             else:
                 if last_err:
-                    logger.warning(f"CaBriefingTool giving {lang.code} fallback after retries: {last_err}")
-                return self.fallback_briefing(article, lang)
+                    logger.warning(f"CaBriefingTool giving {lang.code} template after retries: {last_err}")
+                return self.teacher_briefing_from_article(article, lang)
 
             result = self.merge_llm(article, data, lang)
             logger.info(
@@ -261,14 +344,14 @@ class CaBriefingTool:
             )
             return result
         except asyncio.TimeoutError:
-            logger.warning("CaBriefingTool LLM timed out, using fallback")
-            return self.fallback_briefing(article, lang)
+            logger.warning("CaBriefingTool LLM timed out, using template voice")
+            return self.teacher_briefing_from_article(article, lang)
         except Exception as e:
             if groq_error_is_rate_limit(e):
                 groq_mark_limited(e)
-            logger.warning(f"CaBriefingTool LLM failed ({e}), using fallback")
+            logger.warning(f"CaBriefingTool LLM failed ({e}), using template voice")
             try:
-                return self.fallback_briefing(article, lang)
+                return self.teacher_briefing_from_article(article, lang)
             except Exception as inner:
                 logger.error(f"Error in CaBriefingTool: {inner}")
                 raise CustomException("CaBriefingTool Failed", inner)

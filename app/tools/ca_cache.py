@@ -1,5 +1,6 @@
 import json
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from app.common.logger import get_logger
 from app.config.config import CA_BUNDLE_TTL_SECONDS, REDIS_URL
@@ -7,9 +8,14 @@ from app.schema.interview import EnrichedArticle
 
 logger = get_logger(__name__)
 
+_IST = ZoneInfo("Asia/Kolkata")
 _memory_bundles: dict[str, str] = {}
 _memory_explains: dict[str, str] = {}
 _redis_warned = False
+
+
+def india_today() -> date:
+    return datetime.now(_IST).date()
 
 
 class CaCache:
@@ -40,7 +46,7 @@ class CaCache:
                 logger.warning(f"Redis unavailable, CA cache using memory: {e}")
 
     def key(self, day: date | None = None) -> str:
-        d = day or date.today()
+        d = day or india_today()
         return f"ca_bundle:{d.isoformat()}"
 
     async def get_bundle(self, day: date | None = None) -> list[EnrichedArticle] | None:
@@ -61,31 +67,70 @@ class CaCache:
             logger.warning(f"CA cache parse failed: {e}")
             return None
 
+    async def _clear_explains_for_day(self, day: date | None = None) -> int:
+        await self.connect()
+        key = self.key(day)
+        deleted = 0
+        if self._use_memory:
+            prefix = f"ca_explain_v15:{key}:"
+            for k in list(_memory_explains.keys()):
+                if k.startswith(prefix):
+                    _memory_explains.pop(k, None)
+                    deleted += 1
+            return deleted
+        pattern = f"ca_explain_v15:{key}:*"
+        async for k in self._client.scan_iter(match=pattern):
+            await self._client.delete(k)
+            deleted += 1
+        return deleted
+
     async def set_bundle(self, articles: list[EnrichedArticle], day: date | None = None) -> None:
         await self.connect()
         key = self.key(day)
+        cleared = await self._clear_explains_for_day(day)
         payload = json.dumps([a.model_dump() for a in articles])
         if self._use_memory:
             _memory_bundles[key] = payload
+            if cleared:
+                logger.info(f"CA explain cache cleared before bundle store: {cleared} keys")
             return
         await self._client.setex(key, CA_BUNDLE_TTL_SECONDS, payload)
-        logger.info(f"CA cache stored: {key} ({len(articles)} articles, TTL {CA_BUNDLE_TTL_SECONDS}s)")
+        logger.info(
+            f"CA cache stored: {key} ({len(articles)} articles, TTL {CA_BUNDLE_TTL_SECONDS}s"
+            f"{f', cleared {cleared} stale voice keys' if cleared else ''})"
+        )
 
     async def delete_bundle(self, day: date | None = None) -> None:
         await self.connect()
         key = self.key(day)
         if self._use_memory:
             _memory_bundles.pop(key, None)
-            prefix = f"ca_explain_v15:{key}:"
-            for k in list(_memory_explains.keys()):
-                if k.startswith(prefix):
-                    _memory_explains.pop(k, None)
+            cleared = await self._clear_explains_for_day(day)
+            logger.info(f"CA cache cleared: {key} (+ {cleared} voice keys)")
             return
         await self._client.delete(key)
-        pattern = f"ca_explain_v15:{key}:*"
-        async for k in self._client.scan_iter(match=pattern):
+        cleared = await self._clear_explains_for_day(day)
+        logger.info(f"CA cache cleared: {key} (+ {cleared} voice keys)")
+
+    async def clear_all(self) -> dict[str, int]:
+        """Delete every CA bundle + briefing/voice key (fixes story/audio mismatch)."""
+        await self.connect()
+        deleted = {"bundles": 0, "explains": 0}
+        if self._use_memory:
+            deleted["bundles"] = len(_memory_bundles)
+            deleted["explains"] = len(_memory_explains)
+            _memory_bundles.clear()
+            _memory_explains.clear()
+            logger.info(f"CA memory cache cleared: {deleted}")
+            return deleted
+        async for k in self._client.scan_iter(match="ca_bundle:*"):
             await self._client.delete(k)
-        logger.info(f"CA cache cleared: {key} (+ voice keys)")
+            deleted["bundles"] += 1
+        async for k in self._client.scan_iter(match="ca_explain_v15:*"):
+            await self._client.delete(k)
+            deleted["explains"] += 1
+        logger.info(f"CA Redis cache cleared: {deleted}")
+        return deleted
 
     def explain_key(self, article_index: int, language: str = "hi", day: date | None = None) -> str:
         return f"ca_explain_v15:{self.key(day)}:{language}:{article_index}"

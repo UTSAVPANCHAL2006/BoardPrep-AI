@@ -48,4 +48,6 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 SYLLABUS_PATH = BASE_DIR / "app" / "data" / "sample_syllabus.txt"
 FALLBACK_CA_PATH = BASE_DIR / "app" / "data" / "fallback_current_affairs.json"
 DAILY_CA_ARTICLE_COUNT = int(os.getenv("DAILY_CA_ARTICLE_COUNT", "10"))
+# Set false only for emergency demos when LLM quota is exhausted.
+CA_USE_LLM_BRIEFING = os.getenv("CA_USE_LLM_BRIEFING", "true").lower() in ("1", "true", "yes")
 RAG_VECTORS_ENABLED = os.getenv("RAG_VECTORS_ENABLED", "true").lower() in ("1", "true", "yes")

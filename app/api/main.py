@@ -50,6 +50,7 @@ _ca_prepare_running = False
 _ca_prepare_task: asyncio.Task | None = None
 _ca_prewarm_lock = asyncio.Lock()
 _ca_prewarm_running = False
+_explain_locks: dict[str, asyncio.Lock] = {}
 _IST = ZoneInfo("Asia/Kolkata")
 
 
@@ -129,51 +130,63 @@ async def build_and_cache_explain(
 ):
     """One article: classroom briefing + TTS in the selected language, then Redis."""
     lang = resolve_ca_language(language)
-    if not force:
-        cached = await ca_cache.get_explain(article_index, language=lang.code)
-        if cached and cached.get("audio_base64"):
-            return cached, False
+    lock_key = ca_cache.explain_key(article_index, language=lang.code)
+    if lock_key not in _explain_locks:
+        _explain_locks[lock_key] = asyncio.Lock()
 
-    briefing_tool = get_briefing_tool()
-    briefing = await briefing_tool.generate_briefing(article, session_id, language=lang.code)
-    audio = b""
-    audio_error = ""
-    try:
-        audio = await asyncio.wait_for(
-            tts_tool.synthesize(briefing["briefing_voice"], language_code=lang.tts),
-            timeout=90.0,
-        )
-    except asyncio.TimeoutError:
-        audio_error = "TTS timed out"
-        logger.error(f"CA explain TTS timed out after 90s (index={article_index}, lang={lang.code})")
-    except Exception as e:
-        audio_error = str(e)
-        logger.error(f"CA explain TTS failed (index={article_index}, lang={lang.code}): {e}")
-        if "402" in audio_error or "Payment Required" in audio_error:
-            raise
+    async with _explain_locks[lock_key]:
+        if not force:
+            cached = await ca_cache.get_explain(article_index, language=lang.code)
+            if cached and cached.get("audio_base64"):
+                cached_title = (cached.get("article_title") or "").strip().lower()
+                current_title = (getattr(article, "title", "") or "").strip().lower()
+                if not cached_title or not current_title or cached_title == current_title:
+                    return cached, False
+                logger.warning(
+                    f"CA explain cache stale at index {article_index} — "
+                    f"'{cached_title[:40]}' != '{current_title[:40]}'"
+                )
 
-    payload = serialize_ca_briefing(briefing)
-    if not payload:
-        raise HTTPException(status_code=500, detail="Failed to generate briefing")
-    payload.source = article.source or ""
-    payload.source_url = article.url or ""
-    payload.voice_language = lang.code
-    payload.audio_base64 = base64.b64encode(audio).decode() if audio else ""
-    if audio:
-        payload.briefing_voice = ""
-    if audio_error and not audio:
-        payload.voice_error = voice_error_message(audio_error)
+        briefing_tool = get_briefing_tool()
+        briefing = await briefing_tool.generate_briefing(article, session_id, language=lang.code)
+        audio = b""
+        audio_error = ""
+        try:
+            audio = await asyncio.wait_for(
+                tts_tool.synthesize(briefing["briefing_voice"], language_code=lang.tts),
+                timeout=90.0,
+            )
+        except asyncio.TimeoutError:
+            audio_error = "TTS timed out"
+            logger.error(f"CA explain TTS timed out after 90s (index={article_index}, lang={lang.code})")
+        except Exception as e:
+            audio_error = str(e)
+            logger.error(f"CA explain TTS failed (index={article_index}, lang={lang.code}): {e}")
+            if "402" in audio_error or "Payment Required" in audio_error:
+                raise
 
-    dumped = payload.model_dump()
-    if audio and not briefing.get("is_fallback"):
-        await ca_cache.set_explain(article_index, dumped, language=lang.code)
-    elif briefing.get("is_fallback"):
-        logger.warning("CA explain not cached — LLM briefing missing, short fallback only")
-    elif audio_error:
-        logger.warning(
-            f"CA explain not cached — TTS failed (index={article_index}, lang={lang.code}): {audio_error}"
-        )
-    return dumped, True
+        payload = serialize_ca_briefing(briefing)
+        if not payload:
+            raise HTTPException(status_code=500, detail="Failed to generate briefing")
+        payload.source = article.source or ""
+        payload.source_url = article.url or ""
+        payload.voice_language = lang.code
+        payload.audio_base64 = base64.b64encode(audio).decode() if audio else ""
+        if audio:
+            payload.briefing_voice = ""
+        if audio_error and not audio:
+            payload.voice_error = voice_error_message(audio_error)
+
+        dumped = payload.model_dump()
+        if audio and not briefing.get("is_fallback"):
+            await ca_cache.set_explain(article_index, dumped, language=lang.code)
+        elif audio and briefing.get("is_fallback"):
+            logger.warning("CA explain not cached — generic fallback voice only")
+        elif audio_error:
+            logger.warning(
+                f"CA explain not cached — TTS failed (index={article_index}, lang={lang.code}): {audio_error}"
+            )
+        return dumped, True
 
 
 async def prewarm_voices_background(
@@ -380,7 +393,11 @@ def ca_bundle_is_stale(articles: list) -> bool:
 async def prepare_current_affairs(session_id, profile, force: bool = False):
     """Build shared daily CA bundle — 8–10 curated newspaper headlines."""
     enrich_tool = get_enrich_tool()
-    cached = None if force else await ca_cache.get_bundle()
+    if force:
+        await ca_cache.delete_bundle()
+        cached = None
+    else:
+        cached = await ca_cache.get_bundle()
     if cached and ca_bundle_is_stale(cached):
         await ca_cache.delete_bundle()
         cached = None
@@ -683,6 +700,27 @@ class PrewarmStatusResponse(BaseModel):
     audio_ready: int
     prewarm_running: bool
     cache_backend: str = ""
+
+
+class ClearCACacheResponse(BaseModel):
+    deleted_bundles: int
+    deleted_explains: int
+    refreshed: bool = False
+
+
+@app.post("/current-affairs/clear-cache", response_model=ClearCACacheResponse)
+async def clear_ca_cache(refresh: bool = Form(False)):
+    """Wipe Redis CA articles + cached Hindi/English voice briefings. Use refresh=true to rebuild."""
+    deleted = await ca_cache.clear_all()
+    refreshed = False
+    if refresh:
+        await schedule_daily_ca_prepare("daily-ca", force=True)
+        refreshed = True
+    return ClearCACacheResponse(
+        deleted_bundles=deleted["bundles"],
+        deleted_explains=deleted["explains"],
+        refreshed=refreshed,
+    )
 
 
 @app.get("/current-affairs/prewarm-status", response_model=PrewarmStatusResponse)
