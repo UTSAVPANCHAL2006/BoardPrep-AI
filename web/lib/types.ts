@@ -63,6 +63,8 @@ export interface DailyCAResponse {
   is_fallback?: boolean;
   is_preparing?: boolean;
   article_count: number;
+  voices_ready?: number;
+  voices_total?: number;
 }
 
 export interface DAFFlag {

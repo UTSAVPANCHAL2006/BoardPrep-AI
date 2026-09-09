@@ -15,7 +15,14 @@ from app.common.logger import get_logger
 from app.common.timing import get_metrics, record_turn, track_step
 from app.common.utils import build_daf_topic_stack
 from app.config.ca_languages import DEFAULT_CA_VOICE_LANG, languages_public, resolve_ca_language
-from app.config.config import DAILY_CA_ARTICLE_COUNT, DEFAULT_INTERVIEW_MODE, INTERVIEW_MODES, SYLLABUS_PATH, UPLOAD_DIR
+from app.config.config import (
+    CA_EXPLAIN_LLM_ON_DEMAND,
+    DAILY_CA_ARTICLE_COUNT,
+    DEFAULT_INTERVIEW_MODE,
+    INTERVIEW_MODES,
+    SYLLABUS_PATH,
+    UPLOAD_DIR,
+)
 from app.tools.ca_briefing_tool import CaBriefingTool
 from app.tools.ca_cache import CaCache
 from app.rag.embedding import Embedding
@@ -121,12 +128,25 @@ async def schedule_daily_ca_prepare(session_id: str = "daily-ca", force: bool = 
     asyncio.create_task(run())
 
 
+async def lookup_cached_explain(article, article_index: int, language: str = DEFAULT_CA_VOICE_LANG) -> dict | None:
+    lang = resolve_ca_language(language)
+    cached = await ca_cache.get_explain(article_index, language=lang.code)
+    if not cached or not cached.get("audio_base64"):
+        return None
+    cached_title = (cached.get("article_title") or "").strip().lower()
+    current_title = (getattr(article, "title", "") or "").strip().lower()
+    if cached_title and current_title and cached_title != current_title:
+        return None
+    return cached
+
+
 async def build_and_cache_explain(
     article,
     article_index: int,
     session_id: str,
     force: bool = False,
     language: str = DEFAULT_CA_VOICE_LANG,
+    use_llm: bool = True,
 ):
     """One article: classroom briefing + TTS in the selected language, then Redis."""
     lang = resolve_ca_language(language)
@@ -136,19 +156,14 @@ async def build_and_cache_explain(
 
     async with _explain_locks[lock_key]:
         if not force:
-            cached = await ca_cache.get_explain(article_index, language=lang.code)
-            if cached and cached.get("audio_base64"):
-                cached_title = (cached.get("article_title") or "").strip().lower()
-                current_title = (getattr(article, "title", "") or "").strip().lower()
-                if not cached_title or not current_title or cached_title == current_title:
-                    return cached, False
-                logger.warning(
-                    f"CA explain cache stale at index {article_index} — "
-                    f"'{cached_title[:40]}' != '{current_title[:40]}'"
-                )
+            cached = await lookup_cached_explain(article, article_index, language=lang.code)
+            if cached:
+                return cached, False
 
         briefing_tool = get_briefing_tool()
-        briefing = await briefing_tool.generate_briefing(article, session_id, language=lang.code)
+        briefing = await briefing_tool.generate_briefing(
+            article, session_id, language=lang.code, use_llm=use_llm
+        )
         audio = b""
         audio_error = ""
         try:
@@ -213,7 +228,7 @@ async def prewarm_voices_background(
         for i, article in enumerate(articles):
             try:
                 await build_and_cache_explain(
-                    article, i, "daily-ca-prewarm", force=force, language=lang.code
+                    article, i, "daily-ca-prewarm", force=force, language=lang.code, use_llm=True
                 )
             except Exception as e:
                 err = str(e)
@@ -225,7 +240,7 @@ async def prewarm_voices_background(
                     break
                 logger.error(f"CA prewarm failed for index {i}: {e}")
             if i < len(articles) - 1:
-                await asyncio.sleep(0.4)
+                await asyncio.sleep(0.15)
         ready = await ca_cache.count_ready_audio(len(articles), language=lang.code)
         logger.info(f"CA auto-prewarm finished: {lang.code} {ready}/{len(articles)} audio in Redis")
         flush_langfuse()
@@ -552,6 +567,8 @@ class DailyCAResponse(BaseModel):
     is_fallback: bool = False
     is_preparing: bool = False
     article_count: int = 0
+    voices_ready: int = 0
+    voices_total: int = 0
 
 
 class StartInterviewResponse(BaseModel):
@@ -656,6 +673,10 @@ async def daily_current_affairs(session_id: str | None = None, refresh: bool = F
             await schedule_daily_ca_prepare(sid, force=False)
 
     edition_date = india_today().strftime("%d %b %Y")
+    voices_ready = 0
+    if articles:
+        voices_ready = await ca_cache.count_ready_audio(len(articles), language=DEFAULT_CA_VOICE_LANG)
+        asyncio.create_task(prewarm_voices_background(articles, language=DEFAULT_CA_VOICE_LANG))
     return DailyCAResponse(
         articles=[EnrichedArticleResponse(**a.model_dump()) for a in articles],
         personalized=personalized,
@@ -664,12 +685,35 @@ async def daily_current_affairs(session_id: str | None = None, refresh: bool = F
         is_fallback=not is_live,
         is_preparing=_ca_prepare_running and not is_live,
         article_count=len(articles),
+        voices_ready=voices_ready,
+        voices_total=len(articles),
     )
 
 
 @app.get("/current-affairs/languages")
 async def current_affairs_languages():
     return {"default": DEFAULT_CA_VOICE_LANG, "languages": languages_public()}
+
+
+@app.get("/current-affairs/explain-cached", response_model=CABriefingResponse)
+async def explain_current_affair_cached(
+    article_index: int,
+    session_id: str | None = None,
+    language: str = DEFAULT_CA_VOICE_LANG,
+):
+    """Fast path — return prewarmed voice from Redis only (no LLM/TTS)."""
+    profile = DAFProfile()
+    if session_id:
+        state = await session_store.load_state(session_id)
+        if state:
+            profile = state["daf_profile"]
+    articles, _ = await resolve_ca_articles(session_id, profile)
+    if article_index < 0 or article_index >= len(articles):
+        raise HTTPException(status_code=400, detail="Invalid article_index")
+    cached = await lookup_cached_explain(articles[article_index], article_index, language=language)
+    if not cached:
+        raise HTTPException(status_code=404, detail="Voice not ready yet")
+    return CABriefingResponse(**cached)
 
 
 @app.post("/current-affairs/explain", response_model=CABriefingResponse)
@@ -688,9 +732,15 @@ async def explain_current_affair(
     if article_index < 0 or article_index >= len(articles):
         raise HTTPException(status_code=400, detail="Invalid article_index")
 
-    dumped, _ = await build_and_cache_explain(
-        articles[article_index], article_index, sid, language=language
+    dumped, from_cache = await build_and_cache_explain(
+        articles[article_index],
+        article_index,
+        sid,
+        language=language,
+        use_llm=CA_EXPLAIN_LLM_ON_DEMAND,
     )
+    if from_cache:
+        logger.info(f"CA explain instant cache hit (index={article_index}, lang={language})")
     flush_langfuse()
     return CABriefingResponse(**dumped)
 

@@ -264,10 +264,12 @@ class CaBriefingTool:
         article: EnrichedArticle,
         session_id: str = "",
         language: str = DEFAULT_CA_VOICE_LANG,
+        use_llm: bool | None = None,
     ) -> dict:
         lang = resolve_ca_language(language)
-        if not CA_USE_LLM_BRIEFING:
-            logger.info(f"CaBriefingTool template-only mode ({lang.code}): {article.title[:60]}")
+        llm_enabled = CA_USE_LLM_BRIEFING if use_llm is None else use_llm
+        if not llm_enabled:
+            logger.info(f"CaBriefingTool template ({lang.code}): {article.title[:60]}")
             return self.teacher_briefing_from_article(article, lang)
 
         try:

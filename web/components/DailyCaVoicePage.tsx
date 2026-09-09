@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { explainCurrentAffair, fetchDailyCA, playBase64AudioAndWait, stopAudio } from "@/lib/api";
+import { explainCurrentAffair, fetchCachedBriefing, fetchDailyCA, playBase64AudioAndWait, stopAudio } from "@/lib/api";
 import type { AudioPlaybackState } from "@/lib/audio";
 import {
   getStudyStreak,
@@ -49,9 +49,37 @@ export function DailyCaVoicePage() {
   const [studyProgress, setStudyProgress] = useState<DailyProgress | null>(null);
   const [streak, setStreak] = useState(0);
   const [voiceLang, setVoiceLang] = useState<CaVoiceLangCode>(DEFAULT_CA_VOICE_LANG);
+  const [voicesReady, setVoicesReady] = useState(0);
+  const [voiceReadyIndexes, setVoiceReadyIndexes] = useState<Set<number>>(() => new Set());
   const playlistCancelRef = useRef(false);
   const isPlayingRef = useRef(false);
   const wasPlayingRef = useRef(false);
+  const briefingCacheRef = useRef<Map<string, CABriefing>>(new Map());
+
+  const briefingCacheKey = useCallback(
+    (index: number, lang: CaVoiceLangCode = voiceLang) => `${lang}:${index}`,
+    [voiceLang]
+  );
+
+  const markVoiceReady = useCallback((index: number, briefing: CABriefing) => {
+    briefingCacheRef.current.set(briefingCacheKey(index), briefing);
+    setVoiceReadyIndexes((prev) => {
+      if (prev.has(index)) return prev;
+      const next = new Set(prev);
+      next.add(index);
+      return next;
+    });
+  }, [briefingCacheKey]);
+
+  const warmVoiceCache = useCallback(async (indexes: number[]) => {
+    await Promise.all(
+      indexes.map(async (index) => {
+        if (briefingCacheRef.current.has(briefingCacheKey(index))) return;
+        const hit = await fetchCachedBriefing(index, voiceLang);
+        if (hit?.audio_base64) markVoiceReady(index, hit);
+      })
+    );
+  }, [briefingCacheKey, markVoiceReady, voiceLang]);
 
   const loadDaily = useCallback(async (silent = false) => {
     if (isPlayingRef.current) return { is_live: false, is_preparing: false };
@@ -72,7 +100,11 @@ export function DailyCaVoicePage() {
       setIsLive(res.is_live);
       setIsFallback(Boolean(res.is_fallback));
       setIsPreparing(Boolean(res.is_preparing));
+      setVoicesReady(res.voices_ready ?? 0);
       setError("");
+      if (res.articles.length) {
+        void warmVoiceCache([0, 1, 2].filter((i) => i < res.articles.length));
+      }
       return { is_live: res.is_live, is_preparing: Boolean(res.is_preparing) };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load current affairs");
@@ -150,10 +182,21 @@ export function DailyCaVoicePage() {
     setActiveArticleIndex(index);
     setReadIndex(index);
     setError("");
-    setAutoPlayBriefing(false);
     stopAudio();
+
+    const cached = briefingCacheRef.current.get(briefingCacheKey(index));
+    if (cached?.audio_base64) {
+      setBusyIndex(null);
+      setActiveBriefing(cached);
+      setAutoPlayBriefing(true);
+      document.getElementById("ca-voice-stage")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    setAutoPlayBriefing(false);
     try {
       const briefing = await explainCurrentAffair(index, undefined, voiceLang);
+      markVoiceReady(index, briefing);
       setActiveBriefing(briefing);
       setAutoPlayBriefing(Boolean(briefing.audio_base64));
       document.getElementById("ca-voice-stage")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -179,6 +222,7 @@ export function DailyCaVoicePage() {
       setAutoPlayBriefing(false);
       try {
         const briefing = await explainCurrentAffair(i, undefined, voiceLang);
+        markVoiceReady(i, briefing);
         setActiveBriefing(briefing);
         if (briefing.audio_base64) {
           isPlayingRef.current = true;
@@ -282,6 +326,8 @@ export function DailyCaVoicePage() {
                 const next = e.target.value as CaVoiceLangCode;
                 setVoiceLang(next);
                 saveVoiceLanguage(next);
+                briefingCacheRef.current.clear();
+                setVoiceReadyIndexes(new Set());
                 setActiveBriefing(null);
                 stopAudio();
               }}
@@ -304,6 +350,9 @@ export function DailyCaVoicePage() {
               {statusLabel}
             </span>
             <span className="ca-pill">{editionDate || "Today"}</span>
+            {voicesReady > 0 ? (
+              <span className="ca-pill ca-pill--live">{voicesReady} voices ready</span>
+            ) : null}
             {playbackState === "playing" ? (
               <span className="ca-pill ca-pill--live animate-pulse">▶ Now playing</span>
             ) : null}
@@ -422,6 +471,7 @@ export function DailyCaVoicePage() {
             const isReading = readIndex === index;
             const isBusy = busyIndex === index;
             const isDone = listened.includes(index);
+            const voiceReady = voiceReadyIndexes.has(index);
             const extraTags = Math.max(0, article.gs_tags.length - 3);
             return (
               <article
@@ -518,6 +568,10 @@ export function DailyCaVoicePage() {
                     </>
                   ) : isActive && playbackState === "playing" ? (
                     <>🎧 Listening…</>
+                  ) : voiceReady ? (
+                    <>
+                      <span>⚡</span> Listen now
+                    </>
                   ) : isDone ? (
                     <>🔁 Listen again</>
                   ) : (

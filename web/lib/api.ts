@@ -328,6 +328,19 @@ export async function fetchDailyCA(sessionId?: string): Promise<DailyCAResponse>
   return handleResponse<DailyCAResponse>(res);
 }
 
+export async function fetchCachedBriefing(
+  articleIndex: number,
+  language?: string
+): Promise<CABriefing | null> {
+  const q = new URLSearchParams({
+    article_index: String(articleIndex),
+    language: language || "hi",
+  });
+  const res = await apiFetch(`${API_URL}/current-affairs/explain-cached?${q}`, {}, 15000);
+  if (res.status === 404) return null;
+  return handleResponse<CABriefing>(res);
+}
+
 export async function explainCurrentAffair(
   articleIndex: number,
   sessionId?: string,
