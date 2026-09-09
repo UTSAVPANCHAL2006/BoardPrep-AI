@@ -35,7 +35,7 @@ from app.tools.daf_tool import DafTool
 from app.tools.news_enrich_tool import NewsEnrichTool
 from app.tools.news_fetch_tool import NewsFetchTool
 from app.tools.session_store import SessionStore
-from app.tools.voice_tool import SttTool, TtsTool
+from app.tools.voice_tool import SttTool, TtsTool, concat_wav
 from app.observability.langfuse_client import flush_langfuse, init_langfuse, observation_context
 
 logger = get_logger(__name__)
@@ -1299,11 +1299,17 @@ async def respond_stream(
                 ca_briefing.audio_base64 = base64.b64encode(briefing_audio).decode()
                 yield f"data: {json.dumps({'type': 'briefing_audio', 'audio_base64': ca_briefing.audio_base64})}\n\n"
 
+        wav_parts: list[bytes] = []
         if voice_text:
             with track_step(session_id, "tts_stream"):
                 async for chunk in tts_tool.synthesize_stream(voice_text):
+                    chunk_bytes = base64.b64decode(chunk["audio_base64"])
+                    wav_parts.append(chunk_bytes)
                     event_data = {"type": "audio_chunk", **chunk}
                     yield f"data: {json.dumps(event_data)}\n\n"
+                if wav_parts:
+                    combined = concat_wav(wav_parts)
+                    yield f"data: {json.dumps({'type': 'question_audio', 'audio_base64': base64.b64encode(combined).decode()})}\n\n"
 
         yield "data: [DONE]\n\n"
 

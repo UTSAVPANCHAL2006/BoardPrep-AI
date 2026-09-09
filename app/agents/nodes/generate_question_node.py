@@ -5,6 +5,7 @@ from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
 from app.common.utils import (
     build_daf_topic_stack,
+    ca_board_question_word_limits,
     ca_grounding_score,
     format_ca_article_for_prompt,
     history_text,
@@ -13,6 +14,7 @@ from app.common.utils import (
     parse_json_response,
     profile_summary,
     sanitize_board_question,
+    sanitize_ca_board_question,
 )
 from app.config.config import INTERVIEW_JSON_MODEL
 from app.prompts.question_prompt import (
@@ -128,6 +130,7 @@ class GenerateQuestionNode:
             phase = state.get("current_phase", "daf_opening")
             profile = state["daf_profile"]
             session_id = state["session_id"]
+            interview_mode = state.get("interview_mode", "full")
             router_action = state.get("router_action", "pivot")
             router_hint = ROUTER_HINTS.get(router_action, ROUTER_HINTS["pivot"])
             focus_anchor, topic_stack = self.pick_focus_anchor(state, profile)
@@ -161,6 +164,8 @@ class GenerateQuestionNode:
                     question_voice = question
 
             elif phase == "current_affairs":
+                ca_q_max = ca_board_question_word_limits(interview_mode)
+                ca_v_max = ca_board_question_word_limits(interview_mode, for_voice=True)
                 featured, ca_article_cursor = self.pick_ca_article(state)
                 focus_anchor = featured.daf_anchor or featured.title
                 query = f"{featured.title} {featured.daf_anchor}"
@@ -183,8 +188,10 @@ class GenerateQuestionNode:
                     daf_anchor=featured.daf_anchor or "candidate profile",
                 )
                 data = await self.question_from_llm(prompt, session_id, phase, focus_anchor)
-                question = sanitize_board_question(data.get("question", ""), max_words=30)
-                question_voice = sanitize_board_question(data.get("question_voice") or question, max_words=35)
+                question = sanitize_ca_board_question(data.get("question", ""), max_words=ca_q_max)
+                question_voice = sanitize_ca_board_question(
+                    data.get("question_voice") or question, max_words=ca_v_max
+                )
 
                 score = ca_grounding_score(question, featured)
                 grounded = is_ca_grounded(question, featured)
@@ -196,9 +203,9 @@ class GenerateQuestionNode:
                         focus_anchor,
                         run_name="generate_question_ca_retry",
                     )
-                    question = sanitize_board_question(data.get("question", ""), max_words=30)
-                    question_voice = sanitize_board_question(
-                        data.get("question_voice") or question, max_words=35
+                    question = sanitize_ca_board_question(data.get("question", ""), max_words=ca_q_max)
+                    question_voice = sanitize_ca_board_question(
+                        data.get("question_voice") or question, max_words=ca_v_max
                     )
                     score = ca_grounding_score(question, featured)
                     grounded = is_ca_grounded(question, featured)

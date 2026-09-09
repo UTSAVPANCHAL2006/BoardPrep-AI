@@ -216,7 +216,8 @@ export async function respondStream(
   mimeType = "audio/webm",
   onMetadata?: (meta: StreamRespondMetadata) => void,
   onAudioChunk?: (chunk: StreamAudioChunk) => void,
-  onBriefingAudio?: (audioBase64: string) => void
+  onBriefingAudio?: (audioBase64: string) => void,
+  onQuestionAudio?: (audioBase64: string) => void
 ): Promise<void> {
   const form = new FormData();
   form.append("session_id", sessionId);
@@ -258,6 +259,8 @@ export async function respondStream(
           onBriefingAudio(payload.audio_base64);
         } else if (payload.type === "audio_chunk" && onAudioChunk) {
           onAudioChunk(payload as StreamAudioChunk);
+        } else if (payload.type === "question_audio" && onQuestionAudio && payload.audio_base64) {
+          onQuestionAudio(payload.audio_base64);
         }
       } catch {
         // ignore parse errors on partial chunk lines

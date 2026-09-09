@@ -117,11 +117,64 @@ def build_daf_topic_stack(profile: DAFProfile) -> list[str]:
     return anchors or ["background and motivation"]
 
 
+def ca_board_question_word_limits(
+    interview_mode: str,
+    *,
+    for_voice: bool = False,
+) -> int:
+    """CA interview questions only — keep shorter than other phases."""
+    quick = (interview_mode or "full").lower() == "quick"
+    display_cap, voice_cap = (16, 22) if quick else (20, 26)
+    return voice_cap if for_voice else display_cap
+
+
+def sanitize_ca_board_question(text: str, max_words: int = 20) -> str:
+    """CA phase: one short angle — news OR DAF link, not a bundled essay."""
+    cleaned = sanitize_board_question(text, max_words=max_words)
+    if not cleaned:
+        return cleaned
+
+    lower = cleaned.lower()
+    for splitter in (
+        ", given your",
+        " given your",
+        ", considering your",
+        " considering your",
+        ", in light of your",
+        " in light of your",
+        " how would you apply",
+        " how would you integrate",
+        " how would you use",
+        ", and how",
+        "; how would",
+        " aur isse",
+        " aur aap isse",
+    ):
+        idx = lower.find(splitter)
+        if idx > 10:
+            cleaned = cleaned[:idx].rstrip(",;:")
+            if not cleaned.endswith("?"):
+                cleaned += "?"
+            lower = cleaned.lower()
+
+    words = cleaned.split()
+    if len(words) > max_words:
+        cleaned = " ".join(words[:max_words]).rstrip(",;:")
+        if not cleaned.endswith("?"):
+            cleaned += "?"
+
+    return cleaned.strip()
+
+
 def sanitize_board_question(text: str, max_words: int = 32) -> str:
     """Keep questions short and single-threaded like a real UPSC board."""
     cleaned = " ".join((text or "").split())
     if not cleaned:
         return cleaned
+
+    if cleaned.count("?") > 1:
+        first_q = cleaned.find("?")
+        cleaned = cleaned[: first_q + 1]
 
     q_idx = cleaned.find("?")
     if q_idx != -1:
@@ -131,11 +184,24 @@ def sanitize_board_question(text: str, max_words: int = 32) -> str:
         parts = re.split(r"(?<=[.!?])\s+", cleaned)
         cleaned = parts[0] if parts else cleaned
 
-    # Drop compound follow-ups ("..., and in Bengaluru's context, ...?")
+    # Drop compound follow-ups (English + Hinglish/Hindi)
     lower = cleaned.lower()
-    for splitter in (", and ", "; and ", " and in ", " — and "):
+    for splitter in (
+        ", and ",
+        "; and ",
+        " and in ",
+        " — and ",
+        ", aur ",
+        "; aur ",
+        " aur aap ",
+        " aur aapke ",
+        ", and how ",
+        ", and what ",
+        ", और ",
+        "; और ",
+    ):
         idx = lower.find(splitter)
-        if idx > 20:
+        if idx > 12:
             cleaned = cleaned[:idx].rstrip(",;:")
             if not cleaned.endswith("?"):
                 cleaned += "?"

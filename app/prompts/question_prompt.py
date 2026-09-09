@@ -71,13 +71,15 @@ Recent conversation:
 Additional retrieved context:
 {context}
 
-Write ONE UPSC current-affairs question linking the news event to the candidate's DAF ({daf_anchor}).
+Write ONE short UPSC current-affairs question. Pick ONE angle only:
+(A) the news event itself, OR (B) a brief DAF touch ({daf_anchor}) — never both in one question.
 
 STRICT RULES:
-- MUST reference the specific news event or policy in the featured article
-- Link to candidate's DAF ({daf_anchor}) — e.g. "Given your work at X, how would you apply lessons from [news event]?"
-- English: max 30 words, ONE "?"
-- question_voice: HINDI/HINGLISH (max 35 words, NOT English)
+- MUST name or clearly reference the news event / policy in the featured article
+- Max ONE short DAF hint if used — no second follow-up clause ("and how would you integrate…")
+- English: max 20 words, ONE "?", ONE sentence
+- question_voice: HINDI/HINGLISH (max 26 words, NOT English)
+- No compound questions; no "and also" / "aur aap" second parts
 - No generic polity questions unrelated to the featured article
 
 Return JSON: {{"question": "...", "question_voice": "..."}}"""

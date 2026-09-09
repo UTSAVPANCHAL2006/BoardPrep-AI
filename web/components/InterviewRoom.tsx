@@ -88,7 +88,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
     setError("");
     stopStreamingAudio();
     const audioQueue = createStreamingAudioQueue();
-    let streamedChunks = 0;
+    let replayAudio = "";
     let briefingPromise: Promise<void> = Promise.resolve();
     setStreamedQuestionAudio(false);
     try {
@@ -118,20 +118,26 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
           }
         },
         (chunk) => {
-          streamedChunks += 1;
           setStreamedQuestionAudio(true);
           void briefingPromise.then(() => audioQueue.enqueue(chunk.audio_base64));
         },
         (briefingB64) => {
           briefingPromise = playBase64AudioAndWait(briefingB64);
+        },
+        (audioBase64) => {
+          replayAudio = audioBase64;
         }
       );
       await briefingPromise;
       await audioQueue.waitUntilIdle();
+      if (replayAudio) {
+        setLastAudio(replayAudio);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit");
     } finally {
       setBoardStreaming(false);
+      setStreamedQuestionAudio(false);
       setBusy(false);
     }
   }
