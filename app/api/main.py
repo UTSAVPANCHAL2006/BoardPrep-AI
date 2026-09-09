@@ -431,17 +431,16 @@ async def prefetch_daily_ca_startup():
 
 
 async def prefetch_ca_background(session_id: str):
+    """Attach shared daily CA bundle to session — reuses global prepare task, no duplicate fetch."""
     try:
+        articles = await ensure_daily_ca_bundle(session_id, force=False)
         state = await session_store.load_state(session_id)
         if not state:
             return
-        profile = state["daf_profile"]
-        with track_step(session_id, "ca_prefetch"):
-            enriched = await prepare_current_affairs(session_id, profile)
-        state["ca_articles"] = enriched
+        state["ca_articles"] = articles
         state["ca_prefetch_ready"] = True
         await session_store.save_state(session_id, state)
-        logger.info(f"CA prefetch done for {session_id[:8]}: {len(enriched)} articles")
+        logger.info(f"CA prefetch done for {session_id[:8]}: {len(articles)} articles")
         flush_langfuse()
     except Exception as e:
         logger.error(f"CA prefetch failed: {e}")
@@ -765,13 +764,20 @@ async def start_interview(session_id: str = Form(...)):
     profile = state["daf_profile"]
     ingest.ingest_shared_syllabus(SYLLABUS_PATH)
 
-    if state.get("ca_prefetch_ready") and state.get("ca_articles"):
+    cached_bundle = await ca_cache.get_bundle()
+    if cached_bundle and not ca_bundle_is_stale(cached_bundle):
+        enriched = cached_bundle
+        state["ca_articles"] = enriched
+        state["ca_prefetch_ready"] = True
+    elif state.get("ca_prefetch_ready") and state.get("ca_articles"):
         enriched = state["ca_articles"]
         logger.info(f"Using prefetched CA for {session_id[:8]}")
     else:
-        with track_step(session_id, "ca_ingest"):
-            enriched = await prepare_current_affairs(session_id, profile)
-        state["ca_articles"] = enriched
+        # First question is DAF opening — do not block on CA enrich (2+ min)
+        if not state.get("ca_prefetch_ready"):
+            asyncio.create_task(prefetch_ca_background(session_id))
+        enriched = state.get("ca_articles") or []
+        logger.info(f"Starting interview without waiting for CA enrich ({session_id[:8]})")
 
     state["ca_article_cursor"] = 0
     with track_step(session_id, "first_question"):

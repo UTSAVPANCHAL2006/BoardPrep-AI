@@ -16,9 +16,9 @@ from app.prompts.enrich_prompt import (
 from app.schema.interview import EnrichedArticle
 
 logger = get_logger(__name__)
-_DAILY_ENRICH_DELAY_SEC = 1.5
+_DAILY_ENRICH_DELAY_SEC = 0.5
 _MAX_ENRICH_RETRIES = 2
-_ENRICH_CONCURRENCY = 2
+_ENRICH_CONCURRENCY = 3
 
 _PILLAR_EXTRA_HIGHLIGHTS: dict[str, list[str]] = {
     "GS1: Society": [
