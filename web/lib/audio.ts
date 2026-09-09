@@ -84,3 +84,23 @@ export function playStableAudioAndWait(base64: string): Promise<void> {
     void audio.play().catch(done);
   });
 }
+
+/** One-off playback for streamed TTS chunks — does not fight VoicePlayer's shared element. */
+export function playEphemeralAudioAndWait(base64: string): Promise<void> {
+  return new Promise((resolve) => {
+    if (!base64) {
+      resolve();
+      return;
+    }
+    const audio = createAudioFromBase64(base64);
+    const done = () => {
+      audio.removeEventListener("ended", done);
+      audio.removeEventListener("error", done);
+      audio.src = "";
+      resolve();
+    };
+    audio.addEventListener("ended", done);
+    audio.addEventListener("error", done);
+    void audio.play().catch(done);
+  });
+}

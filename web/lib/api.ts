@@ -10,6 +10,7 @@ import type {
 import {
   createAudioFromBase64,
   pauseStableAudio,
+  playEphemeralAudioAndWait,
   playStableAudioAndWait,
   releaseStableAudio,
 } from "@/lib/audio";
@@ -48,11 +49,28 @@ class StreamingAudioQueue {
   private queue: string[] = [];
   private playing = false;
   private stopped = false;
+  private idleWaiters: Array<() => void> = [];
 
   enqueue(base64: string): void {
     if (!base64 || this.stopped) return;
     this.queue.push(base64);
     void this.drain();
+  }
+
+  waitUntilIdle(): Promise<void> {
+    if (!this.playing && this.queue.length === 0) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      this.idleWaiters.push(resolve);
+    });
+  }
+
+  private notifyIdle(): void {
+    if (!this.playing && this.queue.length === 0) {
+      const waiters = this.idleWaiters.splice(0);
+      waiters.forEach((resolve) => resolve());
+    }
   }
 
   private async drain(): Promise<void> {
@@ -61,9 +79,10 @@ class StreamingAudioQueue {
     while (this.queue.length && !this.stopped) {
       const chunk = this.queue.shift();
       if (!chunk) break;
-      await playStableAudioAndWait(chunk);
+      await playEphemeralAudioAndWait(chunk);
     }
     this.playing = false;
+    this.notifyIdle();
     if (this.queue.length && !this.stopped) {
       void this.drain();
     }
@@ -196,7 +215,8 @@ export async function respondStream(
   textAnswer?: string,
   mimeType = "audio/webm",
   onMetadata?: (meta: StreamRespondMetadata) => void,
-  onAudioChunk?: (chunk: StreamAudioChunk) => void
+  onAudioChunk?: (chunk: StreamAudioChunk) => void,
+  onBriefingAudio?: (audioBase64: string) => void
 ): Promise<void> {
   const form = new FormData();
   form.append("session_id", sessionId);
@@ -234,6 +254,8 @@ export async function respondStream(
         const payload = JSON.parse(payloadStr);
         if (payload.type === "metadata" && onMetadata) {
           onMetadata(payload as StreamRespondMetadata);
+        } else if (payload.type === "briefing_audio" && onBriefingAudio && payload.audio_base64) {
+          onBriefingAudio(payload.audio_base64);
         } else if (payload.type === "audio_chunk" && onAudioChunk) {
           onAudioChunk(payload as StreamAudioChunk);
         }

@@ -987,10 +987,6 @@ async def respond_stream(
     state.update(result)
     interview_complete = bool(state.get("interview_complete"))
     question = "" if interview_complete else state.get("current_question", "")
-    briefing_audio = b""
-    if question and state.get("current_phase") == "current_affairs" and state.get("last_ca_briefing"):
-        with track_step(session_id, "ca_briefing_tts"):
-            briefing_audio = await synthesize_briefing_audio(state)
     record_turn(session_id, state.get("current_phase", "daf_opening"))
     await session_store.save_state(session_id, state)
     flush_langfuse()
@@ -1000,8 +996,6 @@ async def respond_stream(
     notes = evaluation.notes if hasattr(evaluation, "notes") else ""
     eval_payload = serialize_evaluation(evaluation)
     ca_briefing = serialize_ca_briefing(state.get("last_ca_briefing"))
-    if ca_briefing and briefing_audio:
-        ca_briefing.audio_base64 = base64.b64encode(briefing_audio).decode()
 
     async def event_generator():
         meta = {
@@ -1021,6 +1015,13 @@ async def respond_stream(
             "evaluation": eval_payload,
         }
         yield f"data: {json.dumps(meta, default=str)}\n\n"
+
+        if question and state.get("current_phase") == "current_affairs" and state.get("last_ca_briefing"):
+            with track_step(session_id, "ca_briefing_tts"):
+                briefing_audio = await synthesize_briefing_audio(state)
+            if briefing_audio and ca_briefing:
+                ca_briefing.audio_base64 = base64.b64encode(briefing_audio).decode()
+                yield f"data: {json.dumps({'type': 'briefing_audio', 'audio_base64': ca_briefing.audio_base64})}\n\n"
 
         if voice_text:
             with track_step(session_id, "tts_stream"):

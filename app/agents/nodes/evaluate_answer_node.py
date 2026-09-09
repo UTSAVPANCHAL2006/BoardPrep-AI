@@ -34,7 +34,7 @@ class EvaluateAnswerNode:
                 profile=profile_summary(profile),
             )
 
-            llm = self.llm.get_llm()
+            llm = self.llm.get_llm(temperature=0.2, max_tokens=220)
             session_id = state.get("session_id", "")
             from app.observability.langfuse_client import langchain_invoke_config
 

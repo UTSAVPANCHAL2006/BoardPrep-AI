@@ -66,7 +66,7 @@ class GenerateQuestionNode:
     async def invoke_llm(self, user_prompt: str, session_id: str = "", run_name: str = "generate_question") -> dict:
         from app.observability.langfuse_client import langchain_invoke_config
 
-        llm = self.llm.get_llm()
+        llm = self.llm.get_llm(temperature=0.3, max_tokens=320)
         config = langchain_invoke_config(
             session_id,
             run_name=run_name,
@@ -113,6 +113,8 @@ class GenerateQuestionNode:
                 data = await self.invoke_llm(prompt, session_id)
                 question = sanitize_board_question(data.get("question", ""), max_words=28)
                 question_voice = sanitize_board_question(data.get("question_voice") or question, max_words=32)
+                if not question_voice.strip():
+                    question_voice = question
 
             elif phase == "current_affairs":
                 featured, ca_article_cursor = self.pick_ca_article(state)
@@ -162,7 +164,9 @@ class GenerateQuestionNode:
                     grounded=grounded,
                     grounding_score=round(score, 3),
                 )
-                ca_briefing = await self.ca_briefing.generate_briefing(featured, session_id)
+                ca_briefing = await self.ca_briefing.generate_briefing(
+                    featured, session_id, use_llm=False
+                )
 
             else:
                 prompt = DAF_QUESTION_TEMPLATE.format(
@@ -179,6 +183,8 @@ class GenerateQuestionNode:
                 question_voice = sanitize_board_question(
                     data.get("question_voice") or question, max_words=30
                 )
+                if not question_voice.strip():
+                    question_voice = question
 
             history = list(state.get("chat_history", []))
             history.append(ChatTurn(role="panel", content=question))

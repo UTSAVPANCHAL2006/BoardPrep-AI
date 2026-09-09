@@ -44,12 +44,16 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [lastAudio, setLastAudio] = useState("");
   const [boardStreaming, setBoardStreaming] = useState(false);
+  const [streamedQuestionAudio, setStreamedQuestionAudio] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const mimeTypeRef = useRef("audio/webm");
 
-  const questionAutoPlay = !(phase === "current_affairs" && caBriefing?.audio_base64) && !boardStreaming;
+  const questionAutoPlay =
+    !(phase === "current_affairs" && caBriefing?.audio_base64) &&
+    !boardStreaming &&
+    !streamedQuestionAudio;
 
   useEffect(() => {
     let cancelled = false;
@@ -84,8 +88,9 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
     setError("");
     stopStreamingAudio();
     const audioQueue = createStreamingAudioQueue();
-    let streamedChunks: string[] = [];
+    let streamedChunks = 0;
     let briefingPromise: Promise<void> = Promise.resolve();
+    setStreamedQuestionAudio(false);
     try {
       await respondStream(
         sessionId,
@@ -108,21 +113,21 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
           setTextAnswer("");
           setLastAudio("");
           setBoardStreaming(true);
-          if (meta.ca_briefing?.audio_base64) {
-            briefingPromise = playBase64AudioAndWait(meta.ca_briefing.audio_base64);
-          }
           if (meta.interview_complete) {
             router.push(`/feedback?session=${sessionId}`);
           }
         },
         (chunk) => {
-          streamedChunks.push(chunk.audio_base64);
+          streamedChunks += 1;
+          setStreamedQuestionAudio(true);
           void briefingPromise.then(() => audioQueue.enqueue(chunk.audio_base64));
+        },
+        (briefingB64) => {
+          briefingPromise = playBase64AudioAndWait(briefingB64);
         }
       );
-      if (streamedChunks.length) {
-        setLastAudio(streamedChunks[streamedChunks.length - 1]);
-      }
+      await briefingPromise;
+      await audioQueue.waitUntilIdle();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit");
     } finally {

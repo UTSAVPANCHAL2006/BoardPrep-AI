@@ -131,6 +131,16 @@ def sanitize_board_question(text: str, max_words: int = 32) -> str:
         parts = re.split(r"(?<=[.!?])\s+", cleaned)
         cleaned = parts[0] if parts else cleaned
 
+    # Drop compound follow-ups ("..., and in Bengaluru's context, ...?")
+    lower = cleaned.lower()
+    for splitter in (", and ", "; and ", " and in ", " — and "):
+        idx = lower.find(splitter)
+        if idx > 20:
+            cleaned = cleaned[:idx].rstrip(",;:")
+            if not cleaned.endswith("?"):
+                cleaned += "?"
+            break
+
     words = cleaned.split()
     if len(words) > max_words:
         cleaned = " ".join(words[:max_words]).rstrip(",;:")
