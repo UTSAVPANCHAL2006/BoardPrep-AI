@@ -167,6 +167,15 @@ def resolve_ca_language(code: str | None) -> CaVoiceLanguage:
     return _BY_CODE.get(key, _BY_CODE[DEFAULT_CA_VOICE_LANG])
 
 
+def ca_explain_use_llm(lang: CaVoiceLanguage) -> bool:
+    """Only Hindi/English may use fast template mode; all other languages need LLM scripts."""
+    from app.config.config import CA_EXPLAIN_LLM_ON_DEMAND
+
+    if lang.code in ("hi", "en") and not CA_EXPLAIN_LLM_ON_DEMAND:
+        return False
+    return True
+
+
 def languages_public() -> list[dict]:
     return [
         {

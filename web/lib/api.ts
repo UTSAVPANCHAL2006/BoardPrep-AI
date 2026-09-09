@@ -363,6 +363,12 @@ export async function fetchCachedBriefing(
   return handleResponse<CABriefing>(res);
 }
 
+export async function prewarmCaAudio(language?: string): Promise<void> {
+  const form = new FormData();
+  if (language) form.append("language", language);
+  await apiFetch(`${API_URL}/current-affairs/prewarm`, { method: "POST", body: form }, 120000);
+}
+
 export async function explainCurrentAffair(
   articleIndex: number,
   sessionId?: string,

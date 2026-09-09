@@ -164,9 +164,7 @@ class GenerateQuestionNode:
                     grounded=grounded,
                     grounding_score=round(score, 3),
                 )
-                ca_briefing = await self.ca_briefing.generate_briefing(
-                    featured, session_id, use_llm=False
-                )
+                ca_briefing = await self.ca_briefing.generate_briefing(featured, session_id, use_llm=True)
 
             else:
                 prompt = DAF_QUESTION_TEMPLATE.format(

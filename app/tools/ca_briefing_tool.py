@@ -175,13 +175,7 @@ class CaBriefingTool:
             parts.append("Remember facts for Prelims, India's angle for Mains, and a clear view for Interview.")
             voice = " ".join(parts)
         else:
-            base = self.fallback_briefing(article, lang)
-            base["is_fallback"] = False
-            base["briefing_voice"] = clip_text(
-                " ".join(highlights[:3]) or article.detailed_insights or article.title,
-                900,
-            )
-            return base
+            return self.fallback_briefing(article, lang)
 
         if len(voice.strip()) < 80:
             return self.fallback_briefing(article, lang)

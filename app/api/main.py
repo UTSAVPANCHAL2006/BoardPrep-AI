@@ -14,9 +14,8 @@ from app.agents.state import InterviewState
 from app.common.logger import get_logger
 from app.common.timing import get_metrics, record_turn, track_step
 from app.common.utils import build_daf_topic_stack
-from app.config.ca_languages import DEFAULT_CA_VOICE_LANG, languages_public, resolve_ca_language
+from app.config.ca_languages import DEFAULT_CA_VOICE_LANG, ca_explain_use_llm, languages_public, resolve_ca_language
 from app.config.config import (
-    CA_EXPLAIN_LLM_ON_DEMAND,
     DAILY_CA_ARTICLE_COUNT,
     DEFAULT_INTERVIEW_MODE,
     INTERVIEW_MODES,
@@ -136,6 +135,8 @@ async def lookup_cached_explain(article, article_index: int, language: str = DEF
     cached_title = (cached.get("article_title") or "").strip().lower()
     current_title = (getattr(article, "title", "") or "").strip().lower()
     if cached_title and current_title and cached_title != current_title:
+        return None
+    if (cached.get("voice_language") or lang.code) != lang.code:
         return None
     return cached
 
@@ -737,7 +738,7 @@ async def explain_current_affair(
         article_index,
         sid,
         language=language,
-        use_llm=CA_EXPLAIN_LLM_ON_DEMAND,
+        use_llm=ca_explain_use_llm(resolve_ca_language(language)),
     )
     if from_cache:
         logger.info(f"CA explain instant cache hit (index={article_index}, lang={language})")

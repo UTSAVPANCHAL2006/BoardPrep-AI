@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { explainCurrentAffair, fetchCachedBriefing, fetchDailyCA, playBase64AudioAndWait, stopAudio } from "@/lib/api";
+import { explainCurrentAffair, fetchCachedBriefing, fetchDailyCA, playBase64AudioAndWait, prewarmCaAudio, stopAudio } from "@/lib/api";
 import type { AudioPlaybackState } from "@/lib/audio";
 import {
   getStudyStreak,
@@ -152,6 +152,11 @@ export function DailyCaVoicePage() {
       clearInterval(timer);
     };
   }, [articles.length, voiceLang, warmVoiceCache]);
+
+  useEffect(() => {
+    if (!articles.length) return;
+    void prewarmCaAudio(voiceLang).catch(() => {});
+  }, [articles.length, voiceLang]);
 
   useEffect(() => {
     setVoiceLang(loadVoiceLanguage());
