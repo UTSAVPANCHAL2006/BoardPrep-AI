@@ -16,6 +16,8 @@ from app.common.timing import get_metrics, record_turn, track_step
 from app.common.utils import build_daf_topic_stack
 from app.config.ca_languages import CA_VOICE_LANGUAGES, DEFAULT_CA_VOICE_LANG, ca_explain_use_llm, languages_public, resolve_ca_language
 from app.config.config import (
+    CA_BATCH_AI_ONLY_AT_MIDNIGHT,
+    CA_STARTUP_CATCHUP_ENABLED,
     DAILY_CA_ARTICLE_COUNT,
     DEFAULT_INTERVIEW_MODE,
     INTERVIEW_MODES,
@@ -74,11 +76,17 @@ async def _run_ca_prepare(session_id: str, force: bool = False) -> list:
     _ca_prepare_running = True
     try:
         articles = await prepare_current_affairs(session_id, DAFProfile(), force=force)
-        if articles and ca_bundle_is_live(articles):
+        if (
+            articles
+            and ca_bundle_is_live(articles)
+            and not CA_BATCH_AI_ONLY_AT_MIDNIGHT
+        ):
             needs, force_fetch_flag = await assess_daily_pipeline()
             if needs:
                 asyncio.create_task(
-                    schedule_full_daily_pipeline(force_fetch=force_fetch_flag, force_voice=force)
+                    schedule_full_daily_pipeline(
+                        force_fetch=force_fetch_flag, force_voice=force, source="prepare"
+                    )
                 )
         logger.info(f"Daily CA prepare finished ({len(articles)} articles)")
         return articles
@@ -116,6 +124,12 @@ async def ensure_daily_ca_bundle(session_id: str = "daily-ca", force: bool = Fal
 
 async def schedule_daily_ca_prepare(session_id: str = "daily-ca", force: bool = False) -> None:
     """Kick off one background CA build — never block HTTP handlers on enrich."""
+    if CA_BATCH_AI_ONLY_AT_MIDNIGHT and not force:
+        cached = await ca_cache.get_bundle()
+        if cached and not ca_bundle_is_stale(cached):
+            return
+        if not cached:
+            return
     async with _ca_prepare_lock:
         if _ca_prepare_task and not _ca_prepare_task.done():
             return
@@ -171,6 +185,11 @@ async def build_and_cache_explain(
         briefing = await briefing_tool.generate_briefing(
             article, session_id, language=lang.code, use_llm=use_llm
         )
+        if session_id == "daily-ca-prewarm" and briefing.get("is_fallback"):
+            logger.info(
+                f"CA prewarm skip — no article-specific voice ({lang.code}, index={article_index})"
+            )
+            return None, False
         audio = b""
         audio_error = ""
         try:
@@ -219,7 +238,7 @@ async def _prewarm_language_voices(articles: list, language: str, *, force: bool
     """Generate Aayan audio for one language (no global lock — caller owns concurrency)."""
     lang = resolve_ca_language(language)
     if not force:
-        ready = await ca_cache.count_ready_audio(len(articles), language=lang.code)
+        ready = await ca_cache.count_ready_audio(len(articles), language=lang.code, quiet=True)
         if ready >= len(articles):
             logger.info(f"CA voices already in Redis ({lang.code} {ready}/{len(articles)})")
             return
@@ -228,9 +247,11 @@ async def _prewarm_language_voices(articles: list, language: str, *, force: bool
             logger.warning(f"CA prewarm stopped — Redis storage full ({lang.code} at index {i})")
             break
         try:
-            await build_and_cache_explain(
+            result, _ = await build_and_cache_explain(
                 article, i, "daily-ca-prewarm", force=force, language=lang.code, use_llm=True
             )
+            if result is None:
+                continue
         except Exception as e:
             err = str(e)
             if "402" in err or "Payment Required" in err:
@@ -242,7 +263,7 @@ async def _prewarm_language_voices(articles: list, language: str, *, force: bool
             logger.error(f"CA prewarm failed for index {i} ({lang.code}): {e}")
         if i < len(articles) - 1:
             await asyncio.sleep(0.15)
-    ready = await ca_cache.count_ready_audio(len(articles), language=lang.code)
+    ready = await ca_cache.count_ready_audio(len(articles), language=lang.code, quiet=True)
     logger.info(f"CA auto-prewarm finished: {lang.code} {ready}/{len(articles)} audio in Redis")
 
 
@@ -438,6 +459,11 @@ async def prepare_current_affairs(session_id, profile, force: bool = False):
     if cached:
         enriched = cached
         logger.info(f"Using Redis daily CA bundle ({len(enriched)} articles)")
+    elif CA_BATCH_AI_ONLY_AT_MIDNIGHT and not force:
+        enriched = enrich_tool.load_fallback_current_affairs()
+        logger.info(
+            f"Daily CA using fallback until 12 AM IST fetch ({len(enriched)} articles)"
+        )
     else:
         try:
             with observation_context("ca_fetch_daily", session_id, as_type="tool"):
@@ -484,7 +510,9 @@ async def all_languages_ready(articles: list) -> bool:
     return all(ready.get(lang.code, 0) >= len(articles) for lang in CA_VOICE_LANGUAGES)
 
 
-async def prewarm_all_languages_background(articles: list, force: bool = False) -> None:
+async def prewarm_all_languages_background(
+    articles: list, force: bool = False, *, midnight_job: bool = False
+) -> None:
     """Prewarm every supported CA voice language into Redis (midnight batch job)."""
     global _ca_prewarm_running
     if not articles:
@@ -499,6 +527,9 @@ async def prewarm_all_languages_background(articles: list, force: bool = False) 
             if ca_cache.is_storage_full():
                 logger.error("CA batch prewarm aborted — Redis storage full")
                 break
+            if CA_BATCH_AI_ONLY_AT_MIDNIGHT and not midnight_job and lang.code not in ("hi", "en"):
+                logger.info(f"CA batch prewarm deferred until 12 AM IST: {lang.name} ({lang.code})")
+                continue
             logger.info(f"CA batch prewarm starting: {lang.name} ({lang.code})")
             await _prewarm_language_voices(articles, lang.code, force=force)
         ready = await count_languages_ready(articles)
@@ -514,6 +545,8 @@ async def assess_daily_pipeline() -> tuple[bool, bool]:
     """Return (needs_run, force_fetch). force_fetch=True only when bundle missing or stale."""
     today = india_today()
     if await ca_cache.is_daily_pipeline_done(day=today):
+        return False, False
+    if CA_BATCH_AI_ONLY_AT_MIDNIGHT:
         return False, False
     cached = await ca_cache.get_bundle(day=today)
     if not cached or ca_bundle_is_stale(cached):
@@ -532,11 +565,19 @@ async def run_midnight_ca_pipeline(*, force_fetch: bool = True) -> None:
         articles = await ca_cache.get_bundle()
         if not articles or ca_bundle_is_stale(articles):
             articles = await ensure_daily_ca_bundle("midnight-ist", force=False)
-    await prewarm_all_languages_background(articles, force=False)
+    await prewarm_all_languages_background(articles, force=False, midnight_job=True)
 
 
-async def schedule_full_daily_pipeline(*, force_fetch: bool = False, force_voice: bool = False) -> bool:
+async def schedule_full_daily_pipeline(
+    *,
+    force_fetch: bool = False,
+    force_voice: bool = False,
+    source: str = "auto",
+) -> bool:
     """Run fetch + 11-language prewarm in background. Returns False if already running or done today."""
+    if CA_BATCH_AI_ONLY_AT_MIDNIGHT and source not in ("midnight", "manual"):
+        logger.info(f"Daily CA pipeline deferred until 12 AM IST (source={source})")
+        return False
     if force_fetch or force_voice:
         await ca_cache.clear_daily_pipeline_done()
     else:
@@ -565,7 +606,10 @@ async def schedule_full_daily_pipeline(*, force_fetch: bool = False, force_voice
                 articles = await ca_cache.get_bundle()
                 if not articles or ca_bundle_is_stale(articles):
                     articles = await ensure_daily_ca_bundle("manual-pipeline", force=False)
-            await prewarm_all_languages_background(articles, force=force_voice)
+            midnight_job = source in ("midnight", "manual")
+            await prewarm_all_languages_background(
+                articles, force=force_voice, midnight_job=midnight_job
+            )
             if ca_cache.is_storage_full():
                 logger.error("Daily CA pipeline stopped early — Redis storage full")
                 return
@@ -584,11 +628,31 @@ async def schedule_full_daily_pipeline(*, force_fetch: bool = False, force_voice
 
 async def prefetch_daily_ca_startup():
     """Load today's newspaper bundle in background; voices handled by daily pipeline scheduler."""
+    if CA_BATCH_AI_ONLY_AT_MIDNIGHT:
+        logger.info("Daily CA startup fetch skipped — fresh fetch runs at 12:00 AM IST only")
+        return
     try:
         asyncio.create_task(ensure_daily_ca_bundle("startup", force=False))
         logger.info("Daily CA bundle prefetch scheduled on startup")
     except Exception as e:
         logger.error(f"Daily CA startup prefetch failed: {e}")
+
+
+async def preserve_today_ca_cache():
+    """Keep existing Redis CA — stop batch LLM/TTS until midnight IST job."""
+    await asyncio.sleep(9)
+    try:
+        cached = await ca_cache.get_bundle()
+        if not cached or ca_bundle_is_stale(cached):
+            logger.info("No live CA bundle in Redis — waiting for 12 AM IST fetch")
+            return
+        ready = await count_languages_ready(cached)
+        await ca_cache.mark_daily_pipeline_done()
+        logger.info(
+            f"CA cache preserved for today — batch Redis writes paused until 12 AM IST: {ready}"
+        )
+    except Exception as e:
+        logger.warning(f"CA cache preserve check failed: {e}")
 
 
 async def prefetch_ca_background(session_id: str):
@@ -614,7 +678,10 @@ async def lifespan(app: FastAPI):
         ingest.ingest_shared_syllabus(SYLLABUS_PATH)
     except Exception as e:
         logger.error(f"Syllabus ingest failed (RAG may be degraded): {e}")
-    asyncio.create_task(prefetch_daily_ca_startup())
+    if CA_BATCH_AI_ONLY_AT_MIDNIGHT:
+        asyncio.create_task(preserve_today_ca_cache())
+    else:
+        asyncio.create_task(prefetch_daily_ca_startup())
     from app.tools.ca_daily_scheduler import start_midnight_ca_scheduler
 
     asyncio.create_task(
@@ -622,7 +689,7 @@ async def lifespan(app: FastAPI):
             assess_pipeline=assess_daily_pipeline,
             schedule_pipeline=schedule_full_daily_pipeline,
             ca_cache=ca_cache,
-            startup_catchup=True,
+            startup_catchup=CA_STARTUP_CATCHUP_ENABLED and not CA_BATCH_AI_ONLY_AT_MIDNIGHT,
         )
     )
     yield
@@ -919,7 +986,9 @@ async def run_daily_pipeline_now(fetch: bool = Form(False), force_voice: bool = 
             languages_ready=ready,
             articles=len(articles),
         )
-    started = await schedule_full_daily_pipeline(force_fetch=fetch, force_voice=force_voice)
+    started = await schedule_full_daily_pipeline(
+        force_fetch=fetch, force_voice=force_voice, source="manual"
+    )
     if not started:
         if _daily_pipeline_running:
             msg = "Daily CA pipeline is already in progress"
@@ -947,7 +1016,7 @@ async def clear_ca_cache(refresh: bool = Form(False)):
     deleted = await ca_cache.clear_all()
     refreshed = False
     if refresh:
-        await schedule_full_daily_pipeline(force_fetch=True, force_voice=True)
+        await schedule_full_daily_pipeline(force_fetch=True, force_voice=True, source="manual")
         refreshed = True
     return ClearCACacheResponse(
         deleted_bundles=deleted["bundles"],
@@ -984,6 +1053,18 @@ async def prewarm_daily_ca_audio(
     articles, _ = await resolve_ca_articles(None, DAFProfile())
     if not articles:
         raise HTTPException(status_code=503, detail="No current-affairs articles to prewarm")
+    if CA_BATCH_AI_ONLY_AT_MIDNIGHT and not force:
+        ready = await ca_cache.count_ready_audio(len(articles), language=lang.code)
+        return PrewarmStatusResponse(
+            articles=len(articles),
+            audio_ready=ready,
+            prewarm_running=False,
+            pipeline_running=_daily_pipeline_running,
+            pipeline_done_today=await ca_cache.is_daily_pipeline_done(),
+            redis_storage_full=ca_cache.is_storage_full(),
+            languages_ready=await count_languages_ready(articles),
+            cache_backend="memory" if ca_cache._use_memory else "redis",
+        )
     await prewarm_voices_background(articles, force=force, language=lang.code)
     ready = await ca_cache.count_ready_audio(len(articles), language=lang.code)
     return PrewarmStatusResponse(

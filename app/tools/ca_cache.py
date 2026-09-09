@@ -240,7 +240,7 @@ class CaCache:
         return f"ca_explain_v15:{self.key(day)}:{language}:{article_index}"
 
     async def get_explain(
-        self, article_index: int, day: date | None = None, language: str = "hi"
+        self, article_index: int, day: date | None = None, language: str = "hi", *, quiet: bool = False
     ) -> dict | None:
         await self.connect()
         key = self.explain_key(article_index, language, day)
@@ -252,7 +252,8 @@ class CaCache:
             return None
         try:
             data = json.loads(raw)
-            logger.info(f"CA explain cache hit: {key}")
+            if not quiet:
+                logger.info(f"CA explain cache hit: {key}")
             return data
         except Exception as e:
             logger.warning(f"CA explain cache parse failed: {e}")
@@ -281,11 +282,11 @@ class CaCache:
             return False
 
     async def count_ready_audio(
-        self, article_count: int, day: date | None = None, language: str = "hi"
+        self, article_count: int, day: date | None = None, language: str = "hi", *, quiet: bool = False
     ) -> int:
         ready = 0
         for i in range(article_count):
-            data = await self.get_explain(i, day, language)
+            data = await self.get_explain(i, day, language, quiet=quiet)
             if data and data.get("audio_base64"):
                 ready += 1
         return ready

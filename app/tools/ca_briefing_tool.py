@@ -288,9 +288,10 @@ class CaBriefingTool:
                 short_insight=clip_text(article.detailed_insights or "", 400),
             )
 
+            max_attempts = 1 if session_id == "daily-ca-prewarm" else _MAX_BRIEFING_ATTEMPTS
             data: dict = {}
             last_err: Exception | None = None
-            for attempt in range(_MAX_BRIEFING_ATTEMPTS):
+            for attempt in range(max_attempts):
                 extra = "" if attempt == 0 else self.retry_extra(lang)
                 try:
                     data = await self.invoke_briefing(system, user, session_id, extra)

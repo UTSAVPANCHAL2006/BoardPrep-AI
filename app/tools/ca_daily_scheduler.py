@@ -64,7 +64,7 @@ async def start_midnight_ca_scheduler(
             continue
 
         logger.info(f"Midnight CA job starting for {today.isoformat()} (IST)")
-        started = await schedule_pipeline(force_fetch=True, force_voice=False)
+        started = await schedule_pipeline(force_fetch=True, force_voice=False, source="midnight")
         if started:
             logger.info("Midnight CA job scheduled: fresh fetch + 11-language Redis prewarm")
         else:
