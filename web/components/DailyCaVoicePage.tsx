@@ -113,7 +113,7 @@ export function DailyCaVoicePage() {
       if (!silent) setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [warmVoiceCache]);
 
   useEffect(() => {
     let cancelled = false;
@@ -137,6 +137,21 @@ export function DailyCaVoicePage() {
       if (pollTimer) clearTimeout(pollTimer);
     };
   }, [loadDaily]);
+
+  useEffect(() => {
+    if (!articles.length) return;
+    let cancelled = false;
+    const pollVoices = async () => {
+      if (cancelled || isPlayingRef.current) return;
+      await warmVoiceCache([0, 1, 2].filter((i) => i < articles.length));
+    };
+    void pollVoices();
+    const timer = setInterval(() => void pollVoices(), 4000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [articles.length, voiceLang, warmVoiceCache]);
 
   useEffect(() => {
     setVoiceLang(loadVoiceLanguage());
