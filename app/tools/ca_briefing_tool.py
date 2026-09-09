@@ -58,6 +58,82 @@ _LATIN_TO_DEVANAGARI = {
     "AI": "एआई",
 }
 
+# Native classroom framing per language (article facts may stay English — Sarvam codemix handles TTS).
+_TEACHER_VOICE_FRAMES: dict[str, dict] = {
+    "bn": {
+        "intro": "নমস্কার, আজকের গুরুত্বপূর্ণ খবর নিয়ে কথা বলি।",
+        "source": "এটি {source} এর রিপোর্ট।",
+        "highlights_intro": "মূল বিষয়গুলো শুনুন।",
+        "ordinals": ("প্রথম", "দ্বিতীয়", "তৃতীয়", "চতুর্থ"),
+        "gs": "ইউপিএসসিতে এটিকে {gs_link} এর অধীনে রাখুন।",
+        "close": "প্রিলিমসে তথ্য মনে রাখুন, মেনসে ভারতের প্রভাব লিখুন, ইন্টারভিউতে স্পষ্ট মতামত রাখুন।",
+    },
+    "ta": {
+        "intro": "வணக்கம், இன்றைய முக்கிய செய்தியைப் பார்ப்போம்.",
+        "source": "இது {source} இலிருந்து வந்த அறிக்கை.",
+        "highlights_intro": "முக்கிய புள்ளிகளைக் கேளுங்கள்.",
+        "ordinals": ("முதல்", "இரண்டாவது", "மூன்றாவது", "நான்காவது"),
+        "gs": "இதை யுபிஎஸ்சியில் {gs_link} கீழ் வையுங்கள்.",
+        "close": "ப்ரிலிம்ஸில் உண்மைகளை நினைவில் வையுங்கள், மெயின்ஸில் இந்தியாவின் தாக்கத்தை எழுதுங்கள்.",
+    },
+    "te": {
+        "intro": "నమస్కారం, ఈరోజు ముఖ్యమైన వార్త గురించి మాట్లాడుదాం.",
+        "source": "ఇది {source} నుండి వచ్చిన నివేదిక.",
+        "highlights_intro": "ముఖ్య అంశాలు వినండి.",
+        "ordinals": ("మొదటి", "రెండవ", "మూడవ", "నాల్గవ"),
+        "gs": "దీన్ని యుపిఎస్సీలో {gs_link} కింద ఉంచండి.",
+        "close": "ప్రిలిమ్స్‌లో వాస్తవాలు గుర్తుంచుకోండి, మెయిన్స్‌లో భారతదేశంపై ప్రభావం రాయండి.",
+    },
+    "mr": {
+        "intro": "नमस्कार, आजच्या महत्त्वाच्या बातमीवर बोलूया.",
+        "source": "ही {source} ची बातमी आहे.",
+        "highlights_intro": "मुख्य मुद्दे ऐका.",
+        "ordinals": ("पहिला", "दुसरा", "तिसरा", "चौथा"),
+        "gs": "यूपीएससीमध्ये हे {gs_link} अंतर्गत ठेवा.",
+        "close": "प्रिलिम्समध्ये तथ्ये लक्षात ठेवा, मेन्समध्ये भारतावर परिणाम लिहा.",
+    },
+    "kn": {
+        "intro": "ನಮಸ್ಕಾರ, ಇಂದಿನ ಪ್ರಮುಖ ಸುದ್ದಿಯ ಬಗ್ಗೆ ಮಾತನಾಡೋಣ.",
+        "source": "ಇದು {source} ನಿಂದ ಬಂದ ವರದಿ.",
+        "highlights_intro": "ಮುಖ್ಯ ಅಂಶಗಳನ್ನು ಕೇಳಿ.",
+        "ordinals": ("ಮೊದಲ", "ಎರಡನೇ", "ಮೂರನೇ", "ನಾಲ್ಕನೇ"),
+        "gs": "ಯುಪಿಎಸ್ಸಿಯಲ್ಲಿ ಇದನ್ನು {gs_link} ಅಡಿಯಲ್ಲಿ ಇರಿಸಿ.",
+        "close": "ಪ್ರಿಲಿಮ್ಸ್‌ನಲ್ಲಿ ವಾಸ್ತವಗಳನ್ನು ನೆನಪಿಟ್ಟುಕೊಳ್ಳಿ, ಮೇನ್ಸ್‌ನಲ್ಲಿ ಭಾರತದ ಮೇಲೆ ಪರಿಣಾಮ ಬರೆಯಿರಿ.",
+    },
+    "gu": {
+        "intro": "નમસ્કાર, આજની મહત્વપૂર્ણ ખબર વિશે વાત કરીએ.",
+        "source": "આ {source} ની રિપોર્ટ છે.",
+        "highlights_intro": "મુખ્ય બાબતો સાંભળો.",
+        "ordinals": ("પહેલી", "બીજી", "ત્રીજી", "ચોથી"),
+        "gs": "યુપીએસસીમાં આને {gs_link} હેઠળ રાખો.",
+        "close": "પ્રિલિમ્સમાં તથ્ય યાદ રાખો, મેન્સમાં ભારત પર અસર લખો, ઇન્ટરવ્યૂમાં સ્પષ્ટ અભિપ્રાય રાખો.",
+    },
+    "ml": {
+        "intro": "നമസ്കാരം, ഇന്നത്തെ പ്രധാന വാർത്ത നോക്കാം.",
+        "source": "ഇത് {source} ൽ നിന്നുള്ള റിപ്പോർട്ടാണ്.",
+        "highlights_intro": "പ്രധാന കാര്യങ്ങൾ കേൾക്കൂ.",
+        "ordinals": ("ഒന്നാം", "രണ്ടാം", "മൂന്നാം", "നാലാം"),
+        "gs": "ഇത് യുപിഎസ്സിയിൽ {gs_link} കീഴിൽ വയ്ക്കുക.",
+        "close": "പ്രിലിമ്സിൽ വസ്തുതകൾ ഓർമ്മിക്കുക, മെയിൻസിൽ ഇന്ത്യയിലെ സ്വാധീനം എഴുതുക.",
+    },
+    "pa": {
+        "intro": "ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਅੱਜ ਦੀ ਮਹੱਤਵਪੂਰਨ ਖ਼ਬਰ ਬਾਰੇ ਗੱਲ ਕਰੀਏ.",
+        "source": "ਇਹ {source} ਦੀ ਰਿਪੋਰਟ ਹੈ.",
+        "highlights_intro": "ਮੁੱਖ ਗੱਲਾਂ ਸੁਣੋ.",
+        "ordinals": ("ਪਹਿਲੀ", "ਦੂਜੀ", "ਤੀਜੀ", "ਚੌਥੀ"),
+        "gs": "ਯੂਪੀਐਸਸੀ ਵਿੱਚ ਇਸਨੂੰ {gs_link} ਹੇਠ ਰੱਖੋ.",
+        "close": "ਪ੍ਰੀਲਿਮਸ ਵਿੱਚ ਤੱਥ ਯਾਦ ਰੱਖੋ, ਮੇਨਜ਼ ਵਿੱਚ ਭਾਰਤ ਉੱਤੇ ਅਸਰ ਲਿਖੋ.",
+    },
+    "od": {
+        "intro": "ନମସ୍କାର, ଆଜିର ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ଖବର ନେଇ କହିବା.",
+        "source": "ଏହା {source} ର ରିପୋର୍ଟ.",
+        "highlights_intro": "ମୁଖ୍ୟ ବିଷୟ ଶୁଣ.",
+        "ordinals": ("ପ୍ରଥମ", "ଦ୍ଵିତୀୟ", "ତୃତୀୟ", "ଚତୁର୍ଥ"),
+        "gs": "ଏହାକୁ ଯୁପିଏସସିରେ {gs_link} ତଳେ ରଖ.",
+        "close": "ପ୍ରିଲିମ୍ସରେ ତଥ୍ୟ ମନେରଖ, ମେନ୍ସରେ ଭାରତ ଉପରେ ପ୍ରଭାବ ଲେଖ.",
+    },
+}
+
 
 def repair_voice_script(text: str, lang: CaVoiceLanguage) -> str:
     """Fix common LLM slips: Roman acronyms → Devanagari; drop stray English tokens."""
@@ -146,6 +222,38 @@ class CaBriefingTool:
         parts.append("Remember facts for Prelims, India's angle for Mains, and a clear view for Interview.")
         return " ".join(parts)
 
+    def _article_voice_native(
+        self,
+        article: EnrichedArticle,
+        highlights: list[str],
+        concepts: dict,
+        gs_link: str,
+        lang: CaVoiceLanguage,
+    ) -> str:
+        frame = _TEACHER_VOICE_FRAMES.get(lang.code)
+        if not frame:
+            return self._article_voice_english(article, highlights, concepts, gs_link)
+        parts = [frame["intro"]]
+        if article.source:
+            parts.append(frame["source"].format(source=article.source))
+        if highlights:
+            parts.append(frame["highlights_intro"])
+            ordinals = frame["ordinals"]
+            for i, point in enumerate(highlights[:4]):
+                label = ordinals[i] if i < len(ordinals) else ordinals[-1]
+                parts.append(f"{label} — {point}.")
+        elif article.detailed_insights:
+            parts.append(clip_text(article.detailed_insights, 400))
+        for name, meaning in list(concepts.items())[:2]:
+            parts.append(f"{name} — {meaning}.")
+        parts.append(frame["gs"].format(gs_link=gs_link))
+        parts.append(frame["close"])
+        voice = " ".join(parts)
+        if lang.script_start and lang.script_end and lang.script_start <= 0x097F:
+            for eng, dev in _LATIN_TO_DEVANAGARI.items():
+                voice = re.sub(rf"\b{re.escape(eng)}\b", dev, voice, flags=re.IGNORECASE)
+        return voice
+
     def teacher_briefing_from_article(self, article: EnrichedArticle, lang: CaVoiceLanguage) -> dict:
         """Article-specific voice script when LLM is unavailable — uses enriched notes, not generic filler."""
         highlights = [h.strip() for h in (article.key_highlights or []) if h and h.strip()]
@@ -185,11 +293,16 @@ class CaBriefingTool:
         elif lang.allow_latin:
             voice = self._article_voice_english(article, highlights, concepts, gs_link)
         else:
-            voice = self._article_voice_english(article, highlights, concepts, gs_link)
+            voice = self._article_voice_native(article, highlights, concepts, gs_link, lang)
 
         if len(voice.strip()) < 80:
             extra = clip_text(article.detailed_insights or article.title, 400)
-            voice = f"{article.title}. {extra}".strip()
+            if lang.allow_latin:
+                voice = f"{article.title}. {extra}".strip()
+            else:
+                frame = _TEACHER_VOICE_FRAMES.get(lang.code, {})
+                intro = frame.get("intro", "")
+                voice = f"{intro} {extra}".strip()
         if len(voice.strip()) < 40:
             return self.fallback_briefing(article, lang)
 
@@ -209,11 +322,13 @@ class CaBriefingTool:
         }
 
     def merge_llm(self, article: EnrichedArticle, data: dict, lang: CaVoiceLanguage) -> dict:
-        base = self.fallback_briefing(article, lang)
         voice = repair_voice_script((data.get("briefing_voice") or "").strip(), lang)
         if voice_is_valid(voice, lang):
+            base = self.teacher_briefing_from_article(article, lang)
             base["briefing_voice"] = clip_text(voice, CA_BRIEFING_VOICE_MAX_CHARS)
             base["is_fallback"] = False
+        else:
+            base = self.teacher_briefing_from_article(article, lang)
         if data.get("briefing_text"):
             base["briefing_text"] = clip_text(str(data["briefing_text"]), 280)
         if data.get("prelims_pointer"):

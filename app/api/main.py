@@ -220,11 +220,14 @@ async def build_and_cache_explain(
 
         dumped = payload.model_dump()
         if audio and not briefing.get("is_fallback"):
-            cached_ok = await ca_cache.set_explain(article_index, dumped, language=lang.code)
-            if not cached_ok and ca_cache.is_storage_full():
-                logger.warning(
-                    f"CA explain not cached — Redis full (index={article_index}, lang={lang.code})"
-                )
+            if ca_cache.is_storage_full():
+                pass  # Redis full — serve audio, skip write attempt
+            else:
+                cached_ok = await ca_cache.set_explain(article_index, dumped, language=lang.code)
+                if not cached_ok and ca_cache.is_storage_full():
+                    logger.warning(
+                        f"CA explain not cached — Redis full (index={article_index}, lang={lang.code})"
+                    )
         elif audio and briefing.get("is_fallback"):
             logger.warning(
                 f"CA explain not cached — generic filler only (index={article_index}, lang={lang.code})"

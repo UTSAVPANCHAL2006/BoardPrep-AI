@@ -168,12 +168,12 @@ def resolve_ca_language(code: str | None) -> CaVoiceLanguage:
 
 
 def ca_explain_use_llm(lang: CaVoiceLanguage) -> bool:
-    """Listen: hi/en may use fast templates; other languages use LLM script + Sarvam TTS on cache miss."""
+    """User Listen: native teacher script + Sarvam. LLM only when CA_EXPLAIN_LLM_ON_DEMAND=true."""
     from app.config.config import CA_EXPLAIN_LLM_ON_DEMAND
 
-    if lang.code in ("hi", "en") and not CA_EXPLAIN_LLM_ON_DEMAND:
-        return False
-    return True
+    if CA_EXPLAIN_LLM_ON_DEMAND:
+        return lang.code not in ("hi", "en")
+    return False
 
 
 def languages_public() -> list[dict]:

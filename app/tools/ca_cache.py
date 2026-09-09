@@ -30,6 +30,9 @@ def is_redis_memory_error(err: Exception) -> bool:
             "command not allowed when used memory",
             "read only",
             "readonly",
+            "quota exceeded",
+            "capacity quota",
+            "db capacity",
         )
     )
 
