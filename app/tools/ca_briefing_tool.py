@@ -8,7 +8,7 @@ from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
 from app.common.utils import llm_message_text, parse_json_response
 from app.config.ca_languages import DEFAULT_CA_VOICE_LANG, CaVoiceLanguage, resolve_ca_language
-from app.config.config import CA_USE_LLM_BRIEFING
+from app.config.config import CA_BRIEFING_VOICE_MAX_CHARS, CA_USE_LLM_BRIEFING
 from app.prompts.ca_briefing_prompt import build_ca_briefing_prompts
 from app.schema.interview import EnrichedArticle
 
@@ -148,7 +148,7 @@ class CaBriefingTool:
                     label = ordinals[i] if i < len(ordinals) else "अगली"
                     parts.append(f"{label} बात — {point}.")
             elif article.detailed_insights:
-                parts.append(clip_text(article.detailed_insights, 320))
+                parts.append(clip_text(article.detailed_insights, 280))
             for name, meaning in list(concepts.items())[:2]:
                 parts.append(f"{name} — {meaning}.")
             parts.append(f"यूपीएससी में इसे {gs_link} के तहत रखें।")
@@ -168,7 +168,7 @@ class CaBriefingTool:
                 for point in highlights[:4]:
                     parts.append(point + ".")
             elif article.detailed_insights:
-                parts.append(clip_text(article.detailed_insights, 320))
+                parts.append(clip_text(article.detailed_insights, 280))
             for name, meaning in list(concepts.items())[:2]:
                 parts.append(f"{name}: {meaning}.")
             parts.append(f"Place this under {gs_link} for UPSC.")
@@ -182,7 +182,7 @@ class CaBriefingTool:
 
         return {
             "briefing_text": briefing_text,
-            "briefing_voice": clip_text(voice, 1200),
+            "briefing_voice": clip_text(voice, CA_BRIEFING_VOICE_MAX_CHARS),
             "is_fallback": False,
             "voice_language": lang.code,
             "prelims_pointer": clip_text(prelims, 140),
@@ -199,7 +199,7 @@ class CaBriefingTool:
         base = self.fallback_briefing(article, lang)
         voice = repair_voice_script((data.get("briefing_voice") or "").strip(), lang)
         if voice_is_valid(voice, lang):
-            base["briefing_voice"] = voice
+            base["briefing_voice"] = clip_text(voice, CA_BRIEFING_VOICE_MAX_CHARS)
             base["is_fallback"] = False
         if data.get("briefing_text"):
             base["briefing_text"] = clip_text(str(data["briefing_text"]), 280)
@@ -237,7 +237,7 @@ class CaBriefingTool:
     async def invoke_briefing(self, system: str, user: str, session_id: str, extra: str = "") -> dict:
         from app.observability.langfuse_client import langchain_invoke_config
 
-        llm = self.llm.get_llm(temperature=0.2)
+        llm = self.llm.get_llm(temperature=0.2, max_tokens=520)
         config = langchain_invoke_config(
             session_id,
             run_name="ca_briefing_voice",

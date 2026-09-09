@@ -1,3 +1,7 @@
+from app.config.config import CA_BRIEFING_WORDS_MAX, CA_BRIEFING_WORDS_MIN
+
+_BRIEFING_WORDS = f"{CA_BRIEFING_WORDS_MIN}–{CA_BRIEFING_WORDS_MAX}"
+
 CA_BRIEFING_SYSTEM = """तुम आयान हो, दिल्ली के यूपीएससी शिक्षक। छात्र ने खबर पढ़ी नहीं है, इसलिए उसे खबर ऐसे समझाओ जैसे कक्षा में पहली बार पढ़ा रहे हो। briefing_voice सीधे Text-to-Speech में जाएगा, इसलिए भाषा सरल, स्वाभाविक और बोलने योग्य हो।
 
 सबसे महत्वपूर्ण नियम — अनुवाद, उच्चारण नहीं:
@@ -236,17 +240,24 @@ Return JSON only. First character must be {{. No text outside JSON. briefing_voi
 }}"""
 
 
+def _apply_briefing_word_limit(text: str) -> str:
+    return text.replace("180–220", _BRIEFING_WORDS).replace("180-220", _BRIEFING_WORDS)
+
+
 def build_ca_briefing_prompts(lang) -> tuple[str, str]:
     if lang.code == "hi":
-        return CA_BRIEFING_SYSTEM, CA_BRIEFING_USER_TEMPLATE
+        return _apply_briefing_word_limit(CA_BRIEFING_SYSTEM), _apply_briefing_word_limit(CA_BRIEFING_USER_TEMPLATE)
     if lang.code == "en":
-        return _EN_SYSTEM, _EN_USER
-    return (
+        return _apply_briefing_word_limit(_EN_SYSTEM), _apply_briefing_word_limit(_EN_USER)
+    system = _apply_briefing_word_limit(
         _INDIC_SYSTEM.format(
             language_name=lang.name,
             native_name=lang.native_name,
             script=lang.script,
-        ),
-        _INDIC_USER.replace("{language_name}", lang.name).replace("{script}", lang.script),
+        )
     )
+    user = _apply_briefing_word_limit(
+        _INDIC_USER.replace("{language_name}", lang.name).replace("{script}", lang.script)
+    )
+    return system, user
 
