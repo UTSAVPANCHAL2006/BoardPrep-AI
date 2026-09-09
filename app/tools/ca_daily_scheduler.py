@@ -34,7 +34,6 @@ async def start_midnight_ca_scheduler(
 ) -> None:
     """Background loop — catch-up on boot, then fires at 12:00 AM IST every day."""
     if not CA_MIDNIGHT_PREWARM_ENABLED:
-        logger.info("Midnight CA scheduler disabled (CA_MIDNIGHT_PREWARM_ENABLED=false)")
         return
 
     await asyncio.sleep(8)

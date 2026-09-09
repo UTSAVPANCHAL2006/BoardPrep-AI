@@ -58,8 +58,11 @@ DAILY_CA_ARTICLE_COUNT = int(os.getenv("DAILY_CA_ARTICLE_COUNT", "10"))
 CA_USE_LLM_BRIEFING = os.getenv("CA_USE_LLM_BRIEFING", "true").lower() in ("1", "true", "yes")
 # Listen click: use Redis cache instantly; if miss, fast template+TTS (not 90s LLM). Prewarm still uses LLM.
 CA_EXPLAIN_LLM_ON_DEMAND = os.getenv("CA_EXPLAIN_LLM_ON_DEMAND", "false").lower() in ("1", "true", "yes")
+# Fetch today's news into Redis (Upstash) when bundle missing/stale — NOT at midnight.
+CA_ALLOW_AUTO_NEWS_FETCH = os.getenv("CA_ALLOW_AUTO_NEWS_FETCH", "true").lower() in ("1", "true", "yes")
+# 11-language voice prewarm batch — keep false on Upstash free tier (Redis fills fast).
+CA_AUTO_VOICE_PREWARM = os.getenv("CA_AUTO_VOICE_PREWARM", "false").lower() in ("1", "true", "yes")
 CA_MIDNIGHT_PREWARM_ENABLED = os.getenv("CA_MIDNIGHT_PREWARM_ENABLED", "false").lower() in ("1", "true", "yes")
 CA_STARTUP_CATCHUP_ENABLED = os.getenv("CA_STARTUP_CATCHUP_ENABLED", "false").lower() in ("1", "true", "yes")
-# Batch fetch/enrich/prewarm (LLM+TTS) only at 12 AM IST — not on deploy/startup
-CA_BATCH_AI_ONLY_AT_MIDNIGHT = os.getenv("CA_BATCH_AI_ONLY_AT_MIDNIGHT", "true").lower() in ("1", "true", "yes")
+CA_BATCH_AI_ONLY_AT_MIDNIGHT = os.getenv("CA_BATCH_AI_ONLY_AT_MIDNIGHT", "false").lower() in ("1", "true", "yes")
 RAG_VECTORS_ENABLED = os.getenv("RAG_VECTORS_ENABLED", "true").lower() in ("1", "true", "yes")

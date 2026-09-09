@@ -16,7 +16,10 @@ from app.common.timing import get_metrics, record_turn, track_step
 from app.common.utils import build_daf_topic_stack
 from app.config.ca_languages import CA_VOICE_LANGUAGES, DEFAULT_CA_VOICE_LANG, ca_explain_use_llm, languages_public, resolve_ca_language
 from app.config.config import (
+    CA_ALLOW_AUTO_NEWS_FETCH,
+    CA_AUTO_VOICE_PREWARM,
     CA_BATCH_AI_ONLY_AT_MIDNIGHT,
+    CA_MIDNIGHT_PREWARM_ENABLED,
     CA_STARTUP_CATCHUP_ENABLED,
     DAILY_CA_ARTICLE_COUNT,
     DEFAULT_INTERVIEW_MODE,
@@ -79,6 +82,7 @@ async def _run_ca_prepare(session_id: str, force: bool = False) -> list:
         if (
             articles
             and ca_bundle_is_live(articles)
+            and CA_AUTO_VOICE_PREWARM
             and not CA_BATCH_AI_ONLY_AT_MIDNIGHT
         ):
             needs, force_fetch_flag = await assess_daily_pipeline()
@@ -107,7 +111,7 @@ async def ensure_daily_ca_bundle(session_id: str = "daily-ca", force: bool = Fal
     async with _ca_prepare_lock:
         if not force:
             cached = await ca_cache.get_bundle()
-            if cached and not ca_bundle_is_stale(cached):
+            if cached and (not ca_bundle_is_stale(cached) or not CA_ALLOW_AUTO_NEWS_FETCH):
                 return cached
 
         if _ca_prepare_task and not _ca_prepare_task.done():
@@ -459,15 +463,21 @@ async def prepare_current_affairs(session_id, profile, force: bool = False):
     else:
         cached = await ca_cache.get_bundle()
     if cached and ca_bundle_is_stale(cached):
-        await ca_cache.delete_bundle()
-        cached = None
+        if CA_ALLOW_AUTO_NEWS_FETCH or force:
+            await ca_cache.delete_bundle()
+            cached = None
+        else:
+            logger.info(
+                f"Keeping stale Redis CA bundle ({len(cached)} articles) — auto news fetch disabled"
+            )
+            return cached
     if cached:
         enriched = cached
         logger.info(f"Using Redis daily CA bundle ({len(enriched)} articles)")
-    elif CA_BATCH_AI_ONLY_AT_MIDNIGHT and not force:
+    elif not CA_ALLOW_AUTO_NEWS_FETCH and not force:
         enriched = enrich_tool.load_fallback_current_affairs()
         logger.info(
-            f"Daily CA using fallback until 12 AM IST fetch ({len(enriched)} articles)"
+            f"Daily CA using fallback — auto news fetch disabled ({len(enriched)} articles)"
         )
     else:
         try:
@@ -580,6 +590,12 @@ async def schedule_full_daily_pipeline(
     source: str = "auto",
 ) -> bool:
     """Run fetch + 11-language prewarm in background. Returns False if already running or done today."""
+    if source == "midnight" and not CA_MIDNIGHT_PREWARM_ENABLED:
+        logger.warning("Midnight CA pipeline blocked — CA_MIDNIGHT_PREWARM_ENABLED=false")
+        return False
+    if not CA_AUTO_VOICE_PREWARM and source not in ("manual", "midnight"):
+        logger.info(f"Voice prewarm batch skipped (source={source}) — CA_AUTO_VOICE_PREWARM=false")
+        return False
     if CA_BATCH_AI_ONLY_AT_MIDNIGHT and source not in ("midnight", "manual"):
         logger.info(f"Daily CA pipeline deferred until 12 AM IST (source={source})")
         return False
@@ -632,30 +648,32 @@ async def schedule_full_daily_pipeline(
 
 
 async def prefetch_daily_ca_startup():
-    """Load today's newspaper bundle in background; voices handled by daily pipeline scheduler."""
-    if CA_BATCH_AI_ONLY_AT_MIDNIGHT:
-        logger.info("Daily CA startup fetch skipped — fresh fetch runs at 12:00 AM IST only")
+    """If Upstash Redis has no fresh bundle, fetch today's news once and cache it."""
+    if not CA_ALLOW_AUTO_NEWS_FETCH:
+        logger.info("Daily CA startup fetch skipped — CA_ALLOW_AUTO_NEWS_FETCH=false")
         return
     try:
-        asyncio.create_task(ensure_daily_ca_bundle("startup", force=False))
-        logger.info("Daily CA bundle prefetch scheduled on startup")
+        cached = await ca_cache.get_bundle()
+        if cached and not ca_bundle_is_stale(cached):
+            logger.info(f"Upstash Redis CA bundle OK ({len(cached)} articles)")
+            return
+        force = bool(cached and ca_bundle_is_stale(cached))
+        asyncio.create_task(ensure_daily_ca_bundle("startup", force=force))
+        logger.info(f"Daily CA news fetch scheduled → Upstash Redis (force={force})")
     except Exception as e:
         logger.error(f"Daily CA startup prefetch failed: {e}")
 
 
 async def preserve_today_ca_cache():
-    """Keep existing Redis CA — stop batch LLM/TTS until midnight IST job."""
+    """Log Redis CA status when auto fetch is off."""
     await asyncio.sleep(9)
     try:
         cached = await ca_cache.get_bundle()
-        if not cached or ca_bundle_is_stale(cached):
-            logger.info("No live CA bundle in Redis — waiting for 12 AM IST fetch")
+        if not cached:
+            logger.info("No CA bundle in Upstash Redis — set CA_ALLOW_AUTO_NEWS_FETCH=true or use ?refresh=true")
             return
         ready = await count_languages_ready(cached)
-        await ca_cache.mark_daily_pipeline_done()
-        logger.info(
-            f"CA cache preserved for today — batch Redis writes paused until 12 AM IST: {ready}"
-        )
+        logger.info(f"Upstash CA cache kept as-is (auto fetch off): {len(cached)} articles, voices={ready}")
     except Exception as e:
         logger.warning(f"CA cache preserve check failed: {e}")
 
@@ -683,20 +701,30 @@ async def lifespan(app: FastAPI):
         ingest.ingest_shared_syllabus(SYLLABUS_PATH)
     except Exception as e:
         logger.error(f"Syllabus ingest failed (RAG may be degraded): {e}")
-    if CA_BATCH_AI_ONLY_AT_MIDNIGHT:
-        asyncio.create_task(preserve_today_ca_cache())
-    else:
-        asyncio.create_task(prefetch_daily_ca_startup())
-    from app.tools.ca_daily_scheduler import start_midnight_ca_scheduler
-
-    asyncio.create_task(
-        start_midnight_ca_scheduler(
-            assess_pipeline=assess_daily_pipeline,
-            schedule_pipeline=schedule_full_daily_pipeline,
-            ca_cache=ca_cache,
-            startup_catchup=CA_STARTUP_CATCHUP_ENABLED and not CA_BATCH_AI_ONLY_AT_MIDNIGHT,
-        )
+    logger.info(
+        "CA flags: "
+        f"redis_news_fetch={CA_ALLOW_AUTO_NEWS_FETCH}, "
+        f"voice_prewarm={CA_AUTO_VOICE_PREWARM}, "
+        f"midnight={CA_MIDNIGHT_PREWARM_ENABLED}"
     )
+    if CA_ALLOW_AUTO_NEWS_FETCH:
+        asyncio.create_task(prefetch_daily_ca_startup())
+    else:
+        asyncio.create_task(preserve_today_ca_cache())
+
+    if CA_MIDNIGHT_PREWARM_ENABLED:
+        from app.tools.ca_daily_scheduler import start_midnight_ca_scheduler
+
+        asyncio.create_task(
+            start_midnight_ca_scheduler(
+                assess_pipeline=assess_daily_pipeline,
+                schedule_pipeline=schedule_full_daily_pipeline,
+                ca_cache=ca_cache,
+                startup_catchup=CA_STARTUP_CATCHUP_ENABLED and not CA_BATCH_AI_ONLY_AT_MIDNIGHT,
+            )
+        )
+    else:
+        logger.info("Midnight CA scheduler OFF — no 12 AM IST news fetch")
     yield
     flush_langfuse()
     await session_store.close()
