@@ -1288,7 +1288,7 @@ async def respond_stream(
     await session_store.save_state(session_id, state)
     flush_langfuse()
 
-    voice_text = voice_for_tts(state)
+    voice_text = "" if interview_complete else voice_for_tts(state)
     evaluation = state.get("last_evaluation")
     notes = evaluation.notes if hasattr(evaluation, "notes") else ""
     eval_payload = serialize_evaluation(evaluation)

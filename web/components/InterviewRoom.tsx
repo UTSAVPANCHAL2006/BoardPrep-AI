@@ -90,6 +90,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
     const audioQueue = createStreamingAudioQueue();
     setLastAudio("");
     setBoardStreaming(true);
+    let interviewComplete = false;
     try {
       await respondStream(
         sessionId,
@@ -111,18 +112,27 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
           setDafFlags(meta.daf_flags);
           setTextAnswer("");
           if (meta.interview_complete) {
+            interviewComplete = true;
+            audioQueue.stop();
+            stopStreamingAudio();
+            setBoardStreaming(false);
+            setLastAudio("");
             router.push(`/feedback?session=${sessionId}`);
           }
         },
         (chunk) => {
+          if (interviewComplete) return;
           void audioQueue.enqueue(chunk.audio_base64);
         },
         undefined,
         (audioBase64) => {
+          if (interviewComplete) return;
           setLastAudio(audioBase64);
         }
       );
-      await audioQueue.waitUntilIdle();
+      if (!interviewComplete) {
+        await audioQueue.waitUntilIdle();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit");
     } finally {
