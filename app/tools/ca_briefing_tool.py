@@ -8,14 +8,39 @@ from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
 from app.common.utils import llm_message_text, parse_json_response
 from app.config.ca_languages import DEFAULT_CA_VOICE_LANG, CaVoiceLanguage, resolve_ca_language
-from app.config.config import CA_BRIEFING_VOICE_MAX_CHARS, CA_USE_LLM_BRIEFING
+from app.config.config import CA_BRIEFING_VOICE_MAX_CHARS, CA_BRIEFING_WORDS_MAX, CA_BRIEFING_WORDS_MIN, CA_USE_LLM_BRIEFING
 from app.prompts.ca_briefing_prompt import build_ca_briefing_prompts
 from app.schema.interview import EnrichedArticle
 
 logger = get_logger(__name__)
 
 _LLM_TIMEOUT_SEC = 90.0
+_SIMPLE_NATIVE_TIMEOUT_SEC = 55.0
 _MAX_BRIEFING_ATTEMPTS = 2
+
+_SIMPLE_NATIVE_SYSTEM = """You write UPSC Current Affairs classroom voice scripts for Indian students.
+Return JSON only with one key: briefing_voice.
+
+Write briefing_voice entirely in {language_name} ({native_name}) using the {script} script.
+No English letters (a-z, A-Z) inside briefing_voice.
+Use natural spoken {language_name}, about {word_band} words: hook question, background, all important facts,
+impact on India, UPSC exam link, one-line recap.
+Do not read the English headline word-for-word — explain the story in {language_name}."""
+
+_SIMPLE_NATIVE_USER = """Source: {source}
+GS papers: {gs_tags}
+Prelims relevant: {is_prelims_relevant}
+
+Facts (understand and teach in {language_name}; do not copy English phrases aloud):
+{top_highlight}
+
+Terms:
+{concepts}
+
+Why it matters:
+{short_insight}
+
+Return JSON only: {{"briefing_voice": "..."}}"""
 
 
 def clip_text(text: str, n: int) -> str:
@@ -241,7 +266,7 @@ class CaBriefingTool:
             ordinals = frame["ordinals"]
             for i, point in enumerate(highlights[:4]):
                 label = ordinals[i] if i < len(ordinals) else ordinals[-1]
-                parts.append(f"{label} — {point}.")
+                parts.append(f"{label}.")
         elif article.detailed_insights:
             parts.append(clip_text(article.detailed_insights, 400))
         for name, meaning in list(concepts.items())[:2]:
@@ -362,24 +387,102 @@ class CaBriefingTool:
             f"in {lang.script} with no English letters. First character {{."
         )
 
-    async def invoke_briefing(self, system: str, user: str, session_id: str, extra: str = "") -> dict:
+    async def _call_llm_json(
+        self,
+        system: str,
+        user: str,
+        session_id: str,
+        *,
+        run_name: str,
+        max_tokens: int = 700,
+        timeout: float = _LLM_TIMEOUT_SEC,
+    ) -> dict:
         from app.observability.langfuse_client import langchain_invoke_config
 
-        llm = self.llm.get_llm(temperature=0.2, max_tokens=520)
+        llm = self.llm.get_llm(temperature=0.2, max_tokens=max_tokens)
+        try:
+            llm = llm.bind(response_format={"type": "json_object"})
+        except Exception:
+            pass
         config = langchain_invoke_config(
             session_id,
-            run_name="ca_briefing_voice",
+            run_name=run_name,
             tags=["upsc-interview", "current-affairs", "voice"],
         )
-        messages = [
-            SystemMessage(content=system),
-            HumanMessage(content=user if not extra else f"{user}\n\n{extra}"),
-        ]
-        response = await asyncio.wait_for(llm.ainvoke(messages, config=config), timeout=_LLM_TIMEOUT_SEC)
+        messages = [SystemMessage(content=system), HumanMessage(content=user)]
+        response = await asyncio.wait_for(llm.ainvoke(messages, config=config), timeout=timeout)
         raw = llm_message_text(response)
         if not raw.strip():
-            logger.warning(f"CaBriefingTool empty LLM text; content_type={type(getattr(response, 'content', None))}")
+            logger.warning(
+                f"CaBriefingTool empty LLM text ({run_name}); "
+                f"content_type={type(getattr(response, 'content', None))}"
+            )
         return self.parse_briefing_payload(raw)
+
+    async def invoke_simple_native_voice(
+        self, article: EnrichedArticle, lang: CaVoiceLanguage, session_id: str
+    ) -> dict:
+        if lang.code in ("hi", "en") or lang.allow_latin:
+            raise ValueError("simple native voice is for Indic regional languages only")
+        highlights = article.key_highlights or []
+        concepts = article.key_concepts or {}
+        concept_lines = "\n".join(f"{k}: {v}" for k, v in list(concepts.items())[:4]) or "none"
+        word_band = f"{CA_BRIEFING_WORDS_MIN}–{CA_BRIEFING_WORDS_MAX}"
+        system = _SIMPLE_NATIVE_SYSTEM.format(
+            language_name=lang.name,
+            native_name=lang.native_name,
+            script=lang.script,
+            word_band=word_band,
+        )
+        user = _SIMPLE_NATIVE_USER.format(
+            source=article.source or "",
+            gs_tags=", ".join(article.gs_tags) or "General Studies",
+            is_prelims_relevant=article.is_prelims_relevant,
+            language_name=lang.name,
+            top_highlight="\n".join(f"- {h}" for h in highlights[:4]) or article.title,
+            concepts=concept_lines,
+            short_insight=clip_text(article.detailed_insights or "", 400),
+        )
+        return await self._call_llm_json(
+            system,
+            user,
+            session_id,
+            run_name=f"ca_briefing_native_{lang.code}",
+            max_tokens=700,
+            timeout=_SIMPLE_NATIVE_TIMEOUT_SEC,
+        )
+
+    async def _finish_regional_voice(
+        self,
+        article: EnrichedArticle,
+        lang: CaVoiceLanguage,
+        session_id: str,
+        last_err: Exception | None = None,
+    ) -> dict:
+        if lang.code not in ("hi", "en"):
+            try:
+                data = await self.invoke_simple_native_voice(article, lang, session_id)
+                voice = repair_voice_script((data.get("briefing_voice") or "").strip(), lang)
+                if voice != (data.get("briefing_voice") or "").strip():
+                    data["briefing_voice"] = voice
+                if voice_is_valid(voice, lang):
+                    result = self.merge_llm(article, data, lang)
+                    logger.info(f"CaBriefingTool native LLM ok ({lang.code}, {len(result['briefing_voice'])} chars)")
+                    return result
+            except Exception as e:
+                logger.warning(f"CaBriefingTool native LLM fallback failed ({lang.code}): {e}")
+        if last_err:
+            logger.warning(f"CaBriefingTool giving {lang.code} template after retries: {last_err}")
+        return self.teacher_briefing_from_article(article, lang)
+
+    async def invoke_briefing(self, system: str, user: str, session_id: str, extra: str = "") -> dict:
+        return await self._call_llm_json(
+            system,
+            user if not extra else f"{user}\n\n{extra}",
+            session_id,
+            run_name="ca_briefing_voice",
+            max_tokens=800,
+        )
 
     async def generate_briefing(
         self,
@@ -416,7 +519,12 @@ class CaBriefingTool:
                 short_insight=clip_text(article.detailed_insights or "", 400),
             )
 
-            max_attempts = 1 if session_id == "daily-ca-prewarm" else _MAX_BRIEFING_ATTEMPTS
+            if session_id == "daily-ca-prewarm":
+                max_attempts = 1
+            elif lang.code not in ("hi", "en"):
+                max_attempts = 1  # full prompt once, then simpler native-LLM fallback
+            else:
+                max_attempts = _MAX_BRIEFING_ATTEMPTS
             data: dict = {}
             last_err: Exception | None = None
             for attempt in range(max_attempts):
@@ -440,27 +548,25 @@ class CaBriefingTool:
                     continue
                 except asyncio.TimeoutError:
                     logger.warning(f"CaBriefingTool LLM timed out after {_LLM_TIMEOUT_SEC}s ({lang.code})")
-                    return self.teacher_briefing_from_article(article, lang)
+                    return await self._finish_regional_voice(article, lang, session_id)
                 except Exception as e:
                     last_err = e
                     if isinstance(e, TimeoutError) or "timeout" in type(e).__name__.lower():
                         logger.warning(f"CaBriefingTool LLM timed out ({lang.code})")
-                        return self.teacher_briefing_from_article(article, lang)
+                        return await self._finish_regional_voice(article, lang, session_id)
                     if groq_error_is_rate_limit(e):
                         groq_mark_limited(e)
-                        logger.warning("CaBriefingTool Groq rate limit — using template voice")
-                        return self.teacher_briefing_from_article(article, lang)
+                        logger.warning("CaBriefingTool Groq rate limit — using native fallback")
+                        return await self._finish_regional_voice(article, lang, session_id)
                     if "model_not_found" in str(e).lower() or "404" in str(e):
                         logger.error(f"CaBriefingTool Groq model missing: {e}")
-                        return self.teacher_briefing_from_article(article, lang)
+                        return await self._finish_regional_voice(article, lang, session_id)
                     err_label = type(e).__name__
                     err_msg = str(e).strip() or "no message"
                     logger.warning(f"CaBriefingTool invoke failed [{err_label}]: {err_msg}, retry {attempt + 1}")
                     continue
             else:
-                if last_err:
-                    logger.warning(f"CaBriefingTool giving {lang.code} template after retries: {last_err}")
-                return self.teacher_briefing_from_article(article, lang)
+                return await self._finish_regional_voice(article, lang, session_id, last_err)
 
             result = self.merge_llm(article, data, lang)
             logger.info(
@@ -469,14 +575,14 @@ class CaBriefingTool:
             )
             return result
         except asyncio.TimeoutError:
-            logger.warning("CaBriefingTool LLM timed out, using template voice")
-            return self.teacher_briefing_from_article(article, lang)
+            logger.warning("CaBriefingTool LLM timed out, using native fallback")
+            return await self._finish_regional_voice(article, lang, session_id)
         except Exception as e:
             if groq_error_is_rate_limit(e):
                 groq_mark_limited(e)
-            logger.warning(f"CaBriefingTool LLM failed ({e}), using template voice")
+            logger.warning(f"CaBriefingTool LLM failed ({e}), using native fallback")
             try:
-                return self.teacher_briefing_from_article(article, lang)
+                return await self._finish_regional_voice(article, lang, session_id, e)
             except Exception as inner:
                 logger.error(f"Error in CaBriefingTool: {inner}")
                 raise CustomException("CaBriefingTool Failed", inner)

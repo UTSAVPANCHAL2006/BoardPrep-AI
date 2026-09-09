@@ -168,12 +168,8 @@ def resolve_ca_language(code: str | None) -> CaVoiceLanguage:
 
 
 def ca_explain_use_llm(lang: CaVoiceLanguage) -> bool:
-    """User Listen: native teacher script + Sarvam. LLM only when CA_EXPLAIN_LLM_ON_DEMAND=true."""
-    from app.config.config import CA_EXPLAIN_LLM_ON_DEMAND
-
-    if CA_EXPLAIN_LLM_ON_DEMAND:
-        return lang.code not in ("hi", "en")
-    return False
+    """hi/en: fast native templates. Regional (ml, gu, …): LLM for full native script."""
+    return lang.code not in ("hi", "en")
 
 
 def languages_public() -> list[dict]:
