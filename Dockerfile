@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-small')"
+ARG PRELOAD_EMBEDDINGS=false
+RUN if [ "$PRELOAD_EMBEDDINGS" = "true" ]; then python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-small')"; fi
 
 COPY app/ app/
 COPY data/chroma/.gitkeep data/chroma/
@@ -18,6 +19,7 @@ COPY data/sample_daf_upsc_format_1.pdf data/
 
 ENV PYTHONUNBUFFERED=1
 ENV CHROMA_PATH=/app/data/chroma
+ENV RAG_VECTORS_ENABLED=false
 
 EXPOSE 8000
 

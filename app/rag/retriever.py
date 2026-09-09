@@ -4,6 +4,7 @@ from langchain_core.documents import Document
 
 from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
+from app.config.config import RAG_VECTORS_ENABLED
 from app.rag.embedding import Embedding
 from app.rag.ingest import _bm25_index, get_chroma_client, resolve_collection
 
@@ -49,6 +50,8 @@ class Retriever:
         return [(doc.page_content, 1.0 / (idx + 1)) for idx, doc in enumerate(docs)]
 
     def vector_search(self, collection_key, query, top_k):
+        if not RAG_VECTORS_ENABLED:
+            return []
         client = get_chroma_client()
         try:
             collection = client.get_collection(collection_key)

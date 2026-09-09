@@ -10,7 +10,7 @@ from chromadb.config import Settings as ChromaSettings
 
 from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
-from app.config.config import CHROMA_DIR
+from app.config.config import CHROMA_DIR, RAG_VECTORS_ENABLED
 from app.rag.embedding import Embedding
 from app.schema.interview import EnrichedArticle
 
@@ -170,6 +170,11 @@ class Ingest:
             if not documents:
                 return 0
 
+            if not RAG_VECTORS_ENABLED:
+                _bm25_index[name] = {"documents": documents, "ids": ids}
+                logger.info(f"Ingest completed (BM25-only): {len(documents)} chunks in {name}")
+                return len(documents)
+
             vectors = self.embedding.embed_documents(documents)
             collection.add(ids=ids, documents=documents, embeddings=vectors, metadatas=metadatas)
 
@@ -187,6 +192,11 @@ class Ingest:
         if not path.exists():
             return 0
         content_hash = hashlib.md5(path.read_bytes()).hexdigest()
+        name = SHARED_SYLLABUS_COLLECTION
+        cached = _bm25_index.get(name)
+        if cached and cached.get("documents") and not RAG_VECTORS_ENABLED:
+            logger.info("Shared syllabus BM25 cache hit")
+            return len(cached["documents"])
         client = get_chroma_client()
         try:
             col = client.get_collection(SHARED_SYLLABUS_COLLECTION)
