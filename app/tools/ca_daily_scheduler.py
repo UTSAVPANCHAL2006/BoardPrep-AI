@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime, time, timedelta
+from typing import Awaitable, Callable
 from zoneinfo import ZoneInfo
 
 from app.common.logger import get_logger
-from app.config.ca_languages import CA_VOICE_LANGUAGES
 from app.config.config import CA_MIDNIGHT_PREWARM_ENABLED
 
 logger = get_logger(__name__)
@@ -26,12 +26,13 @@ def seconds_until_next_midnight_ist() -> float:
 
 
 async def start_midnight_ca_scheduler(
-    run_pipeline,
+    assess_pipeline: Callable[[], Awaitable[tuple[bool, bool]]],
+    schedule_pipeline: Callable[..., Awaitable[bool]],
     *,
     ca_cache,
     startup_catchup: bool = True,
 ) -> None:
-    """Background loop — fires at 12:00 AM IST every day."""
+    """Background loop — catch-up on boot, then fires at 12:00 AM IST every day."""
     if not CA_MIDNIGHT_PREWARM_ENABLED:
         logger.info("Midnight CA scheduler disabled (CA_MIDNIGHT_PREWARM_ENABLED=false)")
         return
@@ -39,21 +40,20 @@ async def start_midnight_ca_scheduler(
     await asyncio.sleep(8)
 
     if startup_catchup:
-        today = ist_now().date()
-        cached = await ca_cache.get_bundle(day=today)
-        ready_hi = 0
-        if cached:
-            ready_hi = await ca_cache.count_ready_audio(len(cached), language="hi", day=today)
-        if not cached or ready_hi < len(cached):
-            logger.info("Midnight CA catch-up on startup (today's bundle/voices incomplete)")
-            try:
-                await run_pipeline()
-            except Exception as e:
-                logger.error(f"Midnight CA catch-up failed: {e}")
+        needs_run, force_fetch = await assess_pipeline()
+        if needs_run:
+            logger.info(f"Daily CA catch-up on startup (fetch={force_fetch}, 11 languages)")
+            started = await schedule_pipeline(force_fetch=force_fetch, force_voice=False)
+            if not started:
+                logger.info("Daily CA catch-up skipped — pipeline already running")
+        else:
+            logger.info("Daily CA already complete for today (bundle + 11 languages in Redis)")
 
     while True:
         wait = seconds_until_next_midnight_ist()
-        logger.info(f"Midnight CA scheduler sleeping {int(wait // 3600)}h {int((wait % 3600) // 60)}m until IST midnight")
+        logger.info(
+            f"Midnight CA scheduler sleeping {int(wait // 3600)}h {int((wait % 3600) // 60)}m until IST midnight"
+        )
         await asyncio.sleep(wait)
         await asyncio.sleep(3)
 
@@ -64,9 +64,9 @@ async def start_midnight_ca_scheduler(
             continue
 
         logger.info(f"Midnight CA job starting for {today.isoformat()} (IST)")
-        try:
-            await run_pipeline()
-            logger.info("Midnight CA job completed: fetch + 11-language Redis prewarm")
-        except Exception as e:
-            logger.error(f"Midnight CA job failed: {e}")
+        started = await schedule_pipeline(force_fetch=True, force_voice=False)
+        if started:
+            logger.info("Midnight CA job scheduled: fresh fetch + 11-language Redis prewarm")
+        else:
+            logger.info("Midnight CA job skipped — pipeline already running")
         await asyncio.sleep(60)

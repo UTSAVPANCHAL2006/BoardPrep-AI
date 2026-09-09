@@ -12,6 +12,7 @@ _IST = ZoneInfo("Asia/Kolkata")
 _memory_bundles: dict[str, str] = {}
 _memory_explains: dict[str, str] = {}
 _memory_jobs: set[str] = {}
+_memory_pipeline_done: set[str] = {}
 _redis_warned = False
 
 
@@ -122,6 +123,7 @@ class CaCache:
             deleted["explains"] = len(_memory_explains)
             _memory_bundles.clear()
             _memory_explains.clear()
+            _memory_pipeline_done.clear()
             logger.info(f"CA memory cache cleared: {deleted}")
             return deleted
         async for k in self._client.scan_iter(match="ca_bundle:*"):
@@ -130,6 +132,8 @@ class CaCache:
         async for k in self._client.scan_iter(match="ca_explain_v15:*"):
             await self._client.delete(k)
             deleted["explains"] += 1
+        async for k in self._client.scan_iter(match="ca_job:daily_pipeline_done:*"):
+            await self._client.delete(k)
         logger.info(f"CA Redis cache cleared: {deleted}")
         return deleted
 
@@ -145,6 +149,35 @@ class CaCache:
             return True
         claimed = await self._client.set(key, "1", nx=True, ex=172800)
         return bool(claimed)
+
+    def pipeline_done_key(self, day: date | None = None) -> str:
+        d = day or india_today()
+        return f"ca_job:daily_pipeline_done:{d.isoformat()}"
+
+    async def is_daily_pipeline_done(self, day: date | None = None) -> bool:
+        """True when today's full 11-language prewarm already finished successfully."""
+        await self.connect()
+        key = self.pipeline_done_key(day)
+        if self._use_memory:
+            return key in _memory_pipeline_done
+        return bool(await self._client.get(key))
+
+    async def mark_daily_pipeline_done(self, day: date | None = None) -> None:
+        await self.connect()
+        key = self.pipeline_done_key(day)
+        if self._use_memory:
+            _memory_pipeline_done.add(key)
+            return
+        await self._client.setex(key, 172800, "1")
+        logger.info(f"Daily CA pipeline marked done: {key}")
+
+    async def clear_daily_pipeline_done(self, day: date | None = None) -> None:
+        await self.connect()
+        key = self.pipeline_done_key(day)
+        if self._use_memory:
+            _memory_pipeline_done.discard(key)
+            return
+        await self._client.delete(key)
 
     def explain_key(self, article_index: int, language: str = "hi", day: date | None = None) -> str:
         return f"ca_explain_v15:{self.key(day)}:{language}:{article_index}"
