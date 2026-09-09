@@ -11,6 +11,7 @@ logger = get_logger(__name__)
 _IST = ZoneInfo("Asia/Kolkata")
 _memory_bundles: dict[str, str] = {}
 _memory_explains: dict[str, str] = {}
+_memory_jobs: set[str] = {}
 _redis_warned = False
 
 
@@ -131,6 +132,19 @@ class CaCache:
             deleted["explains"] += 1
         logger.info(f"CA Redis cache cleared: {deleted}")
         return deleted
+
+    async def try_claim_job(self, name: str, day: date | None = None) -> bool:
+        """Once-per-day lock so only one worker runs the midnight CA pipeline."""
+        await self.connect()
+        d = day or india_today()
+        key = f"ca_job:{name}:{d.isoformat()}"
+        if self._use_memory:
+            if key in _memory_jobs:
+                return False
+            _memory_jobs.add(key)
+            return True
+        claimed = await self._client.set(key, "1", nx=True, ex=172800)
+        return bool(claimed)
 
     def explain_key(self, article_index: int, language: str = "hi", day: date | None = None) -> str:
         return f"ca_explain_v15:{self.key(day)}:{language}:{article_index}"

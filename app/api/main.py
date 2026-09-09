@@ -14,7 +14,7 @@ from app.agents.state import InterviewState
 from app.common.logger import get_logger
 from app.common.timing import get_metrics, record_turn, track_step
 from app.common.utils import build_daf_topic_stack
-from app.config.ca_languages import DEFAULT_CA_VOICE_LANG, ca_explain_use_llm, languages_public, resolve_ca_language
+from app.config.ca_languages import CA_VOICE_LANGUAGES, DEFAULT_CA_VOICE_LANG, ca_explain_use_llm, languages_public, resolve_ca_language
 from app.config.config import (
     DAILY_CA_ARTICLE_COUNT,
     DEFAULT_INTERVIEW_MODE,
@@ -450,6 +450,25 @@ async def prepare_current_affairs(session_id, profile, force: bool = False):
     return enriched
 
 
+async def prewarm_all_languages_background(articles: list, force: bool = False) -> None:
+    """Prewarm every supported CA voice language into Redis (midnight batch job)."""
+    if not articles:
+        return
+    for lang in CA_VOICE_LANGUAGES:
+        logger.info(f"CA batch prewarm starting: {lang.name} ({lang.code})")
+        await prewarm_voices_background(articles, force=force, language=lang.code)
+    ready = {}
+    for lang in CA_VOICE_LANGUAGES:
+        ready[lang.code] = await ca_cache.count_ready_audio(len(articles), language=lang.code)
+    logger.info(f"CA batch prewarm summary: {ready}")
+
+
+async def run_midnight_ca_pipeline() -> None:
+    """12 AM IST: fresh newspaper fetch + all 11 language voices in Redis."""
+    articles = await ensure_daily_ca_bundle("midnight-ist", force=True)
+    await prewarm_all_languages_background(articles, force=False)
+
+
 async def prefetch_daily_ca_startup():
     try:
         cached = await ca_cache.get_bundle()
@@ -487,6 +506,15 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Syllabus ingest failed (RAG may be degraded): {e}")
     asyncio.create_task(prefetch_daily_ca_startup())
+    from app.tools.ca_daily_scheduler import start_midnight_ca_scheduler
+
+    asyncio.create_task(
+        start_midnight_ca_scheduler(
+            run_midnight_ca_pipeline,
+            ca_cache=ca_cache,
+            startup_catchup=True,
+        )
+    )
     yield
     flush_langfuse()
     await session_store.close()

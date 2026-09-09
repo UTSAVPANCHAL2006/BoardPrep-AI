@@ -52,4 +52,5 @@ DAILY_CA_ARTICLE_COUNT = int(os.getenv("DAILY_CA_ARTICLE_COUNT", "10"))
 CA_USE_LLM_BRIEFING = os.getenv("CA_USE_LLM_BRIEFING", "true").lower() in ("1", "true", "yes")
 # Listen click: use Redis cache instantly; if miss, fast template+TTS (not 90s LLM). Prewarm still uses LLM.
 CA_EXPLAIN_LLM_ON_DEMAND = os.getenv("CA_EXPLAIN_LLM_ON_DEMAND", "false").lower() in ("1", "true", "yes")
+CA_MIDNIGHT_PREWARM_ENABLED = os.getenv("CA_MIDNIGHT_PREWARM_ENABLED", "true").lower() in ("1", "true", "yes")
 RAG_VECTORS_ENABLED = os.getenv("RAG_VECTORS_ENABLED", "true").lower() in ("1", "true", "yes")
