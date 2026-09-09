@@ -123,6 +123,29 @@ class CaBriefingTool:
             "key_concepts": article.key_concepts,
         }
 
+    def _article_voice_english(
+        self,
+        article: EnrichedArticle,
+        highlights: list[str],
+        concepts: dict,
+        gs_link: str,
+    ) -> str:
+        """Article facts for Sarvam regional TTS (codemix reads English news content in kn-IN, ta-IN, etc.)."""
+        parts = [f"Today's important story: {article.title}."]
+        if article.source:
+            parts.append(f"This report is from {article.source}.")
+        if highlights:
+            parts.append("Key points:")
+            for point in highlights[:4]:
+                parts.append(point + ".")
+        elif article.detailed_insights:
+            parts.append(clip_text(article.detailed_insights, 400))
+        for name, meaning in list(concepts.items())[:2]:
+            parts.append(f"{name}: {meaning}.")
+        parts.append(f"Place this under {gs_link} for UPSC.")
+        parts.append("Remember facts for Prelims, India's angle for Mains, and a clear view for Interview.")
+        return " ".join(parts)
+
     def teacher_briefing_from_article(self, article: EnrichedArticle, lang: CaVoiceLanguage) -> dict:
         """Article-specific voice script when LLM is unavailable — uses enriched notes, not generic filler."""
         highlights = [h.strip() for h in (article.key_highlights or []) if h and h.strip()]
@@ -160,24 +183,14 @@ class CaBriefingTool:
             for eng, dev in _LATIN_TO_DEVANAGARI.items():
                 voice = re.sub(rf"\b{re.escape(eng)}\b", dev, voice, flags=re.IGNORECASE)
         elif lang.allow_latin:
-            parts = ["Let's walk through today's important story."]
-            if article.source:
-                parts.append(f"This report is from {article.source}.")
-            if highlights:
-                parts.append("Key points:")
-                for point in highlights[:4]:
-                    parts.append(point + ".")
-            elif article.detailed_insights:
-                parts.append(clip_text(article.detailed_insights, 280))
-            for name, meaning in list(concepts.items())[:2]:
-                parts.append(f"{name}: {meaning}.")
-            parts.append(f"Place this under {gs_link} for UPSC.")
-            parts.append("Remember facts for Prelims, India's angle for Mains, and a clear view for Interview.")
-            voice = " ".join(parts)
+            voice = self._article_voice_english(article, highlights, concepts, gs_link)
         else:
-            return self.fallback_briefing(article, lang)
+            voice = self._article_voice_english(article, highlights, concepts, gs_link)
 
         if len(voice.strip()) < 80:
+            extra = clip_text(article.detailed_insights or article.title, 400)
+            voice = f"{article.title}. {extra}".strip()
+        if len(voice.strip()) < 40:
             return self.fallback_briefing(article, lang)
 
         return {

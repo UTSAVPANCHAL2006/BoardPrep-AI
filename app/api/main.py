@@ -226,7 +226,9 @@ async def build_and_cache_explain(
                     f"CA explain not cached — Redis full (index={article_index}, lang={lang.code})"
                 )
         elif audio and briefing.get("is_fallback"):
-            logger.warning("CA explain not cached — generic fallback voice only")
+            logger.warning(
+                f"CA explain not cached — generic filler only (index={article_index}, lang={lang.code})"
+            )
         elif audio_error:
             logger.warning(
                 f"CA explain not cached — TTS failed (index={article_index}, lang={lang.code}): {audio_error}"
@@ -937,15 +939,17 @@ async def explain_current_affair(
     if article_index < 0 or article_index >= len(articles):
         raise HTTPException(status_code=400, detail="Invalid article_index")
 
-    dumped, from_cache = await build_and_cache_explain(
+    dumped, freshly_built = await build_and_cache_explain(
         articles[article_index],
         article_index,
         sid,
         language=language,
         use_llm=ca_explain_use_llm(resolve_ca_language(language)),
     )
-    if from_cache:
-        logger.info(f"CA explain instant cache hit (index={article_index}, lang={language})")
+    if freshly_built:
+        logger.info(f"CA explain on-demand Sarvam TTS (index={article_index}, lang={language})")
+    else:
+        logger.info(f"CA explain Redis cache hit (index={article_index}, lang={language})")
     flush_langfuse()
     return CABriefingResponse(**dumped)
 
