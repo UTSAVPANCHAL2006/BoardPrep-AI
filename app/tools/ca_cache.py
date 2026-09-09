@@ -49,6 +49,52 @@ class CaCache:
         self._client = None
         self._use_memory = False
         self._writes_blocked = False
+        self._active_bundle_day: date | None = None
+
+    def active_bundle_day(self) -> date:
+        return self._active_bundle_day or india_today()
+
+    def _parse_bundle_day(self, key: str) -> date | None:
+        prefix = "ca_bundle:"
+        if not key.startswith(prefix):
+            return None
+        try:
+            return date.fromisoformat(key[len(prefix) :])
+        except ValueError:
+            return None
+
+    async def _load_bundle_raw(self, key: str) -> list[EnrichedArticle] | None:
+        if self._use_memory:
+            raw = _memory_bundles.get(key)
+        else:
+            raw = await self._client.get(key)
+        if not raw:
+            return None
+        try:
+            data = json.loads(raw)
+            articles = [EnrichedArticle.model_validate(item) for item in data]
+            bundle_day = self._parse_bundle_day(key)
+            if bundle_day:
+                self._active_bundle_day = bundle_day
+            logger.info(f"CA cache hit: {key} ({len(articles)} articles)")
+            return articles
+        except Exception as e:
+            logger.warning(f"CA cache parse failed for {key}: {e}")
+            return None
+
+    async def _find_latest_bundle_key(self) -> str | None:
+        if self._use_memory:
+            keys = [k for k in _memory_bundles if k.startswith("ca_bundle:")]
+        else:
+            keys = [k async for k in self._client.scan_iter(match="ca_bundle:*")]
+        best_key: str | None = None
+        best_day: date | None = None
+        for key in keys:
+            bundle_day = self._parse_bundle_day(key)
+            if bundle_day and (best_day is None or bundle_day > best_day):
+                best_day = bundle_day
+                best_key = key
+        return best_key
 
     def writes_enabled(self) -> bool:
         return not self._writes_blocked and not self._use_memory
@@ -89,22 +135,24 @@ class CaCache:
         return f"ca_bundle:{d.isoformat()}"
 
     async def get_bundle(self, day: date | None = None) -> list[EnrichedArticle] | None:
+        """Today's bundle first, then most recent ca_bundle:* already in Redis (Upstash demo cache)."""
         await self.connect()
-        key = self.key(day)
-        if self._use_memory:
-            raw = _memory_bundles.get(key)
-        else:
-            raw = await self._client.get(key)
-        if not raw:
-            return None
-        try:
-            data = json.loads(raw)
-            articles = [EnrichedArticle.model_validate(item) for item in data]
-            logger.info(f"CA cache hit: {key} ({len(articles)} articles)")
+        target_day = day or india_today()
+        articles = await self._load_bundle_raw(self.key(target_day))
+        if articles:
             return articles
-        except Exception as e:
-            logger.warning(f"CA cache parse failed: {e}")
+        if day is not None:
             return None
+        latest_key = await self._find_latest_bundle_key()
+        if not latest_key or latest_key == self.key(target_day):
+            return None
+        articles = await self._load_bundle_raw(latest_key)
+        if articles:
+            bundle_day = self._parse_bundle_day(latest_key)
+            logger.info(
+                f"CA reusing Redis bundle from {bundle_day} (today={target_day}) — voice keys preserved"
+            )
+        return articles
 
     async def _clear_explains_for_day(self, day: date | None = None) -> int:
         await self.connect()
@@ -246,21 +294,55 @@ class CaCache:
         self, article_index: int, day: date | None = None, language: str = "hi", *, quiet: bool = False
     ) -> dict | None:
         await self.connect()
-        key = self.explain_key(article_index, language, day)
-        if self._use_memory:
-            raw = _memory_explains.get(key)
-        else:
-            raw = await self._client.get(key)
-        if not raw:
-            return None
-        try:
-            data = json.loads(raw)
-            if not quiet:
-                logger.info(f"CA explain cache hit: {key}")
-            return data
-        except Exception as e:
-            logger.warning(f"CA explain cache parse failed: {e}")
-            return None
+        bundle_day = day or self._active_bundle_day or india_today()
+
+        def _parse(raw: str | None, key: str) -> dict | None:
+            if not raw:
+                return None
+            try:
+                data = json.loads(raw)
+                if not quiet:
+                    logger.info(f"CA explain cache hit: {key}")
+                return data
+            except Exception as e:
+                logger.warning(f"CA explain cache parse failed for {key}: {e}")
+                return None
+
+        keys_to_try = [
+            self.explain_key(article_index, language, bundle_day),
+            self.explain_key(article_index, language, india_today()),
+            f"{language}:{article_index}",
+        ]
+        if self._active_bundle_day and self._active_bundle_day != bundle_day:
+            keys_to_try.insert(1, self.explain_key(article_index, language, self._active_bundle_day))
+
+        seen: set[str] = set()
+        for key in keys_to_try:
+            if key in seen:
+                continue
+            seen.add(key)
+            if self._use_memory:
+                raw = _memory_explains.get(key)
+            else:
+                raw = await self._client.get(key)
+            if not raw:
+                continue
+            if not raw.lstrip().startswith("{"):
+                if not quiet:
+                    logger.info(f"CA explain legacy audio hit: {key}")
+                return {"audio_base64": raw, "briefing_voice": "", "article_title": ""}
+            hit = _parse(raw, key)
+            if hit and hit.get("audio_base64"):
+                return hit
+
+        if not self._use_memory:
+            pattern = f"ca_explain_v15:ca_bundle:*:{language}:{article_index}"
+            async for key in self._client.scan_iter(match=pattern):
+                hit = _parse(await self._client.get(key), key)
+                if hit and hit.get("audio_base64"):
+                    return hit
+
+        return None
 
     async def set_explain(
         self, article_index: int, payload: dict, day: date | None = None, language: str = "hi"
@@ -287,9 +369,10 @@ class CaCache:
     async def count_ready_audio(
         self, article_count: int, day: date | None = None, language: str = "hi", *, quiet: bool = False
     ) -> int:
+        bundle_day = day or self._active_bundle_day
         ready = 0
         for i in range(article_count):
-            data = await self.get_explain(i, day, language, quiet=quiet)
+            data = await self.get_explain(i, bundle_day, language, quiet=quiet)
             if data and data.get("audio_base64"):
                 ready += 1
         return ready

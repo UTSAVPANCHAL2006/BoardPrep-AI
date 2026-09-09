@@ -111,7 +111,7 @@ async def ensure_daily_ca_bundle(session_id: str = "daily-ca", force: bool = Fal
     async with _ca_prepare_lock:
         if not force:
             cached = await ca_cache.get_bundle()
-            if cached and (not ca_bundle_is_stale(cached) or not CA_ALLOW_AUTO_NEWS_FETCH):
+            if cached:
                 return cached
 
         if _ca_prepare_task and not _ca_prepare_task.done():
@@ -140,6 +140,8 @@ async def schedule_daily_ca_prepare(session_id: str = "daily-ca", force: bool = 
         if not force:
             cached = await ca_cache.get_bundle()
             if cached and not ca_bundle_is_stale(cached):
+                return
+            if cached:
                 return
 
     async def run() -> None:
@@ -463,12 +465,12 @@ async def prepare_current_affairs(session_id, profile, force: bool = False):
     else:
         cached = await ca_cache.get_bundle()
     if cached and ca_bundle_is_stale(cached):
-        if CA_ALLOW_AUTO_NEWS_FETCH or force:
+        if force:
             await ca_cache.delete_bundle()
             cached = None
         else:
             logger.info(
-                f"Keeping stale Redis CA bundle ({len(cached)} articles) — auto news fetch disabled"
+                f"Keeping Redis CA bundle ({len(cached)} articles) — use ?refresh=true for fresh news"
             )
             return cached
     if cached:
@@ -648,18 +650,21 @@ async def schedule_full_daily_pipeline(
 
 
 async def prefetch_daily_ca_startup():
-    """If Upstash Redis has no fresh bundle, fetch today's news once and cache it."""
+    """Use existing Upstash bundle/voice — only fetch if Redis has zero ca_bundle keys."""
     if not CA_ALLOW_AUTO_NEWS_FETCH:
         logger.info("Daily CA startup fetch skipped — CA_ALLOW_AUTO_NEWS_FETCH=false")
         return
     try:
         cached = await ca_cache.get_bundle()
-        if cached and not ca_bundle_is_stale(cached):
-            logger.info(f"Upstash Redis CA bundle OK ({len(cached)} articles)")
+        if cached:
+            ready = await ca_cache.count_ready_audio(len(cached), language=DEFAULT_CA_VOICE_LANG, quiet=True)
+            logger.info(
+                f"Upstash Redis CA OK — reusing cached bundle ({len(cached)} articles, "
+                f"hi voice {ready}/{len(cached)}, day={ca_cache.active_bundle_day()})"
+            )
             return
-        force = bool(cached and ca_bundle_is_stale(cached))
-        asyncio.create_task(ensure_daily_ca_bundle("startup", force=force))
-        logger.info(f"Daily CA news fetch scheduled → Upstash Redis (force={force})")
+        asyncio.create_task(ensure_daily_ca_bundle("startup", force=False))
+        logger.info("No ca_bundle in Upstash Redis — scheduling one-time news fetch")
     except Exception as e:
         logger.error(f"Daily CA startup prefetch failed: {e}")
 
@@ -869,7 +874,7 @@ class RespondResponse(BaseModel):
 async def resolve_ca_articles(session_id: str | None, profile: DAFProfile) -> tuple[list, bool]:
     """Return CA articles and whether they are a live newspaper bundle."""
     cached = await ca_cache.get_bundle()
-    if cached and not ca_bundle_is_stale(cached):
+    if cached:
         return cached, ca_bundle_is_live(cached)
     if session_id:
         state = await session_store.load_state(session_id)
