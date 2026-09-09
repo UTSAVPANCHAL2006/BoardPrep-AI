@@ -14,6 +14,8 @@ def get_sarvam_api_key() -> str:
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+# Non-reasoning model for CA voice JSON — reasoning models burn tokens with no JSON output
+CA_BRIEFING_MODEL = os.getenv("CA_BRIEFING_MODEL", "gpt-4o-mini")
 GROQ_API_KEY = OPENAI_API_KEY
 GROQ_MODEL = OPENAI_MODEL
 SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")

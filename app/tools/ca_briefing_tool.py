@@ -19,13 +19,12 @@ _SIMPLE_NATIVE_TIMEOUT_SEC = 55.0
 _MAX_BRIEFING_ATTEMPTS = 2
 
 _SIMPLE_NATIVE_SYSTEM = """You write UPSC Current Affairs classroom voice scripts for Indian students.
-Return JSON only with one key: briefing_voice.
+Return JSON only with one key: briefing_voice. No reasoning steps, no markdown, no preamble.
 
 Write briefing_voice entirely in {language_name} ({native_name}) using the {script} script.
 No English letters (a-z, A-Z) inside briefing_voice.
-Use natural spoken {language_name}, about {word_band} words: hook question, background, all important facts,
-impact on India, UPSC exam link, one-line recap.
-Do not read the English headline word-for-word — explain the story in {language_name}."""
+About {word_band} words: hook, facts, India angle, UPSC link, recap.
+Do not read the English headline word-for-word — explain in {language_name}."""
 
 _SIMPLE_NATIVE_USER = """Source: {source}
 GS papers: {gs_tags}
@@ -387,6 +386,11 @@ class CaBriefingTool:
             f"in {lang.script} with no English letters. First character {{."
         )
 
+    def _is_length_limit_error(self, err: Exception) -> bool:
+        label = type(err).__name__.lower()
+        msg = str(err).lower()
+        return "lengthfinish" in label or "length limit" in msg or "max tokens" in msg
+
     async def _call_llm_json(
         self,
         system: str,
@@ -394,30 +398,42 @@ class CaBriefingTool:
         session_id: str,
         *,
         run_name: str,
-        max_tokens: int = 700,
+        max_tokens: int = 1200,
         timeout: float = _LLM_TIMEOUT_SEC,
     ) -> dict:
         from app.observability.langfuse_client import langchain_invoke_config
 
-        llm = self.llm.get_llm(temperature=0.2, max_tokens=max_tokens)
-        try:
-            llm = llm.bind(response_format={"type": "json_object"})
-        except Exception:
-            pass
         config = langchain_invoke_config(
             session_id,
             run_name=run_name,
             tags=["upsc-interview", "current-affairs", "voice"],
         )
         messages = [SystemMessage(content=system), HumanMessage(content=user)]
-        response = await asyncio.wait_for(llm.ainvoke(messages, config=config), timeout=timeout)
-        raw = llm_message_text(response)
-        if not raw.strip():
-            logger.warning(
-                f"CaBriefingTool empty LLM text ({run_name}); "
-                f"content_type={type(getattr(response, 'content', None))}"
-            )
-        return self.parse_briefing_payload(raw)
+        last_err: Exception | None = None
+        for attempt, token_budget in enumerate((max_tokens, max_tokens * 2)):
+            llm = self.llm.get_briefing_llm(temperature=0.2, max_tokens=token_budget)
+            try:
+                llm = llm.bind(response_format={"type": "json_object"})
+            except Exception:
+                pass
+            try:
+                response = await asyncio.wait_for(llm.ainvoke(messages, config=config), timeout=timeout)
+                raw = llm_message_text(response)
+                if not raw.strip():
+                    logger.warning(
+                        f"CaBriefingTool empty LLM text ({run_name}, tokens={token_budget}); "
+                        f"content_type={type(getattr(response, 'content', None))}"
+                    )
+                return self.parse_briefing_payload(raw)
+            except Exception as e:
+                last_err = e
+                if self._is_length_limit_error(e) and attempt == 0:
+                    logger.warning(f"CaBriefingTool token limit hit ({run_name}), retrying with more tokens")
+                    continue
+                raise
+        if last_err:
+            raise last_err
+        raise RuntimeError(f"CaBriefingTool LLM failed ({run_name})")
 
     async def invoke_simple_native_voice(
         self, article: EnrichedArticle, lang: CaVoiceLanguage, session_id: str
@@ -448,7 +464,7 @@ class CaBriefingTool:
             user,
             session_id,
             run_name=f"ca_briefing_native_{lang.code}",
-            max_tokens=700,
+            max_tokens=1200,
             timeout=_SIMPLE_NATIVE_TIMEOUT_SEC,
         )
 
@@ -481,7 +497,7 @@ class CaBriefingTool:
             user if not extra else f"{user}\n\n{extra}",
             session_id,
             run_name="ca_briefing_voice",
-            max_tokens=800,
+            max_tokens=1400,
         )
 
     async def generate_briefing(
