@@ -3,7 +3,8 @@ from langchain_core.messages import HumanMessage
 from app.agents.state import InterviewState
 from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
-from app.common.utils import parse_json_response, profile_summary
+from app.common.utils import parse_json_response, profile_summary, llm_message_text
+from app.config.config import INTERVIEW_JSON_MODEL
 from app.prompts.evaluate_prompt import EVALUATE_USER_TEMPLATE
 from app.schema.interview import AnswerEvaluation, ChatTurn, DAFFlag
 
@@ -34,7 +35,11 @@ class EvaluateAnswerNode:
                 profile=profile_summary(profile),
             )
 
-            llm = self.llm.get_llm(temperature=0.2, max_tokens=220)
+            llm = self.llm.get_llm(temperature=0.2, max_tokens=280, model=INTERVIEW_JSON_MODEL)
+            try:
+                llm = llm.bind(response_format={"type": "json_object"})
+            except Exception:
+                pass
             session_id = state.get("session_id", "")
             from app.observability.langfuse_client import langchain_invoke_config
 
@@ -44,7 +49,7 @@ class EvaluateAnswerNode:
                 tags=["upsc-interview", "evaluation"],
             )
             response = await llm.ainvoke([HumanMessage(content=prompt)], config=config)
-            data = parse_json_response(str(response.content))
+            data = parse_json_response(llm_message_text(response))
             evaluation = AnswerEvaluation.model_validate(data)
 
             history = list(state.get("chat_history", []))

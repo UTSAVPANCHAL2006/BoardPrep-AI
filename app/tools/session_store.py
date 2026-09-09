@@ -6,6 +6,8 @@ from app.common.logger import get_logger
 from app.config.config import REDIS_URL, SESSION_TTL_SECONDS as _SESSION_TTL
 from app.schema.interview import AnswerEvaluation, ChatTurn, CASource, DAFProfile, DAFFlag, EnrichedArticle, RetrievedChunk
 
+from app.tools.ca_cache import is_redis_memory_error
+
 logger = get_logger(__name__)
 
 _memory_store = {}
@@ -40,17 +42,31 @@ class SessionStore:
         await self.connect()
         serializable = self.serialize_state(state)
         payload = json.dumps(serializable)
+        key = self.key(session_id)
+        _memory_store[key] = payload
         if self._use_memory:
-            _memory_store[self.key(session_id)] = payload
             return
-        await self._client.setex(self.key(session_id), _SESSION_TTL, payload)
+        try:
+            await self._client.setex(key, _SESSION_TTL, payload)
+        except Exception as e:
+            if is_redis_memory_error(e):
+                logger.warning(
+                    f"Redis full — interview session kept in memory only ({session_id[:8]})"
+                )
+                return
+            raise
 
     async def load_state(self, session_id):
         await self.connect()
-        if self._use_memory:
-            raw = _memory_store.get(self.key(session_id))
-        else:
-            raw = await self._client.get(self.key(session_id))
+        key = self.key(session_id)
+        raw = _memory_store.get(key)
+        if raw is None and not self._use_memory and self._client:
+            try:
+                raw = await self._client.get(key)
+            except Exception as e:
+                if not is_redis_memory_error(e):
+                    raise
+                raw = _memory_store.get(key)
         if not raw:
             return None
         return self.deserialize_state(json.loads(raw))

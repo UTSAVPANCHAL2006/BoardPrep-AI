@@ -9,10 +9,12 @@ from app.common.utils import (
     format_ca_article_for_prompt,
     history_text,
     is_ca_grounded,
+    llm_message_text,
     parse_json_response,
     profile_summary,
     sanitize_board_question,
 )
+from app.config.config import INTERVIEW_JSON_MODEL
 from app.prompts.question_prompt import (
     CA_QUESTION_USER_TEMPLATE,
     CA_RETRY_SUFFIX,
@@ -63,20 +65,62 @@ class GenerateQuestionNode:
         cursor = state.get("ca_article_cursor", 0) % len(articles)
         return articles[cursor], (cursor + 1) % len(articles)
 
+    def fallback_question(self, phase: str, focus_anchor: str) -> dict:
+        anchor = focus_anchor or "your background"
+        if phase == "daf_opening":
+            q = f"Good morning. You mentioned {anchor} in your DAF — please introduce yourself briefly."
+            voice = f"नमस्ते। आपने अपने DAF में {anchor} के बारे में लिखा है — कृपया संक्षेप में अपना परिचय दीजिए।"
+        elif phase == "closing":
+            q = "Why do you want to join the civil services?"
+            voice = "आप सिविल सेवा क्यों join करना चाहते हैं?"
+        else:
+            q = f"Please elaborate on {anchor}."
+            voice = f"कृपया {anchor} पर थोड़ा विस्तार से बताइए।"
+        return {"question": q, "question_voice": voice}
+
     async def invoke_llm(self, user_prompt: str, session_id: str = "", run_name: str = "generate_question") -> dict:
         from app.observability.langfuse_client import langchain_invoke_config
 
-        llm = self.llm.get_llm(temperature=0.3, max_tokens=320)
+        llm = self.llm.get_llm(temperature=0.3, max_tokens=480, model=INTERVIEW_JSON_MODEL)
+        try:
+            llm = llm.bind(response_format={"type": "json_object"})
+        except Exception:
+            pass
         config = langchain_invoke_config(
             session_id,
             run_name=run_name,
             tags=["upsc-interview", "question"],
         )
-        response = await llm.ainvoke(
-            [SystemMessage(content=PANEL_PERSONA), HumanMessage(content=user_prompt)],
-            config=config,
-        )
-        return parse_json_response(str(response.content))
+        messages = [SystemMessage(content=PANEL_PERSONA), HumanMessage(content=user_prompt)]
+        last_err: Exception | None = None
+        for attempt in range(2):
+            try:
+                response = await llm.ainvoke(messages, config=config)
+                raw = llm_message_text(response)
+                if not raw.strip():
+                    logger.warning(f"GenerateQuestionNode empty LLM text (attempt {attempt + 1})")
+                return parse_json_response(raw)
+            except Exception as e:
+                last_err = e
+                logger.warning(f"GenerateQuestionNode LLM parse failed (attempt {attempt + 1}): {e}")
+        if last_err:
+            raise last_err
+        raise RuntimeError("GenerateQuestionNode LLM failed")
+
+    async def question_from_llm(
+        self,
+        prompt: str,
+        session_id: str,
+        phase: str,
+        focus_anchor: str,
+        *,
+        run_name: str = "generate_question",
+    ) -> dict:
+        try:
+            return await self.invoke_llm(prompt, session_id, run_name=run_name)
+        except Exception as e:
+            logger.warning(f"GenerateQuestionNode using fallback question ({phase}): {e}")
+            return self.fallback_question(phase, focus_anchor)
 
     async def generate_question_node(self, state: InterviewState):
         try:
@@ -110,7 +154,7 @@ class GenerateQuestionNode:
                     history=history_text(state.get("chat_history", [])),
                     context="\n\n".join(chunks) if chunks else "Use standard UPSC syllabus concepts.",
                 )
-                data = await self.invoke_llm(prompt, session_id)
+                data = await self.question_from_llm(prompt, session_id, phase, focus_anchor)
                 question = sanitize_board_question(data.get("question", ""), max_words=28)
                 question_voice = sanitize_board_question(data.get("question_voice") or question, max_words=32)
                 if not question_voice.strip():
@@ -138,16 +182,18 @@ class GenerateQuestionNode:
                     context="\n\n".join(chunks) if chunks else "None",
                     daf_anchor=featured.daf_anchor or "candidate profile",
                 )
-                data = await self.invoke_llm(prompt, session_id)
+                data = await self.question_from_llm(prompt, session_id, phase, focus_anchor)
                 question = sanitize_board_question(data.get("question", ""), max_words=30)
                 question_voice = sanitize_board_question(data.get("question_voice") or question, max_words=35)
 
                 score = ca_grounding_score(question, featured)
                 grounded = is_ca_grounded(question, featured)
                 if not grounded:
-                    data = await self.invoke_llm(
+                    data = await self.question_from_llm(
                         prompt + CA_RETRY_SUFFIX.format(article_title=featured.title),
                         session_id,
+                        phase,
+                        focus_anchor,
                         run_name="generate_question_ca_retry",
                     )
                     question = sanitize_board_question(data.get("question", ""), max_words=30)
@@ -174,7 +220,7 @@ class GenerateQuestionNode:
                     profile=profile_summary(profile),
                     history=history_text(state.get("chat_history", [])),
                 )
-                data = await self.invoke_llm(prompt, session_id)
+                data = await self.question_from_llm(prompt, session_id, phase, focus_anchor)
                 question = sanitize_board_question(
                     data.get("question", "Tell us briefly about yourself."), max_words=25
                 )

@@ -3,7 +3,8 @@ from langchain_core.messages import HumanMessage
 from app.agents.state import InterviewState
 from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
-from app.common.utils import history_text, parse_json_response, profile_summary
+from app.common.utils import history_text, llm_message_text, parse_json_response, profile_summary
+from app.config.config import INTERVIEW_JSON_MODEL
 from app.prompts.feedback_prompt import FEEDBACK_USER_TEMPLATE
 
 logger = get_logger(__name__)
@@ -29,7 +30,11 @@ class FeedbackReportNode:
                 daf_flags=flags_text,
             )
 
-            llm = self.llm.get_llm()
+            llm = self.llm.get_llm(model=INTERVIEW_JSON_MODEL)
+            try:
+                llm = llm.bind(response_format={"type": "json_object"})
+            except Exception:
+                pass
             session_id = state.get("session_id", "")
             from app.observability.langfuse_client import langchain_invoke_config
 
@@ -39,7 +44,7 @@ class FeedbackReportNode:
                 tags=["upsc-interview", "feedback"],
             )
             response = await llm.ainvoke([HumanMessage(content=prompt)], config=config)
-            report = parse_json_response(str(response.content))
+            report = parse_json_response(llm_message_text(response))
             if daf_flags:
                 report["daf_flags"] = [
                     flag.model_dump() if hasattr(flag, "model_dump") else flag
