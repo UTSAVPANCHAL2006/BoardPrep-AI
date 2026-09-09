@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createStreamingAudioQueue, respondStream, startInterview, getSupportedAudioMimeType, stopStreamingAudio, playBase64AudioAndWait } from "@/lib/api";
+import {
+  createStreamingAudioQueue,
+  respondStream,
+  startInterview,
+  getSupportedAudioMimeType,
+  stopStreamingAudio,
+} from "@/lib/api";
 import type { CABriefing, CASource, DAFFlag, RetrievedChunk } from "@/lib/types";
 import { CaBriefingCard } from "./CaBriefingCard";
 import { VoicePlayer } from "./VoicePlayer";
@@ -44,16 +50,10 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [lastAudio, setLastAudio] = useState("");
   const [boardStreaming, setBoardStreaming] = useState(false);
-  const [streamedQuestionAudio, setStreamedQuestionAudio] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const mimeTypeRef = useRef("audio/webm");
-
-  const questionAutoPlay =
-    !(phase === "current_affairs" && caBriefing?.audio_base64) &&
-    !boardStreaming &&
-    !streamedQuestionAudio;
 
   useEffect(() => {
     let cancelled = false;
@@ -88,9 +88,8 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
     setError("");
     stopStreamingAudio();
     const audioQueue = createStreamingAudioQueue();
-    let replayAudio = "";
-    let briefingPromise: Promise<void> = Promise.resolve();
-    setStreamedQuestionAudio(false);
+    setLastAudio("");
+    setBoardStreaming(true);
     try {
       await respondStream(
         sessionId,
@@ -111,33 +110,23 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
           setCaBriefing(meta.ca_briefing ?? null);
           setDafFlags(meta.daf_flags);
           setTextAnswer("");
-          setLastAudio("");
-          setBoardStreaming(true);
           if (meta.interview_complete) {
             router.push(`/feedback?session=${sessionId}`);
           }
         },
         (chunk) => {
-          setStreamedQuestionAudio(true);
-          void briefingPromise.then(() => audioQueue.enqueue(chunk.audio_base64));
+          void audioQueue.enqueue(chunk.audio_base64);
         },
-        (briefingB64) => {
-          briefingPromise = playBase64AudioAndWait(briefingB64);
-        },
+        undefined,
         (audioBase64) => {
-          replayAudio = audioBase64;
+          setLastAudio(audioBase64);
         }
       );
-      await briefingPromise;
       await audioQueue.waitUntilIdle();
-      if (replayAudio) {
-        setLastAudio(replayAudio);
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit");
     } finally {
       setBoardStreaming(false);
-      setStreamedQuestionAudio(false);
       setBusy(false);
     }
   }
@@ -195,10 +184,8 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
 
       <div className={`grid gap-5 ${sidebarOpen ? "lg:grid-cols-[1fr_300px]" : ""}`}>
         <div className="space-y-4">
-          {/* Board question card */}
           <div className="gradient-border animate-fade-up">
             <div className="inner space-y-6 p-6 md:p-8">
-              {/* Panel header */}
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="relative">
@@ -228,11 +215,10 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
 
               <DafFlagsBanner flags={dafFlags} />
 
-              {phase === "current_affairs" && caBriefing?.audio_base64 && (
-                <CaBriefingCard briefing={caBriefing} compact autoPlay={!boardStreaming} />
+              {phase === "current_affairs" && caBriefing && (
+                <CaBriefingCard briefing={{ ...caBriefing, audio_base64: "" }} compact autoPlay={false} />
               )}
 
-              {/* Question */}
               <div className="relative pl-4">
                 <div className="absolute left-0 top-0 h-full w-1 rounded-full bg-gradient-to-b from-saffron to-saffron-dark" />
                 <p className="question-text">&ldquo;{question}&rdquo;</p>
@@ -248,11 +234,10 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
                 <VoicePlayer
                   audioBase64={lastAudio}
                   label="Board question voice"
-                  autoPlay={questionAutoPlay}
+                  autoPlay={false}
                 />
               )}
 
-              {/* Divider */}
               <div className="flex items-center gap-4">
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 <span className="text-xs uppercase tracking-widest text-slate-600">Your turn</span>
@@ -295,7 +280,6 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
             </div>
           )}
 
-          {/* Transcript */}
           {turns.length > 1 && (
             <div className="glass-card">
               <button

@@ -13,7 +13,7 @@ from app.agents.graph import InterviewGraph
 from app.agents.state import InterviewState
 from app.common.logger import get_logger
 from app.common.timing import get_metrics, record_turn, track_step
-from app.common.utils import build_daf_topic_stack
+from app.common.utils import build_daf_topic_stack, ca_board_question_word_limits, sanitize_ca_board_question
 from app.config.ca_languages import CA_VOICE_LANGUAGES, DEFAULT_CA_VOICE_LANG, ca_explain_use_llm, languages_public, resolve_ca_language
 from app.config.config import (
     CA_ALLOW_AUTO_NEWS_FETCH,
@@ -374,7 +374,11 @@ def serialize_daf_flags(flags):
 
 
 def voice_for_tts(state: dict) -> str:
-    return state.get("current_question_voice") or state.get("current_question", "")
+    raw = state.get("current_question_voice") or state.get("current_question", "")
+    if state.get("current_phase") == "current_affairs":
+        cap = ca_board_question_word_limits(state.get("interview_mode", "full"), for_voice=True)
+        return sanitize_ca_board_question(raw, max_words=cap)
+    return raw.strip()
 
 
 def serialize_ca_source(ca_source) -> "CASourceResponse | None":
@@ -837,8 +841,6 @@ def build_start_interview_response(
     briefing_audio: bytes = b"",
 ) -> StartInterviewResponse:
     ca_briefing = serialize_ca_briefing(state.get("last_ca_briefing"))
-    if ca_briefing and briefing_audio:
-        ca_briefing.audio_base64 = base64.b64encode(briefing_audio).decode()
     return StartInterviewResponse(
         session_id=session_id,
         question=state.get("current_question", ""),
@@ -1149,13 +1151,11 @@ async def start_interview(session_id: str = Form(...)):
     if state.get("interview_started") and state.get("current_question"):
         logger.info(f"Interview already started for {session_id[:8]} — returning cached first question")
         cached_q_audio = state.get("start_audio_base64") or ""
-        cached_b_audio = state.get("start_briefing_audio_base64") or ""
         return build_start_interview_response(
             session_id,
             state,
             enriched,
             base64.b64decode(cached_q_audio) if cached_q_audio else b"",
-            base64.b64decode(cached_b_audio) if cached_b_audio else b"",
         )
 
     profile = state["daf_profile"]
@@ -1182,10 +1182,6 @@ async def start_interview(session_id: str = Form(...)):
             graph = get_graph()
             result = await graph.run_first_question(state)
     state.update(result)
-    briefing_audio = b""
-    if state.get("current_phase") == "current_affairs" and state.get("last_ca_briefing"):
-        with track_step(session_id, "ca_briefing_tts"):
-            briefing_audio = await synthesize_briefing_audio(state)
     audio_out = b""
     with track_step(session_id, "tts"):
         try:
@@ -1195,12 +1191,10 @@ async def start_interview(session_id: str = Form(...)):
             audio_out = b""
     state["interview_started"] = True
     state["start_audio_base64"] = base64.b64encode(audio_out).decode() if audio_out else ""
-    if briefing_audio:
-        state["start_briefing_audio_base64"] = base64.b64encode(briefing_audio).decode()
     record_turn(session_id, state.get("current_phase", "daf_opening"))
     await session_store.save_state(session_id, state)
     flush_langfuse()
-    return build_start_interview_response(session_id, state, enriched, audio_out, briefing_audio)
+    return build_start_interview_response(session_id, state, enriched, audio_out)
 
 
 @app.post("/respond", response_model=RespondResponse)
@@ -1226,10 +1220,6 @@ async def respond(session_id: str = Form(...), audio: UploadFile = File(None), t
     interview_complete = bool(state.get("interview_complete"))
     question = "" if interview_complete else state.get("current_question", "")
     audio_out = b""
-    briefing_audio = b""
-    if question and state.get("current_phase") == "current_affairs" and state.get("last_ca_briefing"):
-        with track_step(session_id, "ca_briefing_tts"):
-            briefing_audio = await synthesize_briefing_audio(state)
     if question:
         with track_step(session_id, "tts"):
             try:
@@ -1244,8 +1234,6 @@ async def respond(session_id: str = Form(...), audio: UploadFile = File(None), t
     notes = evaluation.notes if hasattr(evaluation, "notes") else ""
     eval_payload = serialize_evaluation(evaluation)
     ca_briefing = serialize_ca_briefing(state.get("last_ca_briefing"))
-    if ca_briefing and briefing_audio:
-        ca_briefing.audio_base64 = base64.b64encode(briefing_audio).decode()
     return RespondResponse(
         session_id=session_id,
         transcript=transcript,
@@ -1324,13 +1312,6 @@ async def respond_stream(
             "evaluation": eval_payload,
         }
         yield f"data: {json.dumps(meta, default=str)}\n\n"
-
-        if question and state.get("current_phase") == "current_affairs" and state.get("last_ca_briefing"):
-            with track_step(session_id, "ca_briefing_tts"):
-                briefing_audio = await synthesize_briefing_audio(state)
-            if briefing_audio and ca_briefing:
-                ca_briefing.audio_base64 = base64.b64encode(briefing_audio).decode()
-                yield f"data: {json.dumps({'type': 'briefing_audio', 'audio_base64': ca_briefing.audio_base64})}\n\n"
 
         wav_parts: list[bytes] = []
         if voice_text:
