@@ -134,6 +134,7 @@ export interface FeedbackReport {
   current_affairs_awareness: string;
   scores?: FeedbackScores;
   phase_breakdown?: Record<string, string>;
+  priority_actions?: string[];
   daf_flags?: DAFFlag[];
 }
 

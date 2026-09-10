@@ -348,6 +348,7 @@ def initial_state(session_id, daf_text, profile, mode_config):
         panel_persona="UPSC board member",
         follow_up_count=0,
         phase_exchange_count=0,
+        evaluation_log=[],
         interview_complete=False,
         feedback_report={},
         router_action="pivot",

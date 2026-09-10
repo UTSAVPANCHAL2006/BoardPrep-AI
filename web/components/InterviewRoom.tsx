@@ -8,6 +8,7 @@ import {
   respondStream,
   startInterview,
   getSupportedAudioMimeType,
+  stopAudio,
   stopStreamingAudio,
 } from "@/lib/api";
 import type { CABriefing, CASource, DAFFlag, RetrievedChunk } from "@/lib/types";
@@ -62,6 +63,8 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
   const vadCleanupRef = useRef<(() => void) | null>(null);
   const captionCleanupRef = useRef<(() => void) | null>(null);
   const autoStopRef = useRef(false);
+  const pendingFirstAudioRef = useRef<string | null>(null);
+  const firstAudioPlayedRef = useRef(false);
 
   function cleanupRecordingExtras() {
     vadCleanupRef.current?.();
@@ -97,9 +100,8 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
         setCaBriefing(res.ca_briefing ?? null);
         setTurns([{ role: "panel", content: res.question }]);
         setLastAudio(res.audio_base64);
-        if (res.audio_base64) {
-          await speakQuestionAudio(res.audio_base64);
-        }
+        pendingFirstAudioRef.current = res.audio_base64 || null;
+        firstAudioPlayedRef.current = false;
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Failed to start");
@@ -113,6 +115,30 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
       cancelled = true;
     };
   }, [sessionId]);
+
+  useEffect(() => {
+    if (loading) return;
+    const audio = pendingFirstAudioRef.current;
+    if (!audio || firstAudioPlayedRef.current) return;
+
+    firstAudioPlayedRef.current = true;
+    pendingFirstAudioRef.current = null;
+
+    const timer = window.setTimeout(() => {
+      void speakQuestionAudio(audio);
+    }, 400);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [loading]);
+
+  useEffect(() => {
+    return () => {
+      stopStreamingAudio();
+      stopAudio();
+    };
+  }, []);
 
   async function handleRespond(blob?: Blob, mimeType?: string, text?: string) {
     setBusy(true);
@@ -295,7 +321,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
 
               {boardSpeaking && (
                 <p className="text-xs font-medium uppercase tracking-widest text-saffron/90">
-                  Board bol raha hai — suniye, phir jawab dijiye
+                  Board is speaking — listen, then respond
                 </p>
               )}
 
@@ -305,14 +331,14 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
                   className="btn-primary w-full sm:w-auto"
                   onClick={() => void speakQuestionAudio(lastAudio)}
                 >
-                  ▶ Pehla sawaal suno (board voice)
+                  ▶ Hear first question (board voice)
                 </button>
               )}
 
               {lastAudio && !boardSpeaking && (
                 <VoicePlayer
                   audioBase64={lastAudio}
-                  label="Dobara suno — replay question"
+                  label="Replay question"
                   autoPlay={false}
                 />
               )}

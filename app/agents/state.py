@@ -35,6 +35,7 @@ class InterviewState(TypedDict, total=False):
     follow_up_count: int
     phase_exchange_count: int
     last_evaluation: AnswerEvaluation
+    evaluation_log: list[dict]
     feedback_report: dict
     interview_complete: bool
     route: str

@@ -27,7 +27,18 @@ class EvaluateAnswerNode:
                     factual_consistency="unknown",
                     notes="No answer provided.",
                 )
-                return {"last_evaluation": evaluation}
+                eval_log = list(state.get("evaluation_log", []))
+                eval_log.append(
+                    {
+                        "phase": state.get("current_phase", ""),
+                        "question": state.get("current_question", ""),
+                        "answer": "",
+                        "clarity": evaluation.clarity,
+                        "factual_consistency": evaluation.factual_consistency,
+                        "notes": evaluation.notes,
+                    }
+                )
+                return {"last_evaluation": evaluation, "evaluation_log": eval_log}
 
             prompt = EVALUATE_USER_TEMPLATE.format(
                 question=state.get("current_question", ""),
@@ -66,6 +77,18 @@ class EvaluateAnswerNode:
                     )
                 )
 
+            eval_log = list(state.get("evaluation_log", []))
+            eval_log.append(
+                {
+                    "phase": state.get("current_phase", ""),
+                    "question": state.get("current_question", ""),
+                    "answer": answer[:800],
+                    "clarity": evaluation.clarity,
+                    "factual_consistency": evaluation.factual_consistency,
+                    "notes": evaluation.notes or "",
+                }
+            )
+
             logger.info(f"EvaluateAnswerNode completed: clarity={evaluation.clarity}")
             return {
                 "last_evaluation": evaluation,
@@ -73,6 +96,7 @@ class EvaluateAnswerNode:
                 "follow_up_count": state.get("follow_up_count", 0) + 1,
                 "phase_exchange_count": state.get("phase_exchange_count", 0) + 1,
                 "daf_flags": daf_flags,
+                "evaluation_log": eval_log,
             }
 
         except Exception as e:

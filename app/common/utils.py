@@ -92,11 +92,28 @@ def profile_summary(profile: DAFProfile) -> str:
     )
 
 
-def history_text(history: list[ChatTurn]) -> str:
+def history_text(history: list[ChatTurn], *, limit: int | None = 6) -> str:
     if not history:
         return "(no prior exchanges)"
-    lines = [f"{turn.role.upper()}: {turn.content}" for turn in history[-6:]]
+    turns = history if limit is None else history[-limit:]
+    lines = [f"{turn.role.upper()}: {turn.content}" for turn in turns]
     return "\n".join(lines)
+
+
+def evaluation_log_text(evaluation_log: list[dict]) -> str:
+    if not evaluation_log:
+        return "(no per-turn evaluations recorded)"
+    lines = []
+    for i, entry in enumerate(evaluation_log, 1):
+        lines.append(
+            f"Turn {i} [{entry.get('phase', 'unknown')}]\n"
+            f"Q: {entry.get('question', '')}\n"
+            f"A: {entry.get('answer', '')}\n"
+            f"Clarity: {entry.get('clarity', 'unknown')} | "
+            f"DAF: {entry.get('factual_consistency', 'unknown')}\n"
+            f"Notes: {entry.get('notes', '')}"
+        )
+    return "\n\n".join(lines)
 
 
 def build_daf_topic_stack(profile: DAFProfile) -> list[str]:

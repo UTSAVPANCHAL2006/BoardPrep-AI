@@ -21,7 +21,6 @@ export function MicButton({
 }) {
   return (
     <div className="flex flex-col items-center gap-5">
-      {/* Outer rings */}
       <div className="relative">
         {(recording || busy) && (
           <>
@@ -62,14 +61,14 @@ export function MicButton({
       <div className="text-center">
         <p className="text-sm font-medium text-slate-200">
           {boardSpeaking
-            ? "Board bol raha hai — khatam hone ke baad mic khulega"
+            ? "Board is speaking — mic unlocks when finished"
             : busy
-            ? "Transcribing & evaluating — can take 1–2 min"
-            : recording
-              ? autoSubmitInSec
-                ? `Chup ho gaye — ${autoSubmitInSec}s mein auto-submit`
-                : "Sun raha hoon — boliye, ~7 sec pause pe submit"
-              : "Tap microphone to respond"}
+              ? "Transcribing & evaluating — can take 1–2 min"
+              : recording
+                ? autoSubmitInSec
+                  ? `Paused — auto-submit in ${autoSubmitInSec}s`
+                  : "Listening — auto-submit after ~7s silence, or tap to finish"
+                : "Tap microphone to respond"}
         </p>
         {recording && liveCaption && (
           <p className="mt-2 max-w-md text-sm italic text-saffron/90">
@@ -78,17 +77,17 @@ export function MicButton({
         )}
         {recording && !liveCaption && (
           <p className="mt-2 text-xs text-slate-500">
-            Auto-submit ~7 sec silence ke baad · tap se turant bhejo
+            Auto-submit after ~7s of silence · tap to send now
           </p>
         )}
         <p className="mt-1 text-xs text-slate-500">
           {boardSpeaking
-            ? "Question sun lijiye, phir record kijiye"
+            ? "Listen to the question, then record your answer"
             : busy
-            ? "STT → board LLM → next question voice"
-            : recording
-              ? "Sochne ka gap chalega — pause pe countdown dikhega"
-              : "Speak clearly in Hindi or English"}
+              ? "STT → board LLM → next question voice"
+              : recording
+                ? "Thinking pauses are fine — countdown shows before submit"
+                : "Speak clearly in Hindi or English"}
         </p>
       </div>
     </div>

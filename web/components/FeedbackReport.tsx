@@ -21,13 +21,33 @@ const SCORE_LABELS: Record<keyof FeedbackScores, string> = {
   confidence: "Confidence",
 };
 
+const PHASE_LABELS: Record<string, string> = {
+  daf_opening: "DAF Opening",
+  subject_probe: "Subject Probe",
+  current_affairs: "Current Affairs",
+  closing: "Closing Round",
+};
+
+function scoreBand(avg: number): { label: string; className: string } {
+  if (avg >= 8) return { label: "Strong performance", className: "text-emerald-300" };
+  if (avg >= 6) return { label: "Good foundation — keep refining", className: "text-saffron" };
+  if (avg >= 4) return { label: "Developing — focus on structure", className: "text-amber-300" };
+  return { label: "Needs focused practice", className: "text-red-300" };
+}
+
 function ScoreCard({ label, score }: { label: string; score: number }) {
   const pct = (score / 10) * 100;
-  const color = score >= 7 ? "from-emerald-500 to-emerald-400" : score >= 5 ? "from-saffron to-saffron-light" : "from-red-500 to-red-400";
+  const color =
+    score >= 7 ? "from-emerald-500 to-emerald-400" : score >= 5 ? "from-saffron to-saffron-light" : "from-red-500 to-red-400";
+  const hint =
+    score >= 7 ? "Strong" : score >= 5 ? "Adequate" : score >= 3 ? "Developing" : "Needs work";
   return (
     <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-slate-400">{label}</p>
+        <div>
+          <p className="text-xs font-medium text-slate-400">{label}</p>
+          <p className="mt-0.5 text-[10px] uppercase tracking-wider text-slate-600">{hint}</p>
+        </div>
         <p className="font-display text-2xl font-bold text-slate-100">{score}</p>
       </div>
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-navy-border">
@@ -55,20 +75,30 @@ export function FeedbackReportView({
       }))
     : [];
 
-  const avgScore = chartData.length
-    ? (chartData.reduce((s, d) => s + d.score, 0) / chartData.length).toFixed(1)
+  const avgScoreNum = chartData.length
+    ? chartData.reduce((s, d) => s + d.score, 0) / chartData.length
     : null;
+  const avgScore = avgScoreNum !== null ? avgScoreNum.toFixed(1) : null;
+  const band = avgScoreNum !== null ? scoreBand(avgScoreNum) : null;
+
+  const dimensionNotes = [
+    { title: "DAF Alignment", text: report.daf_consistency },
+    { title: "Subject Depth", text: report.subject_depth },
+    { title: "Current Affairs", text: report.current_affairs_awareness },
+  ].filter((d) => d.text?.trim());
 
   return (
     <div className="space-y-6">
-      {/* Hero summary */}
       <div className="gradient-border">
         <div className="inner p-8">
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <p className="section-label">Interview Complete</p>
               <h2 className="mt-2 font-display text-3xl font-bold">Your Board Report</h2>
-              <p className="mt-3 max-w-xl text-slate-400">{report.overall_summary}</p>
+              {band && (
+                <p className={`mt-2 text-sm font-medium ${band.className}`}>{band.label}</p>
+              )}
+              <p className="mt-3 max-w-xl text-slate-400 leading-relaxed">{report.overall_summary}</p>
             </div>
             {avgScore && (
               <div className="flex h-28 w-28 flex-shrink-0 flex-col items-center justify-center rounded-full bg-gradient-to-br from-saffron/20 to-saffron/5 ring-2 ring-saffron/30">
@@ -82,7 +112,25 @@ export function FeedbackReportView({
 
       <DafFlagsBanner flags={dafFlags || []} />
 
-      {/* Score cards grid */}
+      {report.priority_actions && report.priority_actions.length > 0 && (
+        <div className="glass-card border-saffron/20">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-lg">🎯</span>
+            <h3 className="font-semibold text-saffron">Priority Actions</h3>
+          </div>
+          <ol className="space-y-2">
+            {report.priority_actions.map((action, i) => (
+              <li key={i} className="flex gap-3 text-sm text-slate-300">
+                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-saffron/15 text-xs font-bold text-saffron">
+                  {i + 1}
+                </span>
+                {action}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
       {scores && (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {(Object.keys(SCORE_LABELS) as (keyof FeedbackScores)[]).map((key) => (
@@ -93,7 +141,10 @@ export function FeedbackReportView({
 
       {chartData.length > 0 && (
         <div className="glass-card">
-          <h3 className="mb-6 font-display text-lg font-semibold">Performance Overview</h3>
+          <h3 className="mb-2 font-display text-lg font-semibold">Performance Overview</h3>
+          <p className="mb-6 text-xs text-slate-500">
+            Scores are calibrated for mock practice — 5–6 means adequate for the mode; 7+ is strong.
+          </p>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} barSize={32}>
@@ -115,6 +166,17 @@ export function FeedbackReportView({
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      )}
+
+      {dimensionNotes.length > 0 && (
+        <div className="grid gap-4 md:grid-cols-3">
+          {dimensionNotes.map((item) => (
+            <div key={item.title} className="glass-card">
+              <h3 className="text-sm font-semibold text-slate-200">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.text}</p>
+            </div>
+          ))}
         </div>
       )}
 
@@ -156,7 +218,7 @@ export function FeedbackReportView({
             {Object.entries(report.phase_breakdown).map(([phase, text]) => (
               <div key={phase} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-saffron/70">
-                  {phase.replace(/_/g, " ")}
+                  {PHASE_LABELS[phase] || phase.replace(/_/g, " ")}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-slate-400">{text}</p>
               </div>
