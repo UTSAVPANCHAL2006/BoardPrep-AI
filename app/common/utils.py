@@ -104,12 +104,12 @@ def build_daf_topic_stack(profile: DAFProfile) -> list[str]:
     anchors: list[str] = []
     if profile.hometown:
         anchors.append(f"hometown: {profile.hometown}")
+    for hobby in profile.hobbies[:2]:
+        anchors.append(f"hobby: {hobby}")
     for edu in profile.education[:2]:
         anchors.append(f"education: {edu}")
     for work in profile.work_experience[:2]:
         anchors.append(f"work: {work}")
-    for hobby in profile.hobbies[:2]:
-        anchors.append(f"hobby: {hobby}")
     if profile.optional_subject:
         anchors.append(f"optional subject: {profile.optional_subject}")
     for pref in profile.service_preferences[:1]:

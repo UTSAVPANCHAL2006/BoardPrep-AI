@@ -48,3 +48,4 @@ class InterviewState(TypedDict, total=False):
     interview_mode: str
     max_questions: int
     exchanges_per_phase: int
+    phase_exchanges: dict[str, int]

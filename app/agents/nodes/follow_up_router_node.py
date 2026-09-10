@@ -8,6 +8,11 @@ logger = get_logger(__name__)
 PHASE_ORDER = ["daf_opening", "subject_probe", "current_affairs", "closing"]
 
 
+def phase_exchange_limit(state: InterviewState, phase: str) -> int:
+    phase_limits = state.get("phase_exchanges") or {}
+    return phase_limits.get(phase, state.get("exchanges_per_phase", 3))
+
+
 class FollowUpRouterNode:
     def follow_up_router_node(self, state: InterviewState):
         try:
@@ -15,7 +20,7 @@ class FollowUpRouterNode:
             phase = state.get("current_phase", "daf_opening")
             phase_count = state.get("phase_exchange_count", 0)
             total_count = state.get("follow_up_count", 0)
-            exchanges_per_phase = state.get("exchanges_per_phase", 3)
+            exchange_limit = phase_exchange_limit(state, phase)
             max_questions = state.get("max_questions", 12)
             evaluation = state.get("last_evaluation", AnswerEvaluation())
 
@@ -30,7 +35,10 @@ class FollowUpRouterNode:
             elif evaluation.clarity == "clear":
                 router_action = "pivot"
 
-            if phase_count >= exchanges_per_phase:
+            if router_action == "probe" and phase_count >= 1:
+                router_action = "pivot"
+
+            if phase_count >= exchange_limit:
                 idx = PHASE_ORDER.index(phase) if phase in PHASE_ORDER else 0
                 if idx < len(PHASE_ORDER) - 1:
                     next_phase = PHASE_ORDER[idx + 1]

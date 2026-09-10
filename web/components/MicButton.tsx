@@ -5,11 +5,13 @@ import { Waveform } from "./Waveform";
 export function MicButton({
   recording,
   busy,
+  liveCaption,
   onStart,
   onStop,
 }: {
   recording: boolean;
   busy: boolean;
+  liveCaption?: string;
   onStart: () => void;
   onStop: () => void;
 }) {
@@ -58,11 +60,20 @@ export function MicButton({
           {busy
             ? "Transcribing & evaluating — can take 1–2 min"
             : recording
-              ? "Recording — tap to submit"
+              ? "Listening — ~7 sec pause pe auto-submit, ya tap karke bhejo"
               : "Tap microphone to respond"}
         </p>
+        {recording && liveCaption && (
+          <p className="mt-2 max-w-md text-sm italic text-saffron/90">
+            &ldquo;{liveCaption}&rdquo;
+          </p>
+        )}
         <p className="mt-1 text-xs text-slate-500">
-          {busy ? "STT → board LLM → next question voice" : "Speak clearly in Hindi or English"}
+          {busy
+            ? "STT → board LLM → next question voice"
+            : recording
+              ? "Sochne ka gap chalega · live caption jab browser support kare"
+              : "Speak clearly in Hindi or English"}
         </p>
       </div>
     </div>

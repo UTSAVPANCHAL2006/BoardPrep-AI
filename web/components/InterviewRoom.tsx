@@ -10,6 +10,7 @@ import {
   stopStreamingAudio,
 } from "@/lib/api";
 import type { CABriefing, CASource, DAFFlag, RetrievedChunk } from "@/lib/types";
+import { attachSilenceAutoStop, startLiveCaption } from "@/lib/voice-vad";
 import { CaBriefingCard } from "./CaBriefingCard";
 import { VoicePlayer } from "./VoicePlayer";
 import { DafFlagsBanner } from "./DafFlagsBanner";
@@ -51,9 +52,22 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
   const [lastAudio, setLastAudio] = useState("");
   const [boardStreaming, setBoardStreaming] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
+  const [liveCaption, setLiveCaption] = useState("");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const mimeTypeRef = useRef("audio/webm");
+  const vadCleanupRef = useRef<(() => void) | null>(null);
+  const captionCleanupRef = useRef<(() => void) | null>(null);
+  const autoStopRef = useRef(false);
+
+  function cleanupRecordingExtras() {
+    vadCleanupRef.current?.();
+    vadCleanupRef.current = null;
+    captionCleanupRef.current?.();
+    captionCleanupRef.current = null;
+  }
+
+  useEffect(() => () => cleanupRecordingExtras(), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -146,10 +160,13 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = getSupportedAudioMimeType();
       mimeTypeRef.current = mimeType;
+      autoStopRef.current = false;
+      setLiveCaption("");
       const recorder = new MediaRecorder(stream, { mimeType });
       chunksRef.current = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
       recorder.onstop = () => {
+        cleanupRecordingExtras();
         stream.getTracks().forEach((t) => t.stop());
         const type = recorder.mimeType || mimeType;
         const blob = new Blob(chunksRef.current, { type });
@@ -161,6 +178,15 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
       };
       mediaRecorderRef.current = recorder;
       recorder.start();
+      vadCleanupRef.current = attachSilenceAutoStop(stream, () => {
+        if (!autoStopRef.current && mediaRecorderRef.current?.state === "recording") {
+          autoStopRef.current = true;
+          stopRecording();
+        }
+      });
+      captionCleanupRef.current = startLiveCaption((text) => {
+        setLiveCaption(text);
+      });
       setRecording(true);
       setError("");
     } catch {
@@ -169,8 +195,10 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
   }
 
   function stopRecording() {
+    cleanupRecordingExtras();
     mediaRecorderRef.current?.stop();
     setRecording(false);
+    setLiveCaption("");
   }
 
   if (loading) {
@@ -257,6 +285,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
               <MicButton
                 recording={recording}
                 busy={busy}
+                liveCaption={liveCaption}
                 onStart={() => void startRecording()}
                 onStop={stopRecording}
               />

@@ -36,7 +36,11 @@ SARVAM_TTS_TEMPERATURE = float(os.getenv("SARVAM_TTS_TEMPERATURE", "0.65"))
 SARVAM_STT_MODE = os.getenv("SARVAM_STT_MODE", "codemix")
 
 INTERVIEW_MODES = {
-    "quick": {"max_questions": 4, "exchanges_per_phase": 1},
+    "quick": {
+        "max_questions": 5,
+        "exchanges_per_phase": 1,
+        "phase_exchanges": {"daf_opening": 2},
+    },
     "full": {"max_questions": 12, "exchanges_per_phase": 3},
 }
 DEFAULT_INTERVIEW_MODE = os.getenv("INTERVIEW_MODE", "full")

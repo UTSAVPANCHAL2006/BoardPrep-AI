@@ -358,6 +358,7 @@ def initial_state(session_id, daf_text, profile, mode_config):
         interview_mode=mode_config["interview_mode"],
         max_questions=mode_config["max_questions"],
         exchanges_per_phase=mode_config["exchanges_per_phase"],
+        phase_exchanges=mode_config.get("phase_exchanges", {}),
     )
 
 

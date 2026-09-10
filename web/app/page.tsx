@@ -6,7 +6,7 @@ import { uploadDaf } from "@/lib/api";
 import type { InterviewMode } from "@/lib/types";
 
 const MODES: { id: InterviewMode; label: string; qs: string; desc: string }[] = [
-  { id: "quick", label: "Quick Drill", qs: "4 questions", desc: "~10 min practice" },
+  { id: "quick", label: "Quick Drill", qs: "5 questions", desc: "~10 min practice" },
   { id: "full", label: "Full Board", qs: "12 questions", desc: "Full simulation" },
 ];
 
