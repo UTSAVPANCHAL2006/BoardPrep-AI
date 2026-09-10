@@ -24,6 +24,7 @@ from app.config.config import (
     DAILY_CA_ARTICLE_COUNT,
     DEFAULT_INTERVIEW_MODE,
     INTERVIEW_MODES,
+    INTERVIEW_TTS_LANGUAGE,
     SYLLABUS_PATH,
     UPLOAD_DIR,
 )
@@ -376,11 +377,12 @@ def serialize_daf_flags(flags):
 
 
 def voice_for_tts(state: dict) -> str:
-    raw = state.get("current_question_voice") or state.get("current_question", "")
+    """Spoken board voice — Hindi/Hinglish; on-screen text stays English in current_question."""
+    raw = (state.get("current_question_voice") or state.get("current_question") or "").strip()
     if state.get("current_phase") == "current_affairs":
         cap = ca_board_question_word_limits(state.get("interview_mode", "full"), for_voice=True)
         return sanitize_ca_board_question(raw, max_words=cap)
-    return raw.strip()
+    return raw
 
 
 def serialize_ca_source(ca_source) -> "CASourceResponse | None":
@@ -1188,7 +1190,9 @@ async def start_interview(session_id: str = Form(...)):
     with track_step(session_id, "tts"):
         try:
             with observation_context("tts_synthesize", session_id, as_type="tool", input={"chars": len(voice_for_tts(state))}):
-                audio_out = await tts_tool.synthesize(voice_for_tts(state))
+                audio_out = await tts_tool.synthesize(
+                    voice_for_tts(state), language_code=INTERVIEW_TTS_LANGUAGE
+                )
         except Exception:
             audio_out = b""
     state["interview_started"] = True
@@ -1226,7 +1230,9 @@ async def respond(session_id: str = Form(...), audio: UploadFile = File(None), t
         with track_step(session_id, "tts"):
             try:
                 with observation_context("tts_synthesize", session_id, as_type="tool", input={"chars": len(voice_for_tts(state))}):
-                    audio_out = await tts_tool.synthesize(voice_for_tts(state))
+                    audio_out = await tts_tool.synthesize(
+                    voice_for_tts(state), language_code=INTERVIEW_TTS_LANGUAGE
+                )
             except Exception:
                 audio_out = b""
     record_turn(session_id, state.get("current_phase", "daf_opening"))
@@ -1318,7 +1324,7 @@ async def respond_stream(
         wav_parts: list[bytes] = []
         if voice_text:
             with track_step(session_id, "tts_stream"):
-                async for chunk in tts_tool.synthesize_stream(voice_text):
+                async for chunk in tts_tool.synthesize_stream(voice_text, language_code=INTERVIEW_TTS_LANGUAGE):
                     chunk_bytes = base64.b64decode(chunk["audio_base64"])
                     wav_parts.append(chunk_bytes)
                     event_data = {"type": "audio_chunk", **chunk}

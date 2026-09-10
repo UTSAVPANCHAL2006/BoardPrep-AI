@@ -74,7 +74,7 @@ class GenerateQuestionNode:
             voice = f"नमस्ते। आपने अपने DAF में {anchor} के बारे में लिखा है — कृपया संक्षेप में अपना परिचय दीजिए।"
         elif phase == "closing":
             q = "Why do you want to join the civil services?"
-            voice = "आप सिविल सेवा क्यों join करना चाहते हैं?"
+            voice = "आप civil services क्यों join करना चाहते हैं?"
         else:
             q = f"Please elaborate on {anchor}."
             voice = f"कृपया {anchor} पर थोड़ा विस्तार से बताइए।"

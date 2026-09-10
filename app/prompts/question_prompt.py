@@ -25,9 +25,8 @@ Write ONE realistic UPSC board question anchored to the DAF focus above.
 
 STRICT RULES:
 - ONLY about "{focus_anchor}" — one DAF detail, no other fields
-- English: max 25 words, 1-2 sentences, ONE "?"
-- question: crisp formal ENGLISH for screen
-- question_voice: same meaning in HINDI/HINGLISH (max 30 words, NOT English)
+- question: crisp formal ENGLISH for the candidate's screen (max 25 words, ONE "?")
+- question_voice: same meaning in HINDI or natural HINGLISH for spoken board voice (max 30 words, Devanagari OK, NOT English)
 - No compound questions
 
 Return JSON: {{"question": "...", "question_voice": "..."}}"""
@@ -50,8 +49,8 @@ Write ONE UPSC board question testing optional-subject knowledge linked to their
 STRICT RULES:
 - Test conceptual depth in {optional_subject} — use syllabus context above
 - Link to ONE DAF detail (education or work) where natural
-- English: max 28 words, ONE "?"
-- question_voice: HINDI/HINGLISH (max 32 words, NOT English)
+- question: ENGLISH for screen (max 28 words, ONE "?")
+- question_voice: HINDI/HINGLISH for spoken voice (max 32 words, NOT English)
 - No compound questions
 
 Return JSON: {{"question": "...", "question_voice": "..."}}"""
@@ -76,11 +75,10 @@ Write ONE short UPSC current-affairs question. Pick ONE angle only:
 
 STRICT RULES:
 - MUST name or clearly reference the news event / policy in the featured article
-- Max ONE short DAF hint if used — no second follow-up clause ("and how would you integrate…")
-- English: max 20 words, ONE "?", ONE sentence
-- question_voice: HINDI/HINGLISH (max 26 words, NOT English)
-- No compound questions; no "and also" / "aur aap" second parts
-- No generic polity questions unrelated to the featured article
+- Max ONE short DAF hint if used — no second follow-up clause
+- question: ENGLISH for screen (max 20 words, ONE "?")
+- question_voice: HINDI/HINGLISH for spoken voice (max 26 words, NOT English)
+- No compound questions; no generic polity questions unrelated to the featured article
 
 Return JSON: {{"question": "...", "question_voice": "..."}}"""
 
