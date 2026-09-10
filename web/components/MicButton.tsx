@@ -5,13 +5,17 @@ import { Waveform } from "./Waveform";
 export function MicButton({
   recording,
   busy,
+  boardSpeaking,
   liveCaption,
+  autoSubmitInSec,
   onStart,
   onStop,
 }: {
   recording: boolean;
   busy: boolean;
+  boardSpeaking?: boolean;
   liveCaption?: string;
+  autoSubmitInSec?: number | null;
   onStart: () => void;
   onStop: () => void;
 }) {
@@ -28,7 +32,7 @@ export function MicButton({
 
         <button
           type="button"
-          disabled={busy}
+          disabled={busy || boardSpeaking}
           onClick={recording ? onStop : onStart}
           className={`relative z-10 flex h-28 w-28 items-center justify-center rounded-full transition-all duration-300 disabled:opacity-50 ${
             recording
@@ -57,22 +61,33 @@ export function MicButton({
 
       <div className="text-center">
         <p className="text-sm font-medium text-slate-200">
-          {busy
+          {boardSpeaking
+            ? "Board bol raha hai — khatam hone ke baad mic khulega"
+            : busy
             ? "Transcribing & evaluating — can take 1–2 min"
             : recording
-              ? "Listening — ~7 sec pause pe auto-submit, ya tap karke bhejo"
+              ? autoSubmitInSec
+                ? `Chup ho gaye — ${autoSubmitInSec}s mein auto-submit`
+                : "Sun raha hoon — boliye, ~7 sec pause pe submit"
               : "Tap microphone to respond"}
         </p>
         {recording && liveCaption && (
           <p className="mt-2 max-w-md text-sm italic text-saffron/90">
-            &ldquo;{liveCaption}&rdquo;
+            Live: &ldquo;{liveCaption}&rdquo;
+          </p>
+        )}
+        {recording && !liveCaption && (
+          <p className="mt-2 text-xs text-slate-500">
+            Auto-submit ~7 sec silence ke baad · tap se turant bhejo
           </p>
         )}
         <p className="mt-1 text-xs text-slate-500">
-          {busy
+          {boardSpeaking
+            ? "Question sun lijiye, phir record kijiye"
+            : busy
             ? "STT → board LLM → next question voice"
             : recording
-              ? "Sochne ka gap chalega · live caption jab browser support kare"
+              ? "Sochne ka gap chalega — pause pe countdown dikhega"
               : "Speak clearly in Hindi or English"}
         </p>
       </div>

@@ -10,10 +10,17 @@ export const VAD_DEFAULTS = {
 export function attachSilenceAutoStop(
   stream: MediaStream,
   onSilence: () => void,
-  options?: { silenceMs?: number; minSpeechMs?: number }
+  options?: {
+    silenceMs?: number;
+    minSpeechMs?: number;
+    onSpeechDetected?: () => void;
+    onSilenceProgress?: (remainingMs: number) => void;
+  }
 ): () => void {
   const silenceMs = options?.silenceMs ?? VAD_DEFAULTS.silenceMs;
   const minSpeechMs = options?.minSpeechMs ?? VAD_DEFAULTS.minSpeechMs;
+  const onSpeechDetected = options?.onSpeechDetected;
+  const onSilenceProgress = options?.onSilenceProgress;
 
   const ctx = new AudioContext();
   const source = ctx.createMediaStreamSource(stream);
@@ -39,10 +46,21 @@ export function attachSilenceAutoStop(
     const now = Date.now();
 
     if (rms > 0.022) {
-      if (!speechStarted) speechStartedAt = now;
+      if (!speechStarted) {
+        speechStartedAt = now;
+        onSpeechDetected?.();
+      }
       speechStarted = true;
       lastSpeechAt = now;
       return;
+    }
+
+    if (speechStarted && now - speechStartedAt >= minSpeechMs) {
+      const elapsed = now - lastSpeechAt;
+      const remaining = silenceMs - elapsed;
+      if (remaining > 0) {
+        onSilenceProgress?.(remaining);
+      }
     }
 
     if (

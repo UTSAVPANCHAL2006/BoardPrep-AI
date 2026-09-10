@@ -310,8 +310,35 @@ export async function playBase64Audio(base64: string): Promise<boolean> {
     await activeAudio.play();
     return true;
   } catch {
+    activeAudio = null;
     return false;
   }
+}
+
+export function waitForActiveAudioEnd(): Promise<void> {
+  return new Promise((resolve) => {
+    if (!activeAudio) {
+      resolve();
+      return;
+    }
+    const audio = activeAudio;
+    const done = () => {
+      if (activeAudio === audio) activeAudio = null;
+      resolve();
+    };
+    audio.onended = done;
+    audio.onerror = done;
+  });
+}
+
+/** Auto-speak a board question once; returns false if the browser blocked autoplay. */
+export async function playBoardQuestionAudio(base64: string): Promise<boolean> {
+  if (!base64) return false;
+  stopStreamingAudio();
+  const started = await playBase64Audio(base64);
+  if (!started) return false;
+  await waitForActiveAudioEnd();
+  return true;
 }
 
 export function playBase64Wav(base64: string): void {

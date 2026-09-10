@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   createStreamingAudioQueue,
+  playBoardQuestionAudio,
   respondStream,
   startInterview,
   getSupportedAudioMimeType,
@@ -50,9 +51,11 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
   const [recording, setRecording] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [lastAudio, setLastAudio] = useState("");
-  const [boardStreaming, setBoardStreaming] = useState(false);
+  const [boardSpeaking, setBoardSpeaking] = useState(false);
+  const [awaitingBoardTap, setAwaitingBoardTap] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
   const [liveCaption, setLiveCaption] = useState("");
+  const [autoSubmitInSec, setAutoSubmitInSec] = useState<number | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const mimeTypeRef = useRef("audio/webm");
@@ -69,6 +72,17 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
 
   useEffect(() => () => cleanupRecordingExtras(), []);
 
+  async function speakQuestionAudio(base64: string): Promise<boolean> {
+    if (!base64) return false;
+    setBoardSpeaking(true);
+    setAwaitingBoardTap(false);
+    stopStreamingAudio();
+    const ok = await playBoardQuestionAudio(base64);
+    setBoardSpeaking(false);
+    if (!ok) setAwaitingBoardTap(true);
+    return ok;
+  }
+
   useEffect(() => {
     let cancelled = false;
     async function init() {
@@ -83,6 +97,9 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
         setCaBriefing(res.ca_briefing ?? null);
         setTurns([{ role: "panel", content: res.question }]);
         setLastAudio(res.audio_base64);
+        if (res.audio_base64) {
+          await speakQuestionAudio(res.audio_base64);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Failed to start");
@@ -103,8 +120,10 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
     stopStreamingAudio();
     const audioQueue = createStreamingAudioQueue();
     setLastAudio("");
-    setBoardStreaming(true);
+    setBoardSpeaking(true);
     let interviewComplete = false;
+    let streamHeard = false;
+    let replayAudio = "";
     try {
       await respondStream(
         sessionId,
@@ -129,28 +148,33 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
             interviewComplete = true;
             audioQueue.stop();
             stopStreamingAudio();
-            setBoardStreaming(false);
+            setBoardSpeaking(false);
             setLastAudio("");
             router.push(`/feedback?session=${sessionId}`);
           }
         },
         (chunk) => {
           if (interviewComplete) return;
+          streamHeard = true;
           void audioQueue.enqueue(chunk.audio_base64);
         },
         undefined,
         (audioBase64) => {
           if (interviewComplete) return;
+          replayAudio = audioBase64;
           setLastAudio(audioBase64);
         }
       );
       if (!interviewComplete) {
         await audioQueue.waitUntilIdle();
+        if (!streamHeard && replayAudio) {
+          await speakQuestionAudio(replayAudio);
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit");
     } finally {
-      setBoardStreaming(false);
+      setBoardSpeaking(false);
       setBusy(false);
     }
   }
@@ -162,6 +186,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
       mimeTypeRef.current = mimeType;
       autoStopRef.current = false;
       setLiveCaption("");
+      setAutoSubmitInSec(null);
       const recorder = new MediaRecorder(stream, { mimeType });
       chunksRef.current = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
@@ -183,6 +208,11 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
           autoStopRef.current = true;
           stopRecording();
         }
+      }, {
+        onSpeechDetected: () => setAutoSubmitInSec(null),
+        onSilenceProgress: (remainingMs) => {
+          setAutoSubmitInSec(Math.max(1, Math.ceil(remainingMs / 1000)));
+        },
       });
       captionCleanupRef.current = startLiveCaption((text) => {
         setLiveCaption(text);
@@ -199,6 +229,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
     mediaRecorderRef.current?.stop();
     setRecording(false);
     setLiveCaption("");
+    setAutoSubmitInSec(null);
   }
 
   if (loading) {
@@ -262,16 +293,26 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
                 <p className="question-text">&ldquo;{question}&rdquo;</p>
               </div>
 
-              {boardStreaming && (
+              {boardSpeaking && (
                 <p className="text-xs font-medium uppercase tracking-widest text-saffron/90">
-                  Board speaking — streaming voice
+                  Board bol raha hai — suniye, phir jawab dijiye
                 </p>
               )}
 
-              {lastAudio && !boardStreaming && (
+              {awaitingBoardTap && lastAudio && !boardSpeaking && (
+                <button
+                  type="button"
+                  className="btn-primary w-full sm:w-auto"
+                  onClick={() => void speakQuestionAudio(lastAudio)}
+                >
+                  ▶ Pehla sawaal suno (board voice)
+                </button>
+              )}
+
+              {lastAudio && !boardSpeaking && (
                 <VoicePlayer
                   audioBase64={lastAudio}
-                  label="Board question voice"
+                  label="Dobara suno — replay question"
                   autoPlay={false}
                 />
               )}
@@ -285,7 +326,9 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
               <MicButton
                 recording={recording}
                 busy={busy}
+                boardSpeaking={boardSpeaking}
                 liveCaption={liveCaption}
+                autoSubmitInSec={autoSubmitInSec}
                 onStart={() => void startRecording()}
                 onStop={stopRecording}
               />
