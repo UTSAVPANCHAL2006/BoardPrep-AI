@@ -134,6 +134,24 @@ def build_daf_topic_stack(profile: DAFProfile) -> list[str]:
     return anchors or ["background and motivation"]
 
 
+def build_closing_angles(profile: DAFProfile) -> list[str]:
+    """Rotating closing-round themes so repeat mocks on the same DAF do not feel identical."""
+    angles: list[str] = [
+        "motivation for joining the civil services",
+        "an ethical dilemma and how you would handle it as an administrator",
+        "a personal failure or setback and the lesson you took from it",
+        "what you would do if you are not selected in this attempt",
+        "how you would balance empathy and firmness as a civil servant",
+    ]
+    if profile.service_preferences:
+        angles.append(f"why {profile.service_preferences[0]} is your top service preference")
+    if profile.hometown:
+        angles.append(f"how public service can improve life in {profile.hometown}")
+    if profile.optional_subject:
+        angles.append(f"how your {profile.optional_subject} background shapes your admin approach")
+    return angles
+
+
 def ca_board_question_word_limits(
     interview_mode: str,
     *,

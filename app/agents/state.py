@@ -44,6 +44,7 @@ class InterviewState(TypedDict, total=False):
     last_retrieved_chunks: list[RetrievedChunk]
     ca_articles: list[EnrichedArticle]
     ca_article_cursor: int
+    closing_angle_index: int
     last_ca_source: CASource
     last_ca_briefing: dict
     interview_mode: str

@@ -4,6 +4,7 @@ from app.agents.state import InterviewState
 from app.common.custom_exception import CustomException
 from app.common.logger import get_logger
 from app.common.utils import (
+    build_closing_angles,
     build_daf_topic_stack,
     ca_board_question_word_limits,
     ca_grounding_score,
@@ -20,6 +21,7 @@ from app.config.config import INTERVIEW_JSON_MODEL
 from app.prompts.question_prompt import (
     CA_QUESTION_USER_TEMPLATE,
     CA_RETRY_SUFFIX,
+    CLOSING_QUESTION_TEMPLATE,
     DAF_QUESTION_TEMPLATE,
     PANEL_PERSONA,
     ROUTER_HINTS,
@@ -67,14 +69,31 @@ class GenerateQuestionNode:
         cursor = state.get("ca_article_cursor", 0) % len(articles)
         return articles[cursor], (cursor + 1) % len(articles)
 
-    def fallback_question(self, phase: str, focus_anchor: str) -> dict:
+    def fallback_question(self, phase: str, focus_anchor: str, closing_angle: str = "") -> dict:
         anchor = focus_anchor or "your background"
         if phase == "daf_opening":
             q = f"Good morning. You mentioned {anchor} in your DAF — please introduce yourself briefly."
             voice = f"नमस्ते। आपने अपने DAF में {anchor} के बारे में लिखा है — कृपया संक्षेप में अपना परिचय दीजिए।"
         elif phase == "closing":
-            q = "Why do you want to join the civil services?"
-            voice = "आप civil services क्यों join करना चाहते हैं?"
+            theme = (closing_angle or focus_anchor or "motivation").lower()
+            if "ethical" in theme:
+                q = "Describe an ethical dilemma you faced and how you resolved it."
+                voice = "कोई ethical dilemma बताइए जिसका सामना आपने किया और उसे आपने कैसे handle किया?"
+            elif "failure" in theme or "setback" in theme:
+                q = "Tell us about a failure or setback and what you learned from it."
+                voice = "कोई failure या setback बताइए और उससे आपने क्या सीखा?"
+            elif "not selected" in theme:
+                q = "If you are not selected this time, what will be your next step?"
+                voice = "अगर इस बार selection नहीं हुआ, तो आपका अगला step क्या होगा?"
+            elif "service preference" in theme or "preference" in theme:
+                q = "Why is your first service preference at the top of your list?"
+                voice = "आपकी पहली service preference सबसे ऊपर क्यों है?"
+            elif "hometown" in theme or "public service can improve" in theme:
+                q = "How would you use public service to improve your hometown?"
+                voice = "Public service से आप अपने hometown को कैसे बेहतर बना सकते हैं?"
+            else:
+                q = "Why do you want to join the civil services?"
+                voice = "आप civil services क्यों join करना चाहते हैं?"
         else:
             q = f"Please elaborate on {anchor}."
             voice = f"कृपया {anchor} पर थोड़ा विस्तार से बताइए।"
@@ -117,12 +136,13 @@ class GenerateQuestionNode:
         focus_anchor: str,
         *,
         run_name: str = "generate_question",
+        closing_angle: str = "",
     ) -> dict:
         try:
             return await self.invoke_llm(prompt, session_id, run_name=run_name)
         except Exception as e:
             logger.warning(f"GenerateQuestionNode using fallback question ({phase}): {e}")
-            return self.fallback_question(phase, focus_anchor)
+            return self.fallback_question(phase, focus_anchor, closing_angle)
 
     async def generate_question_node(self, state: InterviewState):
         try:
@@ -218,6 +238,29 @@ class GenerateQuestionNode:
                     grounding_score=round(score, 3),
                 )
                 ca_briefing = await self.ca_briefing.generate_briefing(featured, session_id, use_llm=True)
+
+            elif phase == "closing":
+                closing_angles = build_closing_angles(profile)
+                idx = state.get("closing_angle_index", 0) % len(closing_angles)
+                closing_angle = closing_angles[idx]
+                focus_anchor = closing_angle
+                prompt = CLOSING_QUESTION_TEMPLATE.format(
+                    router_hint=router_hint,
+                    closing_angle=closing_angle,
+                    profile=profile_summary(profile),
+                    history=history_text(state.get("chat_history", [])),
+                )
+                data = await self.question_from_llm(
+                    prompt, session_id, phase, focus_anchor, closing_angle=closing_angle
+                )
+                question = sanitize_board_question(
+                    data.get("question", "Why do you want to join the civil services?"), max_words=25
+                )
+                question_voice = sanitize_board_question(
+                    data.get("question_voice") or question, max_words=30
+                )
+                if not question_voice.strip():
+                    question_voice = question
 
             else:
                 prompt = DAF_QUESTION_TEMPLATE.format(

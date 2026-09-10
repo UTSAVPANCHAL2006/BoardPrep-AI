@@ -15,4 +15,11 @@ Return JSON:
   "clarity": "clear" | "vague" | "off_topic",
   "factual_consistency": "consistent" | "contradicts_daf" | "unknown",
   "notes": "2-3 sentences: what was good, what to improve (depth, structure, DAF link, honesty)"
-}}"""
+}}
+
+Important — factual_consistency rules:
+- Use "contradicts_daf" ONLY when the candidate states a concrete fact that conflicts with the DAF
+  (wrong degree, wrong hometown, hobby they did not list, job they did not mention, etc.).
+- General criticism of government, vague rants, emotional opinions, or poor structure → NOT contradicts_daf.
+  Use clarity "vague" or "off_topic" instead and coach them in notes.
+- Hinglish/Hindi answers are valid — judge content, not language mix."""

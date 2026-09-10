@@ -85,3 +85,25 @@ Return JSON: {{"question": "...", "question_voice": "..."}}"""
 CA_RETRY_SUFFIX = """
 CRITICAL: Your question did NOT reference the required news event.
 You MUST clearly mention: "{article_title}" or its core policy/issue."""
+
+CLOSING_QUESTION_TEMPLATE = """Phase: closing
+Router: {router_hint}
+Closing theme for this round: {closing_angle}
+
+Candidate DAF profile:
+{profile}
+
+Recent conversation:
+{history}
+
+Write ONE closing-round UPSC board question focused on the closing theme above.
+Link to the DAF naturally where relevant, but do NOT repeat an earlier question from the conversation.
+
+STRICT RULES:
+- ONE angle only — the closing theme above
+- question: ENGLISH for screen (max 25 words, ONE "?")
+- question_voice: HINDI/HINGLISH for spoken voice (max 30 words, NOT English)
+- Do NOT default to generic "why civil services" unless that is the closing theme
+- No compound questions
+
+Return JSON: {{"question": "...", "question_voice": "..."}}"""

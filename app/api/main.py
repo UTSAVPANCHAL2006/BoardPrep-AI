@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import random
 import uuid
 from contextlib import asynccontextmanager
 from datetime import date, timedelta
@@ -13,7 +14,7 @@ from app.agents.graph import InterviewGraph
 from app.agents.state import InterviewState
 from app.common.logger import get_logger
 from app.common.timing import get_metrics, record_turn, track_step
-from app.common.utils import build_daf_topic_stack, ca_board_question_word_limits, sanitize_ca_board_question
+from app.common.utils import build_closing_angles, build_daf_topic_stack, ca_board_question_word_limits, sanitize_ca_board_question
 from app.config.ca_languages import CA_VOICE_LANGUAGES, DEFAULT_CA_VOICE_LANG, ca_explain_use_llm, languages_public, resolve_ca_language
 from app.config.config import (
     CA_ALLOW_AUTO_NEWS_FETCH,
@@ -357,6 +358,7 @@ def initial_state(session_id, daf_text, profile, mode_config):
         last_retrieved_chunks=[],
         ca_articles=[],
         ca_article_cursor=0,
+        closing_angle_index=0,
         interview_mode=mode_config["interview_mode"],
         max_questions=mode_config["max_questions"],
         exchanges_per_phase=mode_config["exchanges_per_phase"],
@@ -1180,7 +1182,21 @@ async def start_interview(session_id: str = Form(...)):
         enriched = state.get("ca_articles") or []
         logger.info(f"Starting interview without waiting for CA enrich ({session_id[:8]})")
 
-    state["ca_article_cursor"] = 0
+    article_pool = enriched or state.get("ca_articles") or []
+    if article_pool:
+        if state.get("interview_started"):
+            state["ca_article_cursor"] = (state.get("ca_article_cursor", 0) + 1) % len(article_pool)
+        else:
+            state["ca_article_cursor"] = random.randint(0, len(article_pool) - 1)
+    else:
+        state["ca_article_cursor"] = 0
+
+    closing_angles = build_closing_angles(profile)
+    if state.get("interview_started"):
+        state["closing_angle_index"] = (state.get("closing_angle_index", 0) + 1) % len(closing_angles)
+    else:
+        state["closing_angle_index"] = random.randint(0, len(closing_angles) - 1)
+
     with track_step(session_id, "first_question"):
         with observation_context("interview_first_question", session_id, as_type="chain"):
             graph = get_graph()
