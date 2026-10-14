@@ -195,13 +195,24 @@ def sanitizeCaBoardQuestion(text: str, max_words: int = 20) -> str:
                 cleaned += "?"
             lower = cleaned.lower()
 
-    words = cleaned.split()
-    if len(words) > max_words:
-        cleaned = " ".join(words[:max_words]).rstrip(",;:")
-        if not cleaned.endswith("?"):
-            cleaned += "?"
+    return shortenQuestion(cleaned, max_words)
 
-    return cleaned.strip()
+
+HARD_MAX_WORDS = 40
+DANGLING_WORDS = {"the", "a", "an", "in", "of", "on", "at", "to", "for", "by", "with", "and", "or", "recent", "your", "its"}
+
+
+def shortenQuestion(question: str, max_words: int) -> str:
+    """Never cut a question in the middle: cutting at a word count once produced '...as highlighted in the
+    recent?', and cutting at a comma kept a statement and dropped the actual question. A question longer than
+    max_words is kept whole up to HARD_MAX_WORDS; only a runaway one is trimmed, without dangling words."""
+    words = question.split()
+    if len(words) <= max(max_words, HARD_MAX_WORDS):
+        return question.strip()
+    kept = words[:HARD_MAX_WORDS]
+    while kept and kept[-1].lower().strip(",;:") in DANGLING_WORDS:
+        kept.pop()
+    return " ".join(kept).rstrip(",;:?") + "?"
 
 
 def sanitizeBoardQuestion(text: str, max_words: int = 32) -> str:
@@ -245,13 +256,7 @@ def sanitizeBoardQuestion(text: str, max_words: int = 32) -> str:
                 cleaned += "?"
             break
 
-    words = cleaned.split()
-    if len(words) > max_words:
-        cleaned = " ".join(words[:max_words]).rstrip(",;:")
-        if not cleaned.endswith("?"):
-            cleaned += "?"
-
-    return cleaned.strip()
+    return shortenQuestion(cleaned, max_words)
 
 
 def tokenize(text: str) -> set[str]:

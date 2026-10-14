@@ -1,104 +1,145 @@
 [
   {
     "scenario": "yes_sir",
-    "session": "011da58d-2049-4960-9a2f-0497da00aa78",
+    "session": "c17c742e-da5f-499d-9f5a-d641353d8936",
     "mode": "quick",
     "questions": 5,
     "scores": {
       "clarity": 0,
       "structure": 0,
-      "daf_consistency": 0,
+      "daf_consistency": 2,
       "subject_depth": 0,
       "current_affairs": 0,
       "confidence": 0
     },
-    "average": 0.0,
+    "average": 0.3,
     "coverage": {
-      "answered": 0,
+      "answered": 1,
       "asked": 5,
-      "max_score": 0
+      "max_score": 2
     },
     "strengths": [],
     "daf_flags": null,
-    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "summary": "You answered 1 of 5 questions; the 4 you skipped or answered off-topic score 0, so no score here can go above 2/10. You faced significant challenges in this mock interview, as none of your answers were articulated. Your strongest answer was in the closing question, where you at least attempted to engage. However, the main gap was that you did not provide any content or context in your responses, which is crucial for the UPSC interview.",
     "question_feedback": [
       {
         "turn": 1,
-        "question": "What aspects of Panchkula's urban development have influenced your academic interests?",
+        "question": "How has growing up in Panchkula influenced your perspective on urban governance and public policy?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Provide a brief, relevant answer that directly addresses the question about Panchkula's urban development and its influence on your interests.",
-        "better_answer": "A strong answer would mention specific aspects like urban planning, infrastructure, or governance in Panchkula that shaped your academic focus, supported by a personal insight or example."
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. In a real interview, instead of saying 'Yes sir,' you should provide a brief explanation or insight related to the question. For example, you could mention specific aspects of Panchkula that have shaped your views on urban governance.",
+        "better_answer": "You could discuss how Panchkula's urban planning and infrastructure have influenced your understanding of effective governance and policy-making."
       },
       {
         "turn": 2,
-        "question": "How has playing badminton contributed to your understanding of teamwork and discipline?",
+        "question": "How has playing badminton contributed to your skills in teamwork and leadership?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Answer with a specific example of how playing badminton taught you teamwork and discipline, linking it to your personal growth.",
-        "better_answer": "I play badminton regularly, which has helped me develop patience, strategic thinking, and team coordination—skills I find valuable in professional settings."
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Instead of responding with 'Yes sir,' share specific experiences from playing badminton that demonstrate teamwork and leadership skills.",
+        "better_answer": "You might explain how playing in a team taught you to communicate effectively and resolve conflicts, which are essential skills in leadership."
       },
       {
         "turn": 3,
-        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
+        "question": "How does your understanding of urban sociology inform your views on public policy, particularly in the context of your research at the Centre for Policy Research?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Briefly discuss how social stratification affects access to education, perhaps with an example from Panchkula or urban India, and relate it to your sociology background.",
-        "better_answer": "Social stratification creates disparities in access to quality education, often influenced by economic status and social background, which I studied during my sociology coursework."
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Avoid one-word responses. Instead, elaborate on how your studies in urban sociology have shaped your understanding of public policy.",
+        "better_answer": "You could mention specific theories or case studies from urban sociology that inform your research and policy perspectives."
       },
       {
         "turn": 4,
-        "question": "India-Belgium defence and fintech ties—what is the significance of this partnership?",
-        "status": "off_topic",
-        "quote": "",
-        "what_worked": "",
-        "improve": "This answer did not address the question, so it earns no marks. Provide a structured response discussing the strategic importance of India-Belgium defence and fintech cooperation, mentioning specific areas or benefits.",
-        "better_answer": "This partnership enhances India's technological capabilities and strategic ties in defence and fintech, fostering innovation and international collaboration, which can boost economic growth."
-      },
-      {
-        "turn": 5,
-        "question": "How will you ensure empathy does not compromise your firmness in decision-making as a civil servant?",
+        "question": "What are the strategic implications of integrating thorium fuels in India's nuclear energy policy as advocated?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Share your understanding of balancing empathy with firmness, perhaps with a brief example or approach you would take as a civil servant.",
-        "better_answer": "I believe empathy helps in understanding people's issues, but firmness is essential for implementing policies effectively. I would listen actively but stand firm on principles of justice."
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Provide a brief overview of the implications of thorium fuels in nuclear energy policy instead of saying 'Yes sir.'",
+        "better_answer": "You could discuss the potential benefits of thorium as a safer, more sustainable energy source and its implications for India's energy security."
+      },
+      {
+        "turn": 5,
+        "question": "Can you share a personal failure that significantly impacted you and the lesson you learned from it?",
+        "status": "answered",
+        "quote": "",
+        "what_worked": "",
+        "improve": "To improve, provide a specific example of a personal failure, its impact on you, and the lessons learned.",
+        "better_answer": "You could share a specific instance, such as a project that did not go as planned, and explain how it taught you resilience and the importance of planning.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": false,
+            "evidence": ""
+          }
+        ],
+        "length": {
+          "words": 2,
+          "verdict": "too_short",
+          "note": "2 words (about 1 seconds) — aim for 45-90 seconds."
+        }
       }
     ],
     "improvements": [
-      "Answer each question with specific, structured points rather than brief acknowledgments.",
-      "Develop your open-ended responses with examples, facts, or personal insights to demonstrate depth.",
-      "Practice linking your background and current affairs knowledge more explicitly to your answers.",
-      "Work on maintaining clarity and staying on-topic, especially in questions outside your immediate expertise.",
-      "Prepare concise but complete responses for open questions, avoiding silence or vague replies."
+      "You did not answer any questions, which is a critical area for improvement. Practice articulating your thoughts clearly and concisely.",
+      "Focus on providing specific examples and context in your answers to demonstrate your understanding.",
+      "Work on structuring your responses to include a clear point, reasoning, and conclusion."
     ],
     "transcript": [
       {
         "turn": 1,
-        "question": "What aspects of Panchkula's urban development have influenced your academic interests?",
+        "question": "How has growing up in Panchkula influenced your perspective on urban governance and public policy?",
         "answer": "Yes sir."
       },
       {
         "turn": 2,
-        "question": "How has playing badminton contributed to your understanding of teamwork and discipline?",
+        "question": "How has playing badminton contributed to your skills in teamwork and leadership?",
         "answer": "Yes sir."
       },
       {
         "turn": 3,
-        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
+        "question": "How does your understanding of urban sociology inform your views on public policy, particularly in the context of your research at the Centre for Policy Research?",
         "answer": "Yes sir."
       },
       {
         "turn": 4,
-        "question": "India-Belgium defence and fintech ties—what is the significance of this partnership?",
+        "question": "What are the strategic implications of integrating thorium fuels in India's nuclear energy policy as advocated?",
         "answer": "Yes sir."
       },
       {
         "turn": 5,
-        "question": "How will you ensure empathy does not compromise your firmness in decision-making as a civil servant?",
+        "question": "Can you share a personal failure that significantly impacted you and the lesson you learned from it?",
         "answer": "Yes sir."
       }
     ]

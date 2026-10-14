@@ -1,109 +1,57 @@
 [
   {
     "scenario": "all_answered",
-    "session": "626a2ac0-41b7-4500-8fb5-52d76379ba1e",
+    "session": "b3338d6a-8065-40de-b07b-3cecaca08e75",
     "mode": "quick",
     "questions": 5,
     "scores": {
-      "clarity": 7,
+      "clarity": 8,
       "structure": 7,
-      "daf_consistency": 8,
-      "subject_depth": 6,
-      "current_affairs": 6,
-      "confidence": 6
+      "daf_consistency": 10,
+      "subject_depth": 8,
+      "current_affairs": 7,
+      "confidence": 8
     },
-    "average": 6.7,
+    "average": 8.0,
     "coverage": {
       "answered": 5,
       "asked": 5,
       "max_score": 10
     },
     "strengths": [
-      "Turn 1: \"The key urban governance challenge faced by Panchkula is managing rapid urbanization while ensuring sustainable development.\" — You provided a structured and comprehensive answer, covering key challenges like infrastructure, civic amenities, urban growth regulation, and governance transparency.",
-      "Turn 2: \"Playing badminton has significantly contributed to my personal development and discipline.\" — You linked badminton to qualities like perseverance, discipline, and teamwork, with a clear example of regular practice.",
-      "Turn 3: \"Social stratification significantly influences access to education in urban areas like Panchkula.\" — Your answer clearly explains the influence of social stratification with relevant examples from Panchkula and suggests policy solutions."
+      "Turn 1: \"the city's structured development, with integrated planning and community engagement\" — You effectively highlighted the structured development of Panchkula, stating, 'the city's structured development, with integrated planning and community engagement'.",
+      "Turn 2: \"Playing badminton has significantly enhanced my personal development and teamwork skills.\" — You clearly articulated how badminton has contributed to your development, stating, 'Playing badminton has significantly enhanced my personal development and teamwork skills.'",
+      "Turn 3: \"community engagement as vital for effective urban governance.\" — You effectively connected your sociology background to community engagement, stating, 'community engagement as vital for effective urban governance.'"
     ],
     "daf_flags": null,
-    "summary": "You demonstrated good clarity and a structured approach, especially in your urban governance and disaster preparedness answers. Your strongest answer was on urban governance challenges, where you provided specific examples and a comprehensive view. Your main gap was in the subject depth and DAF linkage, which could be strengthened with more personal insights and local-specific details. Focusing on answering every question briefly and confidently will improve your overall performance.",
+    "summary": "You demonstrated a strong grasp of urban governance and community engagement, particularly in your first and third answers. Your strongest response was about urban governance, where you effectively linked your personal experiences to broader concepts. To improve, focus on providing more personal anecdotes or specific examples in your answers to deepen your responses.",
     "question_feedback": [
       {
         "turn": 1,
-        "question": "What are the key urban governance challenges faced by Panchkula?",
+        "question": "How has growing up in Panchkula influenced your perspective on urban governance?",
         "status": "answered",
-        "quote": "The key urban governance challenge faced by Panchkula is managing rapid urbanization while ensuring sustainable development.",
-        "what_worked": "You provided a structured and comprehensive answer, covering key challenges like infrastructure, civic amenities, urban growth regulation, and governance transparency.",
-        "improve": "Include a specific recent initiative or local example from Panchkula to demonstrate deeper knowledge.",
-        "better_answer": "A strong answer would briefly mention recent urban development projects or policies in Panchkula, linking them to challenges and solutions, showing local awareness.",
+        "quote": "the city's structured development, with integrated planning and community engagement",
+        "what_worked": "You effectively highlighted the structured development of Panchkula, stating, 'the city's structured development, with integrated planning and community engagement'.",
+        "improve": "To enhance your answer, consider sharing a specific challenge or experience from your time in Panchkula that shaped your views on urban governance.",
+        "better_answer": "A strong candidate would discuss a personal experience in Panchkula that illustrated a governance challenge and how it influenced their perspective on urban policy.",
         "checklist": [
           {
             "item": "stand",
             "label": "Clear stand",
             "ok": true,
-            "evidence": "managing rapid urbanization while ensuring sustainable development"
+            "evidence": "participatory planning and transparent administration are crucial for sustainable urban growth"
           },
           {
             "item": "reason",
             "label": "Reason given",
             "ok": true,
-            "evidence": "This involves providing adequate infrastructure, maintaining civic amenities, and regulating urban growth effectively."
+            "evidence": "It motivates me to contribute to urban policy reforms, ensuring cities are inclusive, efficient, and environmentally sustainable, aligning with my passion for …"
           },
           {
             "item": "example",
             "label": "Specific example",
             "ok": true,
-            "evidence": "Panchkula’s expanding population puts pressure on water supply, waste management, and transportation systems."
-          },
-          {
-            "item": "balance",
-            "label": "Other side considered",
-            "ok": true,
-            "evidence": "The key urban governance challenge faced by Panchkula is managing rapid urbanization while ensuring sustainable development."
-          },
-          {
-            "item": "daf_link",
-            "label": "Linked to your background",
-            "ok": false,
-            "evidence": ""
-          },
-          {
-            "item": "conclusion",
-            "label": "Conclusion",
-            "ok": true,
-            "evidence": "In conclusion, effective urban governance is essential for Panchkula’s sustainable growth and improving residents’ quality of life."
-          }
-        ],
-        "length": {
-          "words": 88,
-          "verdict": "good",
-          "note": "88 words — a good length for a board answer."
-        }
-      },
-      {
-        "turn": 2,
-        "question": "How has playing badminton contributed to your personal development and discipline?",
-        "status": "answered",
-        "quote": "Playing badminton has significantly contributed to my personal development and discipline.",
-        "what_worked": "You linked badminton to qualities like perseverance, discipline, and teamwork, with a clear example of regular practice.",
-        "improve": "Add a specific personal anecdote or reflection on how these qualities translate into your civil service aspirations.",
-        "better_answer": "A more impactful answer would include a personal story about overcoming a challenge in badminton and how that experience prepares you for public service.",
-        "checklist": [
-          {
-            "item": "stand",
-            "label": "Clear stand",
-            "ok": true,
-            "evidence": "Playing badminton has significantly contributed to my personal development and discipline."
-          },
-          {
-            "item": "reason",
-            "label": "Reason given",
-            "ok": true,
-            "evidence": "It requires consistent practice, quick reflexes, and strategic thinking, which have enhanced my focus and time management skills."
-          },
-          {
-            "item": "example",
-            "label": "Specific example",
-            "ok": true,
-            "evidence": "Regular practice sessions have taught me the importance of perseverance and discipline, essential qualities for a civil servant."
+            "evidence": "Panchkula's well-maintained public spaces and sanitation reflect good municipal management."
           },
           {
             "item": "balance",
@@ -115,65 +63,13 @@
             "item": "daf_link",
             "label": "Linked to your background",
             "ok": true,
-            "evidence": "Additionally, badminton fosters teamwork and sportsmanship, helping me develop better interpersonal skills."
+            "evidence": "aligning with my passion for urban governance and public policy."
           },
           {
             "item": "conclusion",
             "label": "Conclusion",
             "ok": true,
-            "evidence": "Overall, the sport has instilled in me a sense of dedication and resilience, which I believe are crucial for effective governance and …"
-          }
-        ],
-        "length": {
-          "words": 85,
-          "verdict": "good",
-          "note": "85 words — a good length for a board answer."
-        }
-      },
-      {
-        "turn": 3,
-        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
-        "status": "answered",
-        "quote": "Social stratification significantly influences access to education in urban areas like Panchkula.",
-        "what_worked": "Your answer clearly explains the influence of social stratification with relevant examples from Panchkula and suggests policy solutions.",
-        "improve": "Include a personal insight or data point to deepen the answer and make it more compelling within the time limit.",
-        "better_answer": "A stronger answer would briefly mention specific policies or programs you believe could address these disparities, showing deeper understanding.",
-        "checklist": [
-          {
-            "item": "stand",
-            "label": "Clear stand",
-            "ok": true,
-            "evidence": "Social stratification significantly influences access to education in urban areas like Panchkula."
-          },
-          {
-            "item": "reason",
-            "label": "Reason given",
-            "ok": true,
-            "evidence": "Higher social classes often have better access to quality schools, resources, and extracurricular opportunities due to economic advantages."
-          },
-          {
-            "item": "example",
-            "label": "Specific example",
-            "ok": true,
-            "evidence": "Children from affluent families in Panchkula tend to attend reputed private schools, while marginalized groups may rely on government schools with limited …"
-          },
-          {
-            "item": "balance",
-            "label": "Other side considered",
-            "ok": true,
-            "evidence": "Conversely, lower strata may face barriers like affordability, lack of awareness, and inadequate infrastructure."
-          },
-          {
-            "item": "daf_link",
-            "label": "Linked to your background",
-            "ok": false,
-            "evidence": ""
-          },
-          {
-            "item": "conclusion",
-            "label": "Conclusion",
-            "ok": false,
-            "evidence": ""
+            "evidence": "This experience has reinforced my belief that participatory planning and transparent administration are crucial for sustainable urban growth."
           }
         ],
         "length": {
@@ -183,37 +79,141 @@
         }
       },
       {
-        "turn": 4,
-        "question": "What measures has the Union Home Secretary directed Himalayan states to improve GLOF preparedness after Nepal?",
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal development and teamwork skills?",
         "status": "answered",
-        "quote": "The Union Home Secretary has directed Himalayan states to enhance GLOF (Glacial Lake Outburst Flood) preparedness by strengthening early warning systems, improving …",
-        "what_worked": "You provided a clear, structured answer with relevant examples and linked it to recent incidents, showing good awareness.",
-        "improve": "Add more specific measures or mention additional agencies involved for depth.",
-        "better_answer": "A more comprehensive answer would include details about technological tools or inter-agency coordination efforts for GLOF mitigation.",
+        "quote": "Playing badminton has significantly enhanced my personal development and teamwork skills.",
+        "what_worked": "You clearly articulated how badminton has contributed to your development, stating, 'Playing badminton has significantly enhanced my personal development and teamwork skills.'",
+        "improve": "To improve, consider providing a specific example of how these skills have directly impacted your work or interactions in a professional setting.",
+        "better_answer": "A strong candidate would connect their badminton experience to a specific teamwork success in their academic or professional life.",
         "checklist": [
           {
             "item": "stand",
             "label": "Clear stand",
             "ok": true,
-            "evidence": "The reason is that GLOFs pose significant threats to lives and livelihoods in these regions."
+            "evidence": "It teaches discipline, strategic thinking, and resilience."
           },
           {
             "item": "reason",
             "label": "Reason given",
             "ok": true,
-            "evidence": "GLOFs pose significant threats to lives and livelihoods in these regions."
+            "evidence": "This experience has translated into my professional life, especially during my research and teaching roles."
           },
           {
             "item": "example",
             "label": "Specific example",
             "ok": true,
-            "evidence": "After the Nepal GLOF incident, India emphasized the importance of monitoring glacial lakes and establishing communication networks for timely alerts."
+            "evidence": "coordinating with my partner to outsmart opponents improves communication and collaboration."
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": true,
+            "evidence": "Playing badminton has significantly enhanced my personal development and teamwork skills."
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "badminton fosters qualities like patience and cooperation, which are essential for personal growth and professional success."
+          }
+        ],
+        "length": {
+          "words": 83,
+          "verdict": "good",
+          "note": "83 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 3,
+        "question": "How does your understanding of urban governance, shaped by your sociology background, inform your perspective on the role of community engagement in policy-making?",
+        "status": "answered",
+        "quote": "community engagement as vital for effective urban governance.",
+        "what_worked": "You effectively connected your sociology background to community engagement, stating, 'community engagement as vital for effective urban governance.'",
+        "improve": "To enhance your response, consider sharing a specific outcome from your research that illustrates the impact of community engagement on policy success.",
+        "better_answer": "A strong candidate would provide a concrete example of a policy that was improved through community engagement, demonstrating its effectiveness.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "It fosters inclusivity, ensuring policies address diverse needs."
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "Engaged communities provide local insights, which improve policy relevance and acceptance."
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": true,
+            "evidence": "during my research at the Centre for Policy Research, I observed how community participation in urban planning led to more sustainable solutions."
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": true,
+            "evidence": "My sociology background helps me see community engagement as vital for effective urban governance."
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "involving communities is essential for responsive and effective urban governance."
+          }
+        ],
+        "length": {
+          "words": 87,
+          "verdict": "good",
+          "note": "87 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 4,
+        "question": "What are the strategic implications of integrating thorium fuels in India's nuclear energy policy?",
+        "status": "answered",
+        "quote": "Integrating thorium fuels into India’s nuclear energy policy has significant strategic implications.",
+        "what_worked": "You provided a clear and structured answer, stating, 'Integrating thorium fuels into India’s nuclear energy policy has significant strategic implications.'",
+        "improve": "To deepen your answer, consider discussing potential challenges or international implications related to thorium integration.",
+        "better_answer": "A strong candidate would address both the benefits and challenges of thorium integration, including geopolitical considerations.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "thorium is abundant in India, which enhances energy security."
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "thorium-based reactors produce less long-lived nuclear waste, addressing safety and environmental concerns."
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": true,
+            "evidence": "India’s three-stage nuclear program aims to utilize thorium effectively."
           },
           {
             "item": "balance",
             "label": "Other side considered",
             "ok": true,
-            "evidence": "The Union Home Secretary has directed Himalayan states to enhance GLOF (Glacial Lake Outburst Flood) preparedness by strengthening early warning systems, improving …"
+            "evidence": "Secondly, thorium-based reactors produce less long-lived nuclear waste, addressing safety and environmental concerns."
           },
           {
             "item": "daf_link",
@@ -225,100 +225,100 @@
             "item": "conclusion",
             "label": "Conclusion",
             "ok": true,
-            "evidence": "These measures aim to mitigate disaster impacts and protect vulnerable communities in Himalayan states."
+            "evidence": "adopting thorium technology can strengthen India’s energy independence and promote sustainable development."
           }
         ],
         "length": {
-          "words": 81,
+          "words": 89,
           "verdict": "good",
-          "note": "81 words — a good length for a board answer."
+          "note": "89 words — a good length for a board answer."
         }
       },
       {
         "turn": 5,
-        "question": "If you are not selected this time, what steps will you take to improve yourself for future attempts?",
+        "question": "How would you approach an ethical dilemma involving community engagement in policy-making that conflicts with political interests?",
         "status": "answered",
-        "quote": "If I am not selected this time, I will analyze my performance to identify areas of improvement, especially in interview skills and …",
-        "what_worked": "You showed self-awareness and a clear plan for improvement, emphasizing continuous learning and feedback.",
-        "improve": "Include specific past efforts or concrete future actions, and briefly mention how these will impact your performance.",
-        "better_answer": "A stronger response would specify particular skills or areas you will focus on, with timelines or milestones for improvement.",
+        "quote": "I would prioritize transparency and integrity, as these are fundamental to ethical policy-making.",
+        "what_worked": "You clearly articulated your ethical approach, stating, 'I would prioritize transparency and integrity, as these are fundamental to ethical policy-making.'",
+        "improve": "To strengthen your answer, consider providing a specific example of a policy where community engagement was successfully prioritized despite political challenges.",
+        "better_answer": "A strong candidate would cite a real-world example of a policy that successfully balanced community engagement with political interests.",
         "checklist": [
           {
             "item": "stand",
             "label": "Clear stand",
             "ok": true,
-            "evidence": "If I am not selected this time, I will analyze my performance to identify areas of improvement, especially in interview skills and …"
+            "evidence": "community engagement aims to reflect public needs, whereas political interests may sometimes distort this process."
           },
           {
             "item": "reason",
             "label": "Reason given",
             "ok": true,
-            "evidence": "If I am not selected this time, I will analyze my performance to identify areas of improvement, especially in interview skills and …"
+            "evidence": "My approach would be to advocate for evidence-based policies that serve public good."
           },
           {
             "item": "example",
             "label": "Specific example",
             "ok": true,
-            "evidence": "For example, I regularly blog on governance topics, which I will continue to refine."
+            "evidence": "during my research at the Centre for Policy Research, I observed how community voices were sidelined due to political agendas."
           },
           {
             "item": "balance",
             "label": "Other side considered",
-            "ok": false,
-            "evidence": ""
+            "ok": true,
+            "evidence": "The reason is that community engagement aims to reflect public needs, whereas political interests may sometimes distort this process."
           },
           {
             "item": "daf_link",
             "label": "Linked to your background",
             "ok": true,
-            "evidence": "I plan to engage more deeply with public policy debates and enhance my understanding of administrative issues through reading and discussions."
+            "evidence": "First, I would prioritize transparency and integrity, as these are fundamental to ethical policy-making."
           },
           {
             "item": "conclusion",
             "label": "Conclusion",
-            "ok": false,
-            "evidence": ""
+            "ok": true,
+            "evidence": "balancing community interests with political realities requires steadfast commitment to ethical principles."
           }
         ],
         "length": {
-          "words": 102,
+          "words": 98,
           "verdict": "good",
-          "note": "102 words — a good length for a board answer."
+          "note": "98 words — a good length for a board answer."
         }
       }
     ],
     "improvements": [
-      "Include more local-specific examples or recent initiatives in Panchkula in your urban governance answer.",
-      "Add personal anecdotes or reflections to deepen your responses on personal development and discipline.",
-      "In social stratification, incorporate data or policy specifics to strengthen your answer.",
-      "Mention additional measures or technological tools used in GLOF preparedness for depth.",
-      "Specify concrete past efforts or future milestones in your self-improvement plan."
+      "In Turn 1, include a personal anecdote about a challenge faced in Panchkula that shaped your views.",
+      "In Turn 2, provide a specific example of how badminton skills have impacted your professional interactions.",
+      "In Turn 3, share a concrete outcome from your research that illustrates the effectiveness of community engagement.",
+      "In Turn 4, discuss potential challenges or international implications related to thorium integration.",
+      "In Turn 5, cite a real-world example of a policy that successfully balanced community engagement with political interests."
     ],
     "transcript": [
       {
         "turn": 1,
-        "question": "What are the key urban governance challenges faced by Panchkula?",
-        "answer": "The key urban governance challenge faced by Panchkula is managing rapid urbanization while ensuring sustainable development. This involves providing adequate infrastructure, maintaining civic amenities, and regulating urban growth effectively. For example, Panchkula’s expanding population puts pressure on water supply, waste management, and transportation systems. Additionally, ensuring transparent and accountable governance is crucial to prevent corruption and improve service delivery. Addressing these challenges requires integrated urban planning and community participation. In conclusion, effective urban governance is essential for Panchkula’s sustainable growth and improving residents’ quality of life."
+        "question": "How has growing up in Panchkula influenced your perspective on urban governance?",
+        "answer": "Growing up in Panchkula, a planned city, has given me firsthand insight into effective urban governance. The city's structured development, with integrated planning and community engagement, highlights the importance of proactive governance. For example, Panchkula's well-maintained public spaces and sanitation reflect good municipal management. This experience has reinforced my belief that participatory planning and transparent administration are crucial for sustainable urban growth. It motivates me to contribute to urban policy reforms, ensuring cities are inclusive, efficient, and environmentally sustainable, aligning with my passion for urban governance and public policy."
       },
       {
         "turn": 2,
-        "question": "How has playing badminton contributed to your personal development and discipline?",
-        "answer": "Playing badminton has significantly contributed to my personal development and discipline. It requires consistent practice, quick reflexes, and strategic thinking, which have enhanced my focus and time management skills. For example, regular practice sessions have taught me the importance of perseverance and discipline, essential qualities for a civil servant. Additionally, badminton fosters teamwork and sportsmanship, helping me develop better interpersonal skills. Overall, the sport has instilled in me a sense of dedication and resilience, which I believe are crucial for effective governance and public service."
+        "question": "How has playing badminton contributed to your personal development and teamwork skills?",
+        "answer": "Playing badminton has significantly enhanced my personal development and teamwork skills. It teaches discipline, strategic thinking, and resilience, as matches often require quick decision-making and adaptability. For example, during doubles matches, coordinating with my partner to outsmart opponents improves communication and collaboration. This experience has translated into my professional life, especially during my research and teaching roles, where teamwork and effective communication are vital. In conclusion, badminton fosters qualities like patience and cooperation, which are essential for personal growth and professional success."
       },
       {
         "turn": 3,
-        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
-        "answer": "Social stratification significantly influences access to education in urban areas like Panchkula. Higher social classes often have better access to quality schools, resources, and extracurricular opportunities due to economic advantages. Conversely, lower strata may face barriers like affordability, lack of awareness, and inadequate infrastructure. For example, children from affluent families in Panchkula tend to attend reputed private schools, while marginalized groups may rely on government schools with limited facilities. This disparity perpetuates social inequality. Addressing this requires policy interventions to ensure equitable resource distribution and inclusive education, fostering social mobility and cohesion."
+        "question": "How does your understanding of urban governance, shaped by your sociology background, inform your perspective on the role of community engagement in policy-making?",
+        "answer": "My sociology background helps me see community engagement as vital for effective urban governance. It fosters inclusivity, ensuring policies address diverse needs. For example, during my research at the Centre for Policy Research, I observed how community participation in urban planning led to more sustainable solutions. Engaged communities provide local insights, which improve policy relevance and acceptance. Therefore, community engagement enhances transparency, accountability, and policy success. In conclusion, understanding social dynamics from sociology makes me believe that involving communities is essential for responsive and effective urban governance."
       },
       {
         "turn": 4,
-        "question": "What measures has the Union Home Secretary directed Himalayan states to improve GLOF preparedness after Nepal?",
-        "answer": "The Union Home Secretary has directed Himalayan states to enhance GLOF (Glacial Lake Outburst Flood) preparedness by strengthening early warning systems, improving infrastructure, and conducting regular risk assessments. The reason is that GLOFs pose significant threats to lives and livelihoods in these regions. For example, after the Nepal GLOF incident, India emphasized the importance of monitoring glacial lakes and establishing communication networks for timely alerts. In conclusion, these measures aim to mitigate disaster impacts and protect vulnerable communities in Himalayan states."
+        "question": "What are the strategic implications of integrating thorium fuels in India's nuclear energy policy?",
+        "answer": "Integrating thorium fuels into India’s nuclear energy policy has significant strategic implications. Firstly, thorium is abundant in India, which enhances energy security by reducing dependence on imported uranium. Secondly, thorium-based reactors produce less long-lived nuclear waste, addressing safety and environmental concerns. For example, India’s three-stage nuclear program aims to utilize thorium effectively, making the country self-reliant in nuclear fuel. In conclusion, adopting thorium technology can strengthen India’s energy independence and promote sustainable development, aligning with strategic goals of security and environmental responsibility."
       },
       {
         "turn": 5,
-        "question": "If you are not selected this time, what steps will you take to improve yourself for future attempts?",
-        "answer": "If I am not selected this time, I will analyze my performance to identify areas of improvement, especially in interview skills and current affairs. I plan to engage more deeply with public policy debates and enhance my understanding of administrative issues through reading and discussions. For example, I regularly blog on governance topics, which I will continue to refine. Additionally, I will participate in mock interviews and seek feedback from mentors. My goal is continuous self-improvement, ensuring I am better prepared for future attempts. This approach will help me grow both personally and professionally, aligning with my aspiration to serve effectively."
+        "question": "How would you approach an ethical dilemma involving community engagement in policy-making that conflicts with political interests?",
+        "answer": "First, I would prioritize transparency and integrity, as these are fundamental to ethical policy-making. The reason is that community engagement aims to reflect public needs, whereas political interests may sometimes distort this process. For example, during my research at the Centre for Policy Research, I observed how community voices were sidelined due to political agendas. My approach would be to advocate for evidence-based policies that serve public good, engaging stakeholders openly and ethically. In conclusion, balancing community interests with political realities requires steadfast commitment to ethical principles and transparent communication, ensuring policies remain inclusive and fair."
       }
     ]
   }

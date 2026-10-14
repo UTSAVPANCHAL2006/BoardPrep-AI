@@ -1,7 +1,7 @@
 [
   {
     "scenario": "gibberish",
-    "session": "62bdbf65-25ba-4a84-8521-c8491ff1e15e",
+    "session": "48997b08-99e6-4987-8b65-4b57631aa1a9",
     "mode": "quick",
     "questions": 5,
     "scores": {
@@ -24,81 +24,79 @@
     "question_feedback": [
       {
         "turn": 1,
-        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "question": "What are the key socio-economic challenges faced by Panchkula, Haryana?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "This was not a readable answer, so this question scores 0. Prepare a brief, specific answer about how Panchkula's urban development influenced your interest, perhaps mentioning a particular project or policy aspect.",
-        "better_answer": "A strong candidate would mention a specific urban development initiative in Panchkula, how it sparked your interest in policy, and relate it to your academic or professional pursuits."
+        "improve": "This was not a readable answer, so this question scores 0. In a real interview, if you don't know the answer, it's better to admit it and share what you do know related to the topic.",
+        "better_answer": "A strong candidate would discuss specific socio-economic challenges in Panchkula, such as urbanization issues, housing, and employment opportunities."
       },
       {
         "turn": 2,
-        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "question": "How has playing badminton influenced your approach to teamwork and leadership in your academic or professional life?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "This was not a readable answer, so this question scores 0. Share a concrete example of how playing badminton taught you discipline or teamwork, linking it to your personal growth.",
-        "better_answer": "A good answer would describe a specific instance, like training for a tournament, and how it developed your skills relevant to public service."
+        "improve": "This was not a readable answer, so this question scores 0. Try to connect your experiences in badminton to teamwork and leadership by sharing specific instances where you demonstrated these skills.",
+        "better_answer": "A strong candidate would describe how playing badminton taught them about collaboration, communication, and handling competition in a team setting."
       },
       {
         "turn": 3,
-        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "question": "How does your experience as a Research Associate at the Centre for Policy Research inform your understanding of social stratification in contemporary Indian society?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "This was not a readable answer, so this question scores 0. Even if unsure, briefly outline how urbanization affects social stratification, perhaps mentioning slum development or gentrification.",
-        "better_answer": "A strong candidate would discuss how urbanization can lead to increased inequality but also opportunities for social mobility, citing specific urban trends."
+        "improve": "This was not a readable answer, so this question scores 0. If you struggle to articulate your thoughts, focus on summarizing your research experience and its relevance to social stratification.",
+        "better_answer": "A strong candidate would explain how their research at the Centre for Policy Research helped them understand class disparities and access to resources in India."
       },
       {
         "turn": 4,
-        "question": "India-Belgium defence and fintech ties ke baare mein aap kya jaante hain?",
+        "question": "What implications do the newly approved autonomous hill councils in Ladakh have for local governance and?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "This was not a readable answer, so this question scores 0. Acknowledge limited knowledge and mention any related aspect you are aware of, such as India's engagement in international defense or fintech collaborations.",
-        "better_answer": "A good answer would briefly mention recent India-Belgium defense or fintech cooperation, or express willingness to learn more about it."
+        "improve": "This was not a readable answer, so this question scores 0. When faced with a current affairs question, try to recall key points about the topic, even if you don't have all the details.",
+        "better_answer": "A strong candidate would discuss the implications of autonomous hill councils on local governance, including increased local representation and decision-making power."
       },
       {
         "turn": 5,
-        "question": "Can you share a personal failure that taught you an important lesson?",
+        "question": "How do you believe your academic background and research experience will contribute to your effectiveness as an IAS officer?",
         "status": "skipped",
         "quote": "",
         "what_worked": "",
-        "improve": "This was not a readable answer, so this question scores 0. Be honest about a personal failure, briefly describe what you learned, and how it helped your growth.",
-        "better_answer": "A strong candidate would share a specific failure, what it taught them, and how it improved their approach or skills."
+        "improve": "This was not a readable answer, so this question scores 0. Focus on linking your academic and research experiences to the skills needed for an IAS officer, such as analytical thinking and policy understanding.",
+        "better_answer": "A strong candidate would articulate how their academic background equips them with critical thinking skills and a deep understanding of governance issues."
       }
     ],
     "improvements": [
-      "Focus on answering each question directly and briefly, especially in quick mode, to demonstrate clarity.",
-      "Practice linking your background explicitly to the questions asked, to improve coherence.",
-      "Develop a habit of preparing 2-3 key points for common topics like urban development, teamwork, and personal failures.",
-      "Work on articulating your thoughts clearly even when under pressure, avoiding gibberish responses.",
-      "In future, aim to connect your DAF details more explicitly to your answers to strengthen consistency."
+      "You need to work on articulating your thoughts clearly and coherently. Practice answering questions directly.",
+      "Focus on developing a structured approach to answering questions, even if you have limited knowledge on the topic.",
+      "Engage in mock interviews with peers or mentors to build confidence and improve your response quality."
     ],
     "transcript": [
       {
         "turn": 1,
-        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "question": "What are the key socio-economic challenges faced by Panchkula, Haryana?",
         "answer": "asdf qwer zxcv hjkl"
       },
       {
         "turn": 2,
-        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "question": "How has playing badminton influenced your approach to teamwork and leadership in your academic or professional life?",
         "answer": "asdf qwer zxcv hjkl"
       },
       {
         "turn": 3,
-        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "question": "How does your experience as a Research Associate at the Centre for Policy Research inform your understanding of social stratification in contemporary Indian society?",
         "answer": "asdf qwer zxcv hjkl"
       },
       {
         "turn": 4,
-        "question": "India-Belgium defence and fintech ties ke baare mein aap kya jaante hain?",
+        "question": "What implications do the newly approved autonomous hill councils in Ladakh have for local governance and?",
         "answer": "asdf qwer zxcv hjkl"
       },
       {
         "turn": 5,
-        "question": "Can you share a personal failure that taught you an important lesson?",
+        "question": "How do you believe your academic background and research experience will contribute to your effectiveness as an IAS officer?",
         "answer": "asdf qwer zxcv hjkl"
       }
     ]

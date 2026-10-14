@@ -413,3 +413,19 @@ def testSilenceAndNonDafPdfsAreCaughtBeforeAnyAiCall() -> None:
     assert not isSilent(b"not audio at all")  # not a WAV: left to speech-to-text, which reports it cleanly
     assert not looksLikeDaf(DAFProfile(work_experience=["Software Engineer - Python"]))  # a resume
     assert looksLikeDaf(DAFProfile(hometown="Panchkula", hobbies=["badminton"]))
+
+
+def testALongQuestionIsNeverCutInTheMiddle() -> None:
+    # Cutting at 16 words once showed candidates: "...as highlighted in the recent?"
+    from app.common.utils import sanitizeCaBoardQuestion
+
+    question = "What are the key areas of cooperation between India and Belgium as highlighted in the recent visit of the Belgian delegation?"
+    assert sanitizeCaBoardQuestion(question, 16) == question
+    runaway = " ".join(["word"] * 60) + " in the recent?"
+    assert not sanitizeCaBoardQuestion(runaway, 16).endswith(("the?", "in?", "recent?"))
+
+
+def testOneWordAnswerLengthReadsNaturally() -> None:
+    from app.agents.scoring import judgeLength
+
+    assert judgeLength("Panchkula")["note"].startswith("1 word (about 1 second)")

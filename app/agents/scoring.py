@@ -553,7 +553,9 @@ def judgeLength(answer: str) -> dict:
     """A board answer runs about 45-90 seconds when spoken: roughly 80-180 words."""
     words = len(normalise(answer).split())
     if words < 40:
-        verdict, note = "too_short", f"{words} words (about {max(1, words * 60 // 150)} seconds) — aim for 45-90 seconds."
+        seconds = max(1, words * 60 // 150)
+        verdict = "too_short"
+        note = f"{words} word{'s' if words != 1 else ''} (about {seconds} second{'s' if seconds != 1 else ''}) — aim for 45-90 seconds."
     elif words < 80:
         verdict, note = "short", f"{words} words — good start; one more example or a conclusion would round it off."
     elif words <= 200:
