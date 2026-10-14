@@ -1,5 +1,6 @@
 "use client";
 
+// The full report: scores, coverage, question-by-question feedback with the board checklist.
 import {
   Bar,
   BarChart,
@@ -9,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { FeedbackReport, FeedbackScores } from "@/lib/types";
+import type { FeedbackReport, FeedbackScores, QuestionFeedback } from "@/lib/types";
 import { DafFlagsBanner } from "./DafFlagsBanner";
 
 const SCORE_LABELS: Record<keyof FeedbackScores, string> = {
@@ -35,7 +36,21 @@ function scoreBand(avg: number): { label: string; className: string } {
   return { label: "Needs focused practice", className: "text-red-300" };
 }
 
-function ScoreCard({ label, score }: { label: string; score: number }) {
+function ScoreCard({ label, score }: { label: string; score: number | null }) {
+  if (score === null) {
+    return (
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium text-slate-400">{label}</p>
+            <p className="mt-0.5 text-[10px] uppercase tracking-wider text-slate-600">Not assessed</p>
+          </div>
+          <p className="font-display text-2xl font-bold text-slate-600">—</p>
+        </div>
+        <p className="mt-3 text-[11px] text-slate-600">This phase was not reached in your mock.</p>
+      </div>
+    );
+  }
   const pct = (score / 10) * 100;
   const color =
     score >= 7 ? "from-emerald-500 to-emerald-400" : score >= 5 ? "from-saffron to-saffron-light" : "from-red-500 to-red-400";
@@ -68,12 +83,13 @@ export function FeedbackReportView({
   dafFlags: FeedbackReport["daf_flags"];
 }) {
   const scores = report.scores;
+  // Only dimensions that were assessed count: a phase never reached is "—", not a made-up score.
   const chartData = scores
-    ? (Object.keys(SCORE_LABELS) as (keyof FeedbackScores)[]).map((key) => ({
-        name: SCORE_LABELS[key],
-        score: scores[key] ?? 0,
-      }))
+    ? (Object.keys(SCORE_LABELS) as (keyof FeedbackScores)[])
+        .filter((key) => scores[key] !== null && scores[key] !== undefined)
+        .map((key) => ({ name: SCORE_LABELS[key], score: scores[key] ?? 0 }))
     : [];
+  const coverage = report.coverage;
 
   const avgScoreNum = chartData.length
     ? chartData.reduce((s, d) => s + d.score, 0) / chartData.length
@@ -110,6 +126,15 @@ export function FeedbackReportView({
         </div>
       </div>
 
+      {coverage && coverage.answered < coverage.asked ? (
+        <div className="glass-card border-amber-500/30">
+          <p className="text-sm text-amber-200">
+            You answered {coverage.answered} of {coverage.asked} questions. Skipped questions score 0, so no score
+            here can go above {coverage.max_score}/10.
+          </p>
+        </div>
+      ) : null}
+
       <DafFlagsBanner flags={dafFlags || []} />
 
       {report.priority_actions && report.priority_actions.length > 0 && (
@@ -134,7 +159,7 @@ export function FeedbackReportView({
       {scores && (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {(Object.keys(SCORE_LABELS) as (keyof FeedbackScores)[]).map((key) => (
-            <ScoreCard key={key} label={SCORE_LABELS[key]} score={scores[key] ?? 0} />
+            <ScoreCard key={key} label={SCORE_LABELS[key]} score={scores[key] ?? null} />
           ))}
         </div>
       )}
@@ -186,6 +211,9 @@ export function FeedbackReportView({
             <span className="text-lg">✅</span>
             <h3 className="font-semibold text-emerald-300">Strengths</h3>
           </div>
+          {!report.strengths?.length ? (
+            <p className="text-sm text-slate-500">No strengths to show yet — strengths are only taken from answers you gave.</p>
+          ) : null}
           <ul className="space-y-2">
             {report.strengths?.map((s, i) => (
               <li key={i} className="flex gap-2 text-sm text-slate-300">
@@ -211,6 +239,10 @@ export function FeedbackReportView({
         </div>
       </div>
 
+      {report.question_feedback && report.question_feedback.length > 0 && (
+        <QuestionBreakdown rows={report.question_feedback} />
+      )}
+
       {report.phase_breakdown && (
         <div className="glass-card">
           <h3 className="mb-4 font-display text-lg font-semibold">Phase-wise Breakdown</h3>
@@ -226,6 +258,88 @@ export function FeedbackReportView({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const STATUS_STYLE: Record<QuestionFeedback["status"], { label: string; className: string }> = {
+  answered: { label: "Answered", className: "bg-emerald-500/15 text-emerald-300" },
+  skipped: { label: "Skipped · 0", className: "bg-red-500/15 text-red-300" },
+  off_topic: { label: "Off topic · 0", className: "bg-amber-500/15 text-amber-300" },
+};
+
+/** Question by question: what you said, what worked, what to change, and how a strong answer sounds. */
+function QuestionBreakdown({ rows }: { rows: QuestionFeedback[] }) {
+  return (
+    <div className="glass-card">
+      <h3 className="mb-1 font-display text-lg font-semibold">Question by Question</h3>
+      <p className="mb-4 text-xs text-slate-500">Every quote below is checked against what you actually said.</p>
+      <ol className="space-y-4">
+        {rows.map((row) => {
+          const status = STATUS_STYLE[row.status] ?? STATUS_STYLE.answered;
+          return (
+            <li key={row.turn} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-medium text-slate-200">
+                  <span className="mr-2 text-slate-500">Q{row.turn}.</span>
+                  {row.question}
+                </p>
+                <span className={`flex-shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${status.className}`}>
+                  {status.label}
+                </span>
+              </div>
+              {row.quote ? (
+                <blockquote className="mt-3 border-l-2 border-saffron/50 pl-3 text-sm italic text-slate-300">
+                  “{row.quote}”
+                </blockquote>
+              ) : null}
+              {row.status === "answered" && row.checklist?.length ? (
+                <div className="mt-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">How your answer was built</p>
+                  <ul className="mt-1.5 flex flex-wrap gap-1.5">
+                    {row.checklist.map((check) => (
+                      <li
+                        key={check.item}
+                        title={check.ok ? `“${check.evidence}”` : "Missing from this answer"}
+                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
+                          check.ok ? "bg-emerald-500/15 text-emerald-300" : "bg-white/[0.04] text-slate-500 line-through"
+                        }`}
+                      >
+                        {check.ok ? "✓" : "✗"} {check.label}
+                      </li>
+                    ))}
+                  </ul>
+                  {row.length ? (
+                    <p className={`mt-2 text-xs ${row.length.verdict === "good" ? "text-emerald-300/80" : "text-amber-300/80"}`}>
+                      Length: {row.length.note}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+              <dl className="mt-3 space-y-2 text-sm">
+                {row.what_worked ? (
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300/80">What worked</dt>
+                    <dd className="text-slate-300">{row.what_worked}</dd>
+                  </div>
+                ) : null}
+                {row.improve ? (
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wider text-amber-300/80">Improve</dt>
+                    <dd className="text-slate-300">{row.improve}</dd>
+                  </div>
+                ) : null}
+                {row.better_answer ? (
+                  <div>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wider text-saffron/80">A strong answer</dt>
+                    <dd className="text-slate-400">{row.better_answer}</dd>
+                  </div>
+                ) : null}
+              </dl>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

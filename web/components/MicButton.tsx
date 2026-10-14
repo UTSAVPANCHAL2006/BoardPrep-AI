@@ -1,5 +1,6 @@
 "use client";
 
+// The record button: captures the spoken answer and stops automatically on silence.
 import { Waveform } from "./Waveform";
 
 export function MicButton({

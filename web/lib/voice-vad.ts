@@ -1,6 +1,6 @@
 /** Silence detection — auto-submit after a natural end-of-answer pause. */
 
-export const VAD_DEFAULTS = {
+const VAD_DEFAULTS = {
   /** Wait this long after last speech before auto-submit (natural thinking gaps). */
   silenceMs: 7500,
   /** Require at least this much speech before silence can trigger submit. */

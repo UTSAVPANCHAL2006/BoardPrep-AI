@@ -1,3 +1,5 @@
+// Warns when an answer contradicted the candidate's DAF.
+
 import type { DAFFlag } from "@/lib/types";
 
 export function DafFlagsBanner({ flags }: { flags: DAFFlag[] }) {

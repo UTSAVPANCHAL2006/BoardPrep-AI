@@ -1,5 +1,6 @@
 "use client";
 
+// The news briefing card shown before a current-affairs question.
 import type { CABriefing } from "@/lib/types";
 import { CA_VOICE_LANGUAGES, ttsCodeForVoice } from "@/lib/voice-language";
 import type { AudioPlaybackState } from "@/lib/audio";

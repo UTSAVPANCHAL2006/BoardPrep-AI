@@ -1,5 +1,6 @@
 "use client";
 
+// Reads text aloud with the browser's own voice when server audio is not available.
 import { useEffect, useRef, useState } from "react";
 import type { AudioPlaybackState } from "@/lib/audio";
 import {

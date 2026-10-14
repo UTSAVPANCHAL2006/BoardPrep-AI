@@ -1,5 +1,6 @@
 "use client";
 
+// Home page: what the product does, and the DAF upload that starts an interview.
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { uploadDaf } from "@/lib/api";
@@ -16,16 +17,16 @@ const FEATURES = [
     desc: "Speak in Hindi, English, or Hinglish — the panel listens and responds.",
   },
   {
-    title: "Daily Current Affairs",
-    desc: "Curated headlines with GS notes and a spoken classroom briefing.",
+    title: "Honest Scoring",
+    desc: "A skipped or off-topic answer scores 0 — the report can never inflate silence.",
   },
   {
     title: "DAF-Aware Questions",
     desc: "Questions anchored to your uploaded Detailed Application Form.",
   },
   {
-    title: "Scored Feedback",
-    desc: "Structured rubric report after each mock session.",
+    title: "Question-by-Question Feedback",
+    desc: "Every strength quotes your own words, with what to improve and how a strong answer sounds.",
   },
 ];
 
@@ -84,13 +85,6 @@ export default function HomePage() {
             Upload your DAF, face a four-phase mock panel, and review scored feedback — built as
             an AI engineering portfolio project for UPSC prep workflows.
           </p>
-          <a
-            href="/current-affairs"
-            className="inline-flex items-center gap-2 text-sm font-medium text-saffron transition hover:text-saffron-light"
-          >
-            Browse today&apos;s current affairs
-            <span aria-hidden>→</span>
-          </a>
         </div>
 
         <div className="animate-scale-in gradient-border">

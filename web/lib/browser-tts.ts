@@ -1,6 +1,6 @@
-import type { AudioPlaybackState } from "@/lib/audio";
+// Browser text-to-speech fallback.
 
-let activeUtterance: SpeechSynthesisUtterance | null = null;
+import type { AudioPlaybackState } from "@/lib/audio";
 
 export function browserTtsSupported(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
@@ -9,7 +9,6 @@ export function browserTtsSupported(): boolean {
 export function stopBrowserTts(): void {
   if (typeof window === "undefined") return;
   window.speechSynthesis.cancel();
-  activeUtterance = null;
 }
 
 export function speakBrowserTts(
@@ -34,15 +33,12 @@ export function speakBrowserTts(
   utterance.onstart = () => onState?.("playing");
   utterance.onpause = () => onState?.("paused");
   utterance.onend = () => {
-    activeUtterance = null;
     onState?.("idle");
   };
   utterance.onerror = () => {
-    activeUtterance = null;
     onState?.("idle");
   };
 
-  activeUtterance = utterance;
   window.speechSynthesis.speak(utterance);
   return true;
 }

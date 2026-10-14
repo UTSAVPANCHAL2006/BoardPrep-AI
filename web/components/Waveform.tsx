@@ -1,5 +1,6 @@
 "use client";
 
+// The animated bars shown while audio is playing or recording.
 export function Waveform({ active }: { active: boolean }) {
   const bars = [0, 1, 2, 3, 4, 5, 6, 7];
   return (

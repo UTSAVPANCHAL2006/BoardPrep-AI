@@ -1,5 +1,6 @@
 "use client";
 
+// Plays the board's spoken question, with pause and replay.
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   formatAudioTime,

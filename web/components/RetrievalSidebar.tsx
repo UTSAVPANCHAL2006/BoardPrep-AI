@@ -1,3 +1,5 @@
+// Shows which syllabus or news passages the board used for the current question.
+
 import type { CASource, RetrievedChunk } from "@/lib/types";
 
 export function RetrievalSidebar({

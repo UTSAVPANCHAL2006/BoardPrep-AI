@@ -1,3 +1,5 @@
+// Shows which interview phase you are in (DAF, subject, current affairs, closing).
+
 const PHASES = [
   { id: "daf_opening", label: "DAF Opening", short: "DAF", icon: "📋", desc: "Your background" },
   { id: "subject_probe", label: "Subject Probe", short: "Subject", icon: "📚", desc: "Optional depth" },

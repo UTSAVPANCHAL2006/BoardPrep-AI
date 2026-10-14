@@ -1,6 +1,8 @@
+// Data shapes returned by the backend API.
+
 export type InterviewMode = "quick" | "full";
 
-export interface DAFProfile {
+interface DAFProfile {
   hobbies: string[];
   optional_subject: string;
   work_experience: string[];
@@ -42,31 +44,6 @@ export interface CABriefing {
   voice_language?: string;
 }
 
-export interface EnrichedArticle {
-  title: string;
-  source: string;
-  published_at: string;
-  url?: string;
-  daf_anchor: string;
-  key_highlights: string[];
-  detailed_insights: string;
-  key_concepts: Record<string, string>;
-  gs_tags: string[];
-  is_prelims_relevant: boolean;
-}
-
-export interface DailyCAResponse {
-  articles: EnrichedArticle[];
-  personalized: boolean;
-  edition_date: string;
-  is_live: boolean;
-  is_fallback?: boolean;
-  is_preparing?: boolean;
-  article_count: number;
-  voices_ready?: number;
-  voices_total?: number;
-}
-
 export interface DAFFlag {
   field: string;
   daf_says: string;
@@ -74,7 +51,7 @@ export interface DAFFlag {
   message: string;
 }
 
-export interface Evaluation {
+interface Evaluation {
   clarity: string;
   factual_consistency: string;
   notes: string;
@@ -116,13 +93,28 @@ export interface RespondResponse {
   ca_briefing?: CABriefing | null;
 }
 
+/** 0-10, or null when the phase was never reached ("not assessed"). */
 export interface FeedbackScores {
-  clarity: number;
-  structure: number;
-  daf_consistency: number;
-  subject_depth: number;
-  current_affairs: number;
-  confidence: number;
+  clarity: number | null;
+  structure: number | null;
+  daf_consistency: number | null;
+  subject_depth: number | null;
+  current_affairs: number | null;
+  confidence: number | null;
+}
+
+/** One row per question, tied to the candidate's own words (quotes are checked by the server). */
+export interface QuestionFeedback {
+  turn: number;
+  question: string;
+  status: "answered" | "skipped" | "off_topic";
+  quote: string;
+  what_worked: string;
+  improve: string;
+  better_answer: string;
+  /** How the answer was built; a tick is kept only if its evidence phrase is really in the answer. */
+  checklist?: { item: string; label: string; ok: boolean; evidence: string }[];
+  length?: { words: number; verdict: "too_short" | "short" | "good" | "too_long"; note: string };
 }
 
 export interface FeedbackReport {
@@ -136,6 +128,8 @@ export interface FeedbackReport {
   phase_breakdown?: Record<string, string>;
   priority_actions?: string[];
   daf_flags?: DAFFlag[];
+  question_feedback?: QuestionFeedback[];
+  coverage?: { answered: number; asked: number; max_score: number };
 }
 
 export interface FeedbackReportResponse {

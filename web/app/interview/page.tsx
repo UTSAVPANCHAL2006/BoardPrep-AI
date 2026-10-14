@@ -1,5 +1,6 @@
 "use client";
 
+// The interview page (/interview?session=...).
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { InterviewRoom } from "@/components/InterviewRoom";

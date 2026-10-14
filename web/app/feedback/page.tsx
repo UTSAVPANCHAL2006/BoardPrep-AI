@@ -1,5 +1,6 @@
 "use client";
 
+// The feedback report page (/feedback?session=...).
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";

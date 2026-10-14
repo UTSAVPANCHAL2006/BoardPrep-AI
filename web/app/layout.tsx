@@ -1,3 +1,5 @@
+// The shell around every page: fonts, navbar and page metadata.
+
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
@@ -9,7 +11,7 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakart
 export const metadata: Metadata = {
   title: "BoardPrep AI | UPSC Mock Interview",
   description:
-    "Voice-first UPSC personality test prototype — DAF-aware mock interview, daily current affairs, and Hindi voice briefings.",
+    "Voice-first UPSC personality test practice — a DAF-aware mock board with honest, question-by-question feedback.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

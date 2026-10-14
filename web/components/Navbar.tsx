@@ -1,12 +1,12 @@
 "use client";
 
+// Top navigation bar.
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const NAV_LINKS = [
   { href: "/", label: "Home", scrollTo: null },
-  { href: "/current-affairs", label: "Current Affairs", scrollTo: null },
   { href: "/#features", label: "Features", scrollTo: "features" },
   { href: "/#how-it-works", label: "How it works", scrollTo: "how-it-works" },
 ];

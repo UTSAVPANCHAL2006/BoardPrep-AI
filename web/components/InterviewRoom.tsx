@@ -1,5 +1,6 @@
 "use client";
 
+// The live interview: plays each question, records or types the answer, and moves to the report at the end.
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -267,7 +268,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
         </div>
         <div className="text-center">
           <p className="font-display text-xl font-semibold">Preparing the Board Room</p>
-          <p className="mt-2 text-sm text-slate-500">Indexing syllabus, fetching current affairs, reading your DAF...</p>
+          <p className="mt-2 text-sm text-slate-500">Reading your DAF and preparing your board...</p>
         </div>
       </div>
     );

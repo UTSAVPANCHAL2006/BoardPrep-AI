@@ -1,9 +1,11 @@
+// Audio playback helpers (one shared player, so two clips never play at once).
+
 export type AudioPlaybackState = "idle" | "playing" | "paused";
 
 let sharedAudio: HTMLAudioElement | null = null;
 let sharedBase64: string | null = null;
 
-export function sniffAudioMime(base64: string): string {
+function sniffAudioMime(base64: string): string {
   try {
     const head = atob(base64.slice(0, 32));
     if (head.startsWith("RIFF")) return "audio/wav";
@@ -51,38 +53,6 @@ export function formatAudioTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-export function pauseStableAudio(): void {
-  if (sharedAudio && !sharedAudio.paused) {
-    sharedAudio.pause();
-  }
-}
-
-export function resumeStableAudio(): Promise<boolean> {
-  if (!sharedAudio) return Promise.resolve(false);
-  return sharedAudio.play().then(() => true).catch(() => false);
-}
-
-export function playStableAudioAndWait(base64: string): Promise<void> {
-  return new Promise((resolve) => {
-    if (!base64) {
-      resolve();
-      return;
-    }
-    const audio = getStableAudio(base64);
-    const done = () => {
-      audio.removeEventListener("ended", done);
-      audio.removeEventListener("error", done);
-      resolve();
-    };
-    audio.addEventListener("ended", done);
-    audio.addEventListener("error", done);
-    if (audio.ended) {
-      audio.currentTime = 0;
-    }
-    void audio.play().catch(done);
-  });
 }
 
 /** One-off playback for streamed TTS chunks — does not fight VoicePlayer's shared element. */

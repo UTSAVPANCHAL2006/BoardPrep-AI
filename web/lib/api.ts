@@ -1,6 +1,6 @@
+// Every call the web app makes to the backend API.
+
 import type {
-  CABriefing,
-  DailyCAResponse,
   FeedbackReportResponse,
   InterviewMode,
   RespondResponse,
@@ -9,9 +9,7 @@ import type {
 } from "./types";
 import {
   createAudioFromBase64,
-  pauseStableAudio,
   playEphemeralAudioAndWait,
-  playStableAudioAndWait,
   releaseStableAudio,
 } from "@/lib/audio";
 
@@ -21,14 +19,14 @@ const UPLOAD_TIMEOUT_MS = 60_000;
 const START_INTERVIEW_TIMEOUT_MS = 120_000;
 const RESPOND_TIMEOUT_MS = 180_000;
 
-export type StreamAudioChunk = {
+type StreamAudioChunk = {
   index: number;
   total: number;
   text: string;
   audio_base64: string;
 };
 
-export type StreamRespondMetadata = Pick<
+type StreamRespondMetadata = Pick<
   RespondResponse,
   | "session_id"
   | "transcript"
@@ -185,30 +183,6 @@ function extForMime(mime: string): string {
   return "wav";
 }
 
-export async function respondWithAudio(
-  sessionId: string,
-  audioBlob: Blob,
-  mimeType = "audio/webm"
-): Promise<RespondResponse> {
-  const form = new FormData();
-  form.append("session_id", sessionId);
-  const ext = extForMime(mimeType);
-  form.append("audio", audioBlob, `answer.${ext}`);
-  const res = await apiFetch(`${API_URL}/respond`, { method: "POST", body: form }, RESPOND_TIMEOUT_MS);
-  return handleResponse<RespondResponse>(res);
-}
-
-export async function respondWithText(
-  sessionId: string,
-  textAnswer: string
-): Promise<RespondResponse> {
-  const form = new FormData();
-  form.append("session_id", sessionId);
-  form.append("text_answer", textAnswer);
-  const res = await apiFetch(`${API_URL}/respond`, { method: "POST", body: form }, RESPOND_TIMEOUT_MS);
-  return handleResponse<RespondResponse>(res);
-}
-
 export async function respondStream(
   sessionId: string,
   audioBlob?: Blob,
@@ -283,23 +257,8 @@ export function stopAudio(): void {
   releaseStableAudio();
 }
 
-export function pauseAudio(): void {
-  activeAudio?.pause();
-  pauseStableAudio();
-}
-
-export async function resumeAudio(): Promise<boolean> {
-  if (!activeAudio) return false;
-  try {
-    await activeAudio.play();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 /** Returns true if playback started. Browsers often block autoplay after async delays. */
-export async function playBase64Audio(base64: string): Promise<boolean> {
+async function playBase64Audio(base64: string): Promise<boolean> {
   if (!base64) return false;
   stopAudio();
   activeAudio = createAudioFromBase64(base64);
@@ -315,7 +274,7 @@ export async function playBase64Audio(base64: string): Promise<boolean> {
   }
 }
 
-export function waitForActiveAudioEnd(): Promise<void> {
+function waitForActiveAudioEnd(): Promise<void> {
   return new Promise((resolve) => {
     if (!activeAudio) {
       resolve();
@@ -339,77 +298,6 @@ export async function playBoardQuestionAudio(base64: string): Promise<boolean> {
   if (!started) return false;
   await waitForActiveAudioEnd();
   return true;
-}
-
-export function playBase64Wav(base64: string): void {
-  void playBase64Audio(base64);
-}
-
-export function playBase64AudioAndWait(base64: string): Promise<void> {
-  return playStableAudioAndWait(base64);
-}
-
-export function playAudioSequence(base64List: string[]): Promise<void> {
-  const clips = base64List.filter(Boolean);
-  if (!clips.length) return Promise.resolve();
-
-  return clips.reduce(
-    (chain, b64) =>
-      chain.then(async () => {
-        const ok = await playBase64Audio(b64);
-        if (!ok) return;
-        await new Promise<void>((resolve) => {
-          if (!activeAudio) {
-            resolve();
-            return;
-          }
-          activeAudio.onended = () => {
-            activeAudio = null;
-            resolve();
-          };
-          activeAudio.onerror = () => resolve();
-        });
-      }),
-    Promise.resolve()
-  );
-}
-
-export async function fetchDailyCA(sessionId?: string): Promise<DailyCAResponse> {
-  const q = sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : "";
-  const res = await apiFetch(`${API_URL}/current-affairs/daily${q}`, {}, 30000);
-  return handleResponse<DailyCAResponse>(res);
-}
-
-export async function fetchCachedBriefing(
-  articleIndex: number,
-  language?: string
-): Promise<CABriefing | null> {
-  const q = new URLSearchParams({
-    article_index: String(articleIndex),
-    language: language || "hi",
-  });
-  const res = await apiFetch(`${API_URL}/current-affairs/explain-cached?${q}`, {}, 15000);
-  if (res.status === 404) return null;
-  return handleResponse<CABriefing>(res);
-}
-
-export async function prewarmCaAudio(language?: string): Promise<void> {
-  const form = new FormData();
-  if (language) form.append("language", language);
-  await apiFetch(`${API_URL}/current-affairs/prewarm`, { method: "POST", body: form }, 120000);
-}
-
-export async function explainCurrentAffair(
-  articleIndex: number,
-  sessionId?: string,
-  language?: string
-): Promise<CABriefing> {
-  const form = new FormData();
-  form.append("article_index", String(articleIndex));
-  if (sessionId) form.append("session_id", sessionId);
-  if (language) form.append("language", language);
-  const res = await apiFetch(`${API_URL}/current-affairs/explain`, { method: "POST", body: form }, 180000);
-  return handleResponse<CABriefing>(res);
 }
 
 export function getSupportedAudioMimeType(): string {
