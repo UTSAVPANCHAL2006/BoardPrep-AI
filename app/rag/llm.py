@@ -1,3 +1,5 @@
+"""Creates the chat model client (OpenAI-compatible) with the settings from .env."""
+
 from langchain_openai import ChatOpenAI
 
 from app.config.config import CA_BRIEFING_MODEL, OPENAI_API_KEY, OPENAI_MODEL
@@ -7,7 +9,7 @@ class LLM:
     def __init__(self):
         self._llm = None
 
-    def get_llm(self, temperature=0.4, max_tokens: int | None = None, model: str | None = None):
+    def getLlm(self, temperature=0.4, max_tokens: int | None = None, model: str | None = None):
         kwargs = {
             "api_key": OPENAI_API_KEY,
             "model": model or OPENAI_MODEL,
@@ -18,8 +20,8 @@ class LLM:
             kwargs["max_tokens"] = max_tokens
         return ChatOpenAI(**kwargs)
 
-    def get_briefing_llm(self, temperature=0.2, max_tokens: int | None = None):
-        return self.get_llm(temperature=temperature, max_tokens=max_tokens, model=CA_BRIEFING_MODEL)
+    def getBriefingLlm(self, temperature=0.2, max_tokens: int | None = None):
+        return self.getLlm(temperature=temperature, max_tokens=max_tokens, model=CA_BRIEFING_MODEL)
 
     @property
     def llm(self):

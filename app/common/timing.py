@@ -1,3 +1,5 @@
+"""Per-session timing of each step (STT, model, TTS) for the /metrics endpoint."""
+
 import time
 from contextlib import contextmanager
 from typing import Any
@@ -6,7 +8,7 @@ _metrics_store: dict[str, dict[str, Any]] = {}
 
 
 @contextmanager
-def track_step(session_id: str, step: str):
+def trackStep(session_id: str, step: str):
     start = time.perf_counter()
     try:
         yield
@@ -16,19 +18,18 @@ def track_step(session_id: str, step: str):
         store["last"][step] = elapsed_ms
 
 
-def record_turn(session_id: str, phase: str, extra: dict | None = None):
+def recordTurn(session_id: str, phase: str, extra: dict | None = None):
     store = _metrics_store.setdefault(session_id, {"turns": [], "last": {}})
     turn = {"phase": phase, **store["last"]}
     if extra:
         turn.update(extra)
-    total = sum(v for k, v in turn.items() if k.endswith("_ms") or k in store["last"])
     if "last" in store and store["last"]:
         turn["total_ms"] = round(sum(store["last"].values()), 1)
     store["turns"].append(turn)
     store["last"] = {}
 
 
-def get_metrics(session_id: str) -> dict:
+def getMetrics(session_id: str) -> dict:
     store = _metrics_store.get(session_id, {"turns": [], "last": {}})
     turns = store.get("turns", [])
     totals = [t.get("total_ms", 0) for t in turns if t.get("total_ms")]

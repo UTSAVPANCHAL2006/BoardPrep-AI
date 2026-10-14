@@ -1,25 +1,27 @@
+"""Finds the syllabus passages and news stories most related to a question (keyword + vector search)."""
+
 import asyncio
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 
 from app.common.custom_exception import CustomException
-from app.common.logger import get_logger
+from app.common.logger import getLogger
 from app.config.config import RAG_VECTORS_ENABLED
 from app.rag.embedding import Embedding
-from app.rag.ingest import _bm25_index, get_chroma_client, resolve_collection
+from app.rag.ingest import _bm25_index, getChromaClient, resolveCollection
 
-logger = get_logger(__name__)
+logger = getLogger(__name__)
 
 
 class Retriever:
     def __init__(self, embedding: Embedding):
         self.embedding = embedding
 
-    def ensure_bm25_index(self, collection_key: str) -> None:
+    def ensureBm25Index(self, collection_key: str) -> None:
         if collection_key in _bm25_index and "retriever" in _bm25_index[collection_key]:
             return
         try:
-            client = get_chroma_client()
+            client = getChromaClient()
             collection = client.get_collection(collection_key)
             if collection.count() == 0:
                 return
@@ -38,8 +40,8 @@ class Retriever:
         except Exception:
             return
 
-    def bm25_search(self, collection_key, query, top_k):
-        self.ensure_bm25_index(collection_key)
+    def bm25Search(self, collection_key, query, top_k):
+        self.ensureBm25Index(collection_key)
         index = _bm25_index.get(collection_key)
         if not index or "retriever" not in index:
             return []
@@ -49,38 +51,38 @@ class Retriever:
         # Return matched document content along with normalized score representation
         return [(doc.page_content, 1.0 / (idx + 1)) for idx, doc in enumerate(docs)]
 
-    def vector_search(self, collection_key, query, top_k):
+    def vectorSearch(self, collection_key, query, top_k):
         if not RAG_VECTORS_ENABLED:
             return []
-        client = get_chroma_client()
+        client = getChromaClient()
         try:
             collection = client.get_collection(collection_key)
         except Exception:
             return []
         if collection.count() == 0:
             return []
-        query_vec = self.embedding.embed_query(query)
+        query_vec = self.embedding.embedQuery(query)
         results = collection.query(query_embeddings=[query_vec], n_results=top_k)
         docs = results.get("documents", [[]])[0]
         distances = results.get("distances", [[]])[0]
         return [(doc, 1.0 / (1.0 + float(dist))) for doc, dist in zip(docs, distances)]
 
-    async def hybrid_retrieve_async(self, query, session_id, doc_type="current_affairs", top_k=4):
-        from app.observability.langfuse_client import observation_context
+    async def hybridRetrieveAsync(self, query, session_id, doc_type="current_affairs", top_k=4):
+        from app.observability.langfuse_client import observationContext
 
         try:
             logger.info(f"Retriever started: query={query[:50]}...")
-            name = resolve_collection(session_id, doc_type)
+            name = resolveCollection(session_id, doc_type)
 
-            with observation_context(
+            with observationContext(
                 name="rag_hybrid_retrieve",
                 session_id=session_id,
                 as_type="retrieval",
                 input={"query": query, "doc_type": doc_type, "top_k": top_k},
             ):
                 # Execute vector_search and bm25_search concurrently in threadpool to avoid blocking event loop
-                vector_task = asyncio.to_thread(self.vector_search, name, query, top_k * 2)
-                bm25_task = asyncio.to_thread(self.bm25_search, name, query, top_k * 2)
+                vector_task = asyncio.to_thread(self.vectorSearch, name, query, top_k * 2)
+                bm25_task = asyncio.to_thread(self.bm25Search, name, query, top_k * 2)
 
                 vector_hits, bm25_hits = await asyncio.gather(vector_task, bm25_task)
 
@@ -99,29 +101,4 @@ class Retriever:
             logger.error(f"Error in Retriever: {str(e)}")
             raise CustomException("Retriever Failed", e)
 
-    def hybrid_retrieve(self, query, session_id, doc_type="current_affairs", top_k=4):
-        from app.observability.langfuse_client import observation_context
-
-        try:
-            name = resolve_collection(session_id, doc_type)
-            with observation_context(
-                name="rag_hybrid_retrieve_sync",
-                session_id=session_id,
-                as_type="retrieval",
-                input={"query": query, "doc_type": doc_type, "top_k": top_k},
-            ):
-                vector_hits = self.vector_search(name, query, top_k=top_k * 2)
-                bm25_hits = self.bm25_search(name, query, top_k=top_k * 2)
-
-                fused = {}
-                for doc, score in vector_hits:
-                    fused[doc] = fused.get(doc, 0.0) + score
-                for doc, score in bm25_hits:
-                    fused[doc] = fused.get(doc, 0.0) + score * 0.5
-
-                ranked = sorted(fused.items(), key=lambda x: x[1], reverse=True)
-                return [doc for doc, _ in ranked[:top_k]]
-        except Exception as e:
-            logger.error(f"Error in Retriever: {str(e)}")
-            raise CustomException("Retriever Failed", e)
 

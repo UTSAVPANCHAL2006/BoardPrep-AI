@@ -1,10 +1,12 @@
+"""Small shared helpers: read model replies, turn the DAF and transcript into prompt text, plan DAF topics."""
+
 import json
 import re
 
 from app.schema.interview import ChatTurn, DAFProfile, EnrichedArticle
 
 
-def llm_message_text(response) -> str:
+def llmMessageText(response) -> str:
     """Flatten Groq/LangChain content (gpt-oss may hide text in reasoning / additional_kwargs)."""
     content = getattr(response, "content", response)
     text = ""
@@ -23,7 +25,7 @@ def llm_message_text(response) -> str:
                 btype = str(block.get("type") or "").lower()
                 chunk = block.get("text") or block.get("content") or block.get("reasoning") or ""
                 if isinstance(chunk, list):
-                    chunk = llm_message_text(chunk)
+                    chunk = llmMessageText(chunk)
                 chunk = str(chunk) if chunk else ""
                 if btype in {"reasoning", "thinking"}:
                     reasoning.append(chunk)
@@ -52,8 +54,8 @@ def llm_message_text(response) -> str:
     return (text or "").strip()
 
 
-def parse_json_response(content: str) -> dict:
-    cleaned = llm_message_text(content) if not isinstance(content, str) else content.strip()
+def parseJsonResponse(content: str) -> dict:
+    cleaned = llmMessageText(content) if not isinstance(content, str) else content.strip()
     cleaned = cleaned.strip()
     fence_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", cleaned)
     if fence_match:
@@ -63,7 +65,7 @@ def parse_json_response(content: str) -> dict:
         if obj_match:
             cleaned = obj_match.group(0)
 
-    for candidate in (cleaned, repair_json(cleaned)):
+    for candidate in (cleaned, repairJson(cleaned)):
         try:
             data = json.loads(candidate)
             if isinstance(data, dict):
@@ -73,7 +75,7 @@ def parse_json_response(content: str) -> dict:
     raise json.JSONDecodeError("Could not parse JSON from LLM response", cleaned[:200], 0)
 
 
-def repair_json(text: str) -> str:
+def repairJson(text: str) -> str:
     """Fix common LLM JSON mistakes like mismatched brackets in list items."""
     repaired = text
     repaired = re.sub(r"\(([^)]+)\"\)", r'(\1)"', repaired)
@@ -81,7 +83,7 @@ def repair_json(text: str) -> str:
     return repaired
 
 
-def profile_summary(profile: DAFProfile) -> str:
+def profileSummary(profile: DAFProfile) -> str:
     return (
         f"Hometown: {profile.hometown}\n"
         f"Education: {', '.join(profile.education)}\n"
@@ -92,7 +94,7 @@ def profile_summary(profile: DAFProfile) -> str:
     )
 
 
-def history_text(history: list[ChatTurn], *, limit: int | None = 6) -> str:
+def historyText(history: list[ChatTurn], *, limit: int | None = 6) -> str:
     if not history:
         return "(no prior exchanges)"
     turns = history if limit is None else history[-limit:]
@@ -100,7 +102,7 @@ def history_text(history: list[ChatTurn], *, limit: int | None = 6) -> str:
     return "\n".join(lines)
 
 
-def evaluation_log_text(evaluation_log: list[dict]) -> str:
+def evaluationLogText(evaluation_log: list[dict]) -> str:
     if not evaluation_log:
         return "(no per-turn evaluations recorded)"
     lines = []
@@ -109,6 +111,7 @@ def evaluation_log_text(evaluation_log: list[dict]) -> str:
             f"Turn {i} [{entry.get('phase', 'unknown')}]\n"
             f"Q: {entry.get('question', '')}\n"
             f"A: {entry.get('answer', '')}\n"
+            f"Status: {'NOT ANSWERED (' + entry['non_answer'] + ') - scores 0' if entry.get('non_answer') else 'answered'} | "
             f"Clarity: {entry.get('clarity', 'unknown')} | "
             f"DAF: {entry.get('factual_consistency', 'unknown')}\n"
             f"Notes: {entry.get('notes', '')}"
@@ -116,7 +119,7 @@ def evaluation_log_text(evaluation_log: list[dict]) -> str:
     return "\n\n".join(lines)
 
 
-def build_daf_topic_stack(profile: DAFProfile) -> list[str]:
+def buildDafTopicStack(profile: DAFProfile) -> list[str]:
     """Ordered DAF anchors — one per question rotation across all phases."""
     anchors: list[str] = []
     if profile.hometown:
@@ -134,7 +137,7 @@ def build_daf_topic_stack(profile: DAFProfile) -> list[str]:
     return anchors or ["background and motivation"]
 
 
-def build_closing_angles(profile: DAFProfile) -> list[str]:
+def buildClosingAngles(profile: DAFProfile) -> list[str]:
     """Rotating closing-round themes so repeat mocks on the same DAF do not feel identical."""
     angles: list[str] = [
         "motivation for joining the civil services",
@@ -152,7 +155,7 @@ def build_closing_angles(profile: DAFProfile) -> list[str]:
     return angles
 
 
-def ca_board_question_word_limits(
+def caBoardQuestionWordLimits(
     interview_mode: str,
     *,
     for_voice: bool = False,
@@ -163,9 +166,9 @@ def ca_board_question_word_limits(
     return voice_cap if for_voice else display_cap
 
 
-def sanitize_ca_board_question(text: str, max_words: int = 20) -> str:
+def sanitizeCaBoardQuestion(text: str, max_words: int = 20) -> str:
     """CA phase: one short angle — news OR DAF link, not a bundled essay."""
-    cleaned = sanitize_board_question(text, max_words=max_words)
+    cleaned = sanitizeBoardQuestion(text, max_words=max_words)
     if not cleaned:
         return cleaned
 
@@ -201,7 +204,7 @@ def sanitize_ca_board_question(text: str, max_words: int = 20) -> str:
     return cleaned.strip()
 
 
-def sanitize_board_question(text: str, max_words: int = 32) -> str:
+def sanitizeBoardQuestion(text: str, max_words: int = 32) -> str:
     """Keep questions short and single-threaded like a real UPSC board."""
     cleaned = " ".join((text or "").split())
     if not cleaned:
@@ -255,7 +258,7 @@ def tokenize(text: str) -> set[str]:
     return set(re.findall(r"[a-zA-Z]{4,}", (text or "").lower()))
 
 
-def ca_grounding_score(question: str, article: EnrichedArticle) -> float:
+def caGroundingScore(question: str, article: EnrichedArticle) -> float:
     """Score 0-1: how well the question references the featured CA article."""
     q_tokens = tokenize(question)
     if not q_tokens:
@@ -283,11 +286,11 @@ def ca_grounding_score(question: str, article: EnrichedArticle) -> float:
     return max(signals) if signals else 0.0
 
 
-def is_ca_grounded(question: str, article: EnrichedArticle, threshold: float = 0.12) -> bool:
-    return ca_grounding_score(question, article) >= threshold
+def isCaGrounded(question: str, article: EnrichedArticle, threshold: float = 0.12) -> bool:
+    return caGroundingScore(question, article) >= threshold
 
 
-def format_ca_article_for_prompt(article: EnrichedArticle) -> str:
+def formatCaArticleForPrompt(article: EnrichedArticle) -> str:
     highlights = "\n".join(f"- {h}" for h in article.key_highlights[:3])
     return (
         f"Title: {article.title}\n"

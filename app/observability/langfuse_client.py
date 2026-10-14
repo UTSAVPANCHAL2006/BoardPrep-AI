@@ -1,19 +1,21 @@
+"""Optional Langfuse tracing of model and voice calls; does nothing when no Langfuse keys are set."""
+
 import os
 from contextlib import contextmanager
 from typing import Any, Generator
 
-from app.common.logger import get_logger
+from app.common.logger import getLogger
 
-logger = get_logger(__name__)
+logger = getLogger(__name__)
 
 _langfuse = None
 
 
-def langfuse_host() -> str:
+def langfuseHost() -> str:
     return os.getenv("LANGFUSE_HOST") or os.getenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com")
 
 
-def get_langfuse():
+def getLangfuse():
     global _langfuse
     if _langfuse is not None:
         return _langfuse
@@ -27,7 +29,7 @@ def get_langfuse():
         _langfuse = Langfuse(
             public_key=pk,
             secret_key=sk,
-            host=langfuse_host(),
+            host=langfuseHost(),
         )
         logger.info("Langfuse client initialized")
         return _langfuse
@@ -36,14 +38,14 @@ def get_langfuse():
         return None
 
 
-def init_langfuse() -> bool:
+def initLangfuse() -> bool:
     """Eager init on app startup."""
-    return get_langfuse() is not None
+    return getLangfuse() is not None
 
 
-def get_langchain_handler():
+def getLangchainHandler():
     """Return a LangChain callback handler (Langfuse v4+)."""
-    if not get_langfuse():
+    if not getLangfuse():
         return None
     try:
         from langfuse.langchain import CallbackHandler
@@ -54,14 +56,14 @@ def get_langchain_handler():
         return None
 
 
-def langchain_invoke_config(
+def langchainInvokeConfig(
     session_id: str = "",
     run_name: str = "llm_call",
     tags: list[str] | None = None,
 ) -> dict:
     """Build LangChain invoke config with Langfuse callback + session metadata."""
     config: dict = {"run_name": run_name}
-    handler = get_langchain_handler()
+    handler = getLangchainHandler()
     if handler:
         config["callbacks"] = [handler]
 
@@ -78,7 +80,7 @@ def langchain_invoke_config(
 
 
 @contextmanager
-def observation_context(
+def observationContext(
     name: str,
     session_id: str = "",
     as_type: str = "span",
@@ -86,7 +88,7 @@ def observation_context(
     metadata: dict | None = None,
 ) -> Generator[Any, None, None]:
     """Trace a non-LangChain step (STT, TTS, RAG ingest, etc.)."""
-    lf = get_langfuse()
+    lf = getLangfuse()
     if not lf:
         yield None
         return
@@ -108,22 +110,8 @@ def observation_context(
         yield None
 
 
-def trace_span(session_id: str, name: str, metadata: dict | None = None):
-    lf = get_langfuse()
-    if not lf:
-        return None
-    try:
-        meta = dict(metadata or {})
-        if session_id:
-            meta["session_id"] = session_id
-        return lf.start_observation(name=name, metadata=meta)
-    except Exception as e:
-        logger.warning(f"Langfuse trace_span failed: {e}")
-        return None
-
-
-def flush_langfuse():
-    lf = get_langfuse()
+def flushLangfuse():
+    lf = getLangfuse()
     if lf:
         try:
             lf.flush()

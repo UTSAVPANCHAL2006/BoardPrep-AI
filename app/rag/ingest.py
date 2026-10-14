@@ -1,3 +1,5 @@
+"""Loads the syllabus and the saved news stories into the search index (Chroma + keyword index)."""
+
 import hashlib
 import shutil
 import time
@@ -9,12 +11,12 @@ import chromadb
 from chromadb.config import Settings as ChromaSettings
 
 from app.common.custom_exception import CustomException
-from app.common.logger import get_logger
+from app.common.logger import getLogger
 from app.config.config import CHROMA_DIR, RAG_VECTORS_ENABLED
 from app.rag.embedding import Embedding
 from app.schema.interview import EnrichedArticle
 
-logger = get_logger(__name__)
+logger = getLogger(__name__)
 
 DocType = Literal["current_affairs", "syllabus"]
 SHARED_SYLLABUS_COLLECTION = "shared_syllabus"
@@ -23,25 +25,25 @@ _chroma_client = None
 _bm25_index = {}
 
 
-def shared_ca_collection_name(for_date: date | None = None) -> str:
+def sharedCaCollectionName(for_date: date | None = None) -> str:
     d = for_date or date.today()
     return f"shared_ca_{d.isoformat().replace('-', '_')}"
 
 
-def collection_name(session_id: str, doc_type: DocType) -> str:
+def collectionName(session_id: str, doc_type: DocType) -> str:
     safe_id = session_id.replace("-", "_")
     return f"session_{safe_id}_{doc_type}"
 
 
-def resolve_collection(session_id: str, doc_type: DocType) -> str:
+def resolveCollection(session_id: str, doc_type: DocType) -> str:
     if doc_type == "syllabus":
         return SHARED_SYLLABUS_COLLECTION
     if doc_type == "current_affairs":
-        return shared_ca_collection_name()
-    return collection_name(session_id, doc_type)
+        return sharedCaCollectionName()
+    return collectionName(session_id, doc_type)
 
 
-def _reset_chroma_storage() -> int:
+def resetChromaStorage() -> int:
     """Clear corrupt local Chroma files (sqlite + segment dirs). Keeps .gitkeep."""
     chroma_path = Path(CHROMA_DIR)
     if not chroma_path.exists():
@@ -59,7 +61,7 @@ def _reset_chroma_storage() -> int:
     return removed
 
 
-def get_chroma_client():
+def getChromaClient():
     global _chroma_client
     if _chroma_client is not None:
         return _chroma_client
@@ -73,7 +75,7 @@ def get_chroma_client():
         except BaseException as e:
             _chroma_client = None
             if attempt == 0:
-                n = _reset_chroma_storage()
+                n = resetChromaStorage()
                 logger.warning(
                     f"Chroma init failed ({e}). Cleared {n} corrupt file(s) in {CHROMA_DIR}; retrying."
                 )
@@ -82,7 +84,7 @@ def get_chroma_client():
     return _chroma_client
 
 
-def article_to_document_text(article: EnrichedArticle) -> str:
+def articleToDocumentText(article: EnrichedArticle) -> str:
     highlights = "\n".join(f"- {h}" for h in article.key_highlights)
     concepts = "\n".join(f"{k}: {v}" for k, v in article.key_concepts.items())
     tags = ", ".join(article.gs_tags)
@@ -102,7 +104,7 @@ class Ingest:
     def __init__(self, embedding: Embedding):
         self.embedding = embedding
 
-    def chunk_text(self, text, chunk_size=800, overlap=100):
+    def chunkText(self, text, chunk_size=800, overlap=100):
         if len(text) <= chunk_size:
             return [text]
         chunks = []
@@ -113,15 +115,15 @@ class Ingest:
             start = end - overlap
         return [c for c in chunks if c]
 
-    def doc_id(self, session_id, doc_type, content, index):
+    def docId(self, session_id, doc_type, content, index):
         digest = hashlib.md5(content.encode()).hexdigest()[:12]
         return f"{session_id}_{doc_type}_{index}_{digest}"
 
-    def ingest_corpus(self, items, doc_type: DocType, session_id: str) -> int:
+    def ingestCorpus(self, items, doc_type: DocType, session_id: str) -> int:
         try:
             logger.info(f"Ingest started for session={session_id}, type={doc_type}")
-            client = get_chroma_client()
-            name = resolve_collection(session_id, doc_type)
+            client = getChromaClient()
+            name = resolveCollection(session_id, doc_type)
 
             try:
                 client.delete_collection(name)
@@ -146,7 +148,7 @@ class Ingest:
                 if not items:
                     return 0
                 if isinstance(items[0], EnrichedArticle):
-                    texts = [article_to_document_text(a) for a in items]
+                    texts = [articleToDocumentText(a) for a in items]
                 else:
                     texts = [str(t) for t in items]
             else:
@@ -160,10 +162,10 @@ class Ingest:
 
             chunk_index = 0
             for text in texts:
-                for chunk in self.chunk_text(text):
-                    doc_id = self.doc_id(session_id, doc_type, chunk, chunk_index)
+                for chunk in self.chunkText(text):
+                    docId = self.docId(session_id, doc_type, chunk, chunk_index)
                     documents.append(chunk)
-                    ids.append(doc_id)
+                    ids.append(docId)
                     metadatas.append({"doc_type": doc_type, "session_id": session_id})
                     chunk_index += 1
 
@@ -175,7 +177,7 @@ class Ingest:
                 logger.info(f"Ingest completed (BM25-only): {len(documents)} chunks in {name}")
                 return len(documents)
 
-            vectors = self.embedding.embed_documents(documents)
+            vectors = self.embedding.embedDocuments(documents)
             collection.add(ids=ids, documents=documents, embeddings=vectors, metadatas=metadatas)
 
             _bm25_index[name] = {"documents": documents, "ids": ids}
@@ -186,7 +188,7 @@ class Ingest:
             logger.error(f"Error in Ingest: {str(e)}")
             raise CustomException("Ingest Failed", e)
 
-    def ingest_shared_syllabus(self, syllabus_path) -> int:
+    def ingestSharedSyllabus(self, syllabus_path) -> int:
         """Ingest syllabus once into global shared collection."""
         path = Path(syllabus_path)
         if not path.exists():
@@ -197,7 +199,7 @@ class Ingest:
         if cached and cached.get("documents") and not RAG_VECTORS_ENABLED:
             logger.info("Shared syllabus BM25 cache hit")
             return len(cached["documents"])
-        client = get_chroma_client()
+        client = getChromaClient()
         try:
             col = client.get_collection(SHARED_SYLLABUS_COLLECTION)
             meta = col.metadata or {}
@@ -206,7 +208,7 @@ class Ingest:
                 return col.count()
         except Exception:
             pass
-        count = self.ingest_corpus(syllabus_path, doc_type="syllabus", session_id="shared")
+        count = self.ingestCorpus(syllabus_path, doc_type="syllabus", session_id="shared")
         try:
             col = client.get_collection(SHARED_SYLLABUS_COLLECTION)
             col.modify(metadata={"content_hash": content_hash, "created_at": str(time.time())})
@@ -214,12 +216,12 @@ class Ingest:
             pass
         return count
 
-    def ingest_shared_current_affairs(self, articles: list[EnrichedArticle]) -> int:
+    def ingestSharedCurrentAffairs(self, articles: list[EnrichedArticle]) -> int:
         """Ingest today's CA into one shared Chroma collection (all users)."""
         if not articles:
             return 0
-        client = get_chroma_client()
-        name = shared_ca_collection_name()
+        client = getChromaClient()
+        name = sharedCaCollectionName()
         try:
             col = client.get_collection(name)
             if col.count() > 0:
@@ -227,4 +229,4 @@ class Ingest:
                 return col.count()
         except Exception:
             pass
-        return self.ingest_corpus(articles, doc_type="current_affairs", session_id="shared")
+        return self.ingestCorpus(articles, doc_type="current_affairs", session_id="shared")

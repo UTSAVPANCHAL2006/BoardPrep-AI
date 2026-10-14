@@ -1,26 +1,28 @@
+"""Step 2 of every turn: decide what the board does next - probe the same topic, move on, or change phase."""
+
 from app.agents.state import InterviewState
 from app.common.custom_exception import CustomException
-from app.common.logger import get_logger
+from app.common.logger import getLogger
 from app.schema.interview import AnswerEvaluation
 
-logger = get_logger(__name__)
+logger = getLogger(__name__)
 
 PHASE_ORDER = ["daf_opening", "subject_probe", "current_affairs", "closing"]
 
 
-def phase_exchange_limit(state: InterviewState, phase: str) -> int:
+def phaseExchangeLimit(state: InterviewState, phase: str) -> int:
     phase_limits = state.get("phase_exchanges") or {}
     return phase_limits.get(phase, state.get("exchanges_per_phase", 3))
 
 
 class FollowUpRouterNode:
-    def follow_up_router_node(self, state: InterviewState):
+    def followUpRouterNode(self, state: InterviewState):
         try:
             logger.info("FollowUpRouterNode started")
             phase = state.get("current_phase", "daf_opening")
             phase_count = state.get("phase_exchange_count", 0)
             total_count = state.get("follow_up_count", 0)
-            exchange_limit = phase_exchange_limit(state, phase)
+            exchange_limit = phaseExchangeLimit(state, phase)
             max_questions = state.get("max_questions", 12)
             evaluation = state.get("last_evaluation", AnswerEvaluation())
 
@@ -28,7 +30,9 @@ class FollowUpRouterNode:
             next_phase = phase
             router_action = "pivot"
 
-            if evaluation.factual_consistency == "contradicts_daf":
+            if not evaluation.answered:
+                router_action = "pivot"  # a skipped question is not probed again; move on
+            elif evaluation.factual_consistency == "contradicts_daf":
                 router_action = "daf_probe"
             elif evaluation.clarity in ("vague", "off_topic"):
                 router_action = "probe"

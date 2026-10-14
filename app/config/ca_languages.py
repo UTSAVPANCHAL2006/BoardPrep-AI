@@ -1,3 +1,5 @@
+"""Voice languages for the current-affairs news briefing (codes, names, speakers)."""
+
 """Sarvam Bulbul v3 languages used for CA classroom voice.
 
 Coverage matches UPSC-heavy mother tongues in India plus exam English.
@@ -158,7 +160,7 @@ DEFAULT_CA_VOICE_LANG = "hi"
 _BY_CODE = {lang.code: lang for lang in CA_VOICE_LANGUAGES}
 
 
-def resolve_ca_language(code: str | None) -> CaVoiceLanguage:
+def resolveCaLanguage(code: str | None) -> CaVoiceLanguage:
     key = (code or DEFAULT_CA_VOICE_LANG).strip().lower().replace("_", "-")
     if key.endswith("-in"):
         key = key.split("-", 1)[0]
@@ -167,18 +169,3 @@ def resolve_ca_language(code: str | None) -> CaVoiceLanguage:
     return _BY_CODE.get(key, _BY_CODE[DEFAULT_CA_VOICE_LANG])
 
 
-def ca_explain_use_llm(lang: CaVoiceLanguage) -> bool:
-    """hi/en: fast native templates. Regional (ml, gu, …): LLM for full native script."""
-    return lang.code not in ("hi", "en")
-
-
-def languages_public() -> list[dict]:
-    return [
-        {
-            "code": lang.code,
-            "tts": lang.tts,
-            "name": lang.name,
-            "native_name": lang.native_name,
-        }
-        for lang in CA_VOICE_LANGUAGES
-    ]

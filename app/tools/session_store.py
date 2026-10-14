@@ -1,17 +1,37 @@
+"""Saves each interview session in Redis, or in memory when Redis is not available."""
+
 import json
-from typing import Any
 
 from app.agents.state import InterviewState
-from app.common.logger import get_logger
+from app.common.logger import getLogger
 from app.config.config import REDIS_URL, SESSION_TTL_SECONDS as _SESSION_TTL
 from app.schema.interview import AnswerEvaluation, ChatTurn, CASource, DAFProfile, DAFFlag, EnrichedArticle, RetrievedChunk
 
-from app.tools.ca_cache import is_redis_memory_error
 
-logger = get_logger(__name__)
+logger = getLogger(__name__)
 
 _memory_store = {}
 
+
+
+def isRedisMemoryError(err: Exception) -> bool:
+    msg = f"{type(err).__name__}: {err}".lower()
+    return any(
+        token in msg
+        for token in (
+            "oom",
+            "maxmemory",
+            "memory limit",
+            "out of memory",
+            "cannot allocate",
+            "command not allowed when used memory",
+            "read only",
+            "readonly",
+            "quota exceeded",
+            "capacity quota",
+            "db capacity",
+        )
+    )
 
 class SessionStore:
     def __init__(self):
@@ -38,9 +58,9 @@ class SessionStore:
     def key(self, session_id):
         return f"interview:session:{session_id}"
 
-    async def save_state(self, session_id, state):
+    async def saveState(self, session_id, state):
         await self.connect()
-        serializable = self.serialize_state(state)
+        serializable = self.serializeState(state)
         payload = json.dumps(serializable)
         key = self.key(session_id)
         _memory_store[key] = payload
@@ -49,14 +69,14 @@ class SessionStore:
         try:
             await self._client.setex(key, _SESSION_TTL, payload)
         except Exception as e:
-            if is_redis_memory_error(e):
+            if isRedisMemoryError(e):
                 logger.warning(
                     f"Redis full — interview session kept in memory only ({session_id[:8]})"
                 )
                 return
             raise
 
-    async def load_state(self, session_id):
+    async def loadState(self, session_id):
         await self.connect()
         key = self.key(session_id)
         raw = _memory_store.get(key)
@@ -64,14 +84,14 @@ class SessionStore:
             try:
                 raw = await self._client.get(key)
             except Exception as e:
-                if not is_redis_memory_error(e):
+                if not isRedisMemoryError(e):
                     raise
                 raw = _memory_store.get(key)
         if not raw:
             return None
-        return self.deserialize_state(json.loads(raw))
+        return self.deserializeState(json.loads(raw))
 
-    def serialize_state(self, state):
+    def serializeState(self, state):
         out = {}
         for key, value in state.items():
             if isinstance(value, DAFProfile):
@@ -84,7 +104,7 @@ class SessionStore:
                 out[key] = value
         return out
 
-    def deserialize_state(self, data) -> InterviewState:
+    def deserializeState(self, data) -> InterviewState:
         if "daf_profile" in data and isinstance(data["daf_profile"], dict):
             data["daf_profile"] = DAFProfile.model_validate(data["daf_profile"])
         if "chat_history" in data:

@@ -1,3 +1,5 @@
+"""Everything the interview remembers between turns (one session's state)."""
+
 from typing import Literal
 
 from typing_extensions import TypedDict

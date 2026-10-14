@@ -1,3 +1,5 @@
+"""Prompts for the short news briefing the board reads before a current-affairs question."""
+
 from app.config.config import CA_BRIEFING_WORDS_MAX, CA_BRIEFING_WORDS_MIN
 
 _BRIEFING_WORDS = f"{CA_BRIEFING_WORDS_MIN}–{CA_BRIEFING_WORDS_MAX}"
@@ -240,23 +242,23 @@ Return JSON only. First character must be {{. No text outside JSON. briefing_voi
 }}"""
 
 
-def _apply_briefing_word_limit(text: str) -> str:
+def applyBriefingWordLimit(text: str) -> str:
     return text.replace("180–220", _BRIEFING_WORDS).replace("180-220", _BRIEFING_WORDS)
 
 
-def build_ca_briefing_prompts(lang) -> tuple[str, str]:
+def buildCaBriefingPrompts(lang) -> tuple[str, str]:
     if lang.code == "hi":
-        return _apply_briefing_word_limit(CA_BRIEFING_SYSTEM), _apply_briefing_word_limit(CA_BRIEFING_USER_TEMPLATE)
+        return applyBriefingWordLimit(CA_BRIEFING_SYSTEM), applyBriefingWordLimit(CA_BRIEFING_USER_TEMPLATE)
     if lang.code == "en":
-        return _apply_briefing_word_limit(_EN_SYSTEM), _apply_briefing_word_limit(_EN_USER)
-    system = _apply_briefing_word_limit(
+        return applyBriefingWordLimit(_EN_SYSTEM), applyBriefingWordLimit(_EN_USER)
+    system = applyBriefingWordLimit(
         _INDIC_SYSTEM.format(
             language_name=lang.name,
             native_name=lang.native_name,
             script=lang.script,
         )
     )
-    user = _apply_briefing_word_limit(
+    user = applyBriefingWordLimit(
         _INDIC_USER.replace("{language_name}", lang.name).replace("{script}", lang.script)
     )
     return system, user

@@ -1,3 +1,5 @@
+"""Data shapes used across the app: DAF profile, answer evaluation, DAF flags, news articles."""
+
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -18,6 +20,7 @@ class ChatTurn(BaseModel):
 
 
 class AnswerEvaluation(BaseModel):
+    answered: bool = True  # False for silence or "skip": scored 0 by code, never by the model
     clarity: Literal["clear", "vague", "off_topic"] = "vague"
     factual_consistency: Literal["consistent", "contradicts_daf", "unknown"] = "unknown"
     notes: str = ""

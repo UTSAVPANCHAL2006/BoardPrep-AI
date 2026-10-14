@@ -1,3 +1,5 @@
+"""Prompt that turns DAF text into a structured profile (hometown, education, work, hobbies...)."""
+
 DAF_SYSTEM_PROMPT = """You are an expert at reading UPSC Detailed Application Forms (DAF).
 Extract structured information from the raw DAF text and return ONLY valid JSON with these keys:
 - hobbies: list of strings (sports, music, reading, NSS, volunteering, games — scan the full form)

@@ -1,3 +1,5 @@
+"""Prompts for asking the next board question in each phase."""
+
 PANEL_PERSONA = (
     "You are a senior UPSC Personality Test board member — calm, probing, respectful. "
     "Real UPSC boards combine DAF-based questions, optional-subject depth, and current affairs. "

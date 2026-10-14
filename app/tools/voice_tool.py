@@ -1,3 +1,6 @@
+"""Speech: Sarvam speech-to-text for answers and text-to-speech for the board's questions."""
+
+import array
 import asyncio
 import base64
 import io
@@ -7,9 +10,9 @@ import wave
 import httpx
 
 from app.common.custom_exception import CustomException
-from app.common.logger import get_logger
+from app.common.logger import getLogger
 from app.config.config import (
-    get_sarvam_api_key,
+    getSarvamApiKey,
     SARVAM_STT_MODE,
     SARVAM_TTS_LANGUAGE,
     SARVAM_TTS_PACE,
@@ -17,7 +20,7 @@ from app.config.config import (
     SARVAM_TTS_TEMPERATURE,
 )
 
-logger = get_logger(__name__)
+logger = getLogger(__name__)
 
 SARVAM_STT_URL = "https://api.sarvam.ai/speech-to-text"
 SARVAM_TTS_URL = "https://api.sarvam.ai/text-to-speech"
@@ -28,13 +31,13 @@ TTS_CHUNK_MAX_CHARS = 2400
 TTS_STREAM_CHUNK_MAX_CHARS = 180
 
 
-def prepare_tts_text(text: str) -> str:
+def prepareTtsText(text: str) -> str:
     cleaned = re.sub(r"[*#_\[\]{}`]", "", text or "")
     cleaned = cleaned.replace("—", ", ").replace("–", ", ")
     return re.sub(r"\s+", " ", cleaned).strip()
 
 
-def split_tts_chunks(text: str, max_len: int = TTS_CHUNK_MAX_CHARS) -> list[str]:
+def splitTtsChunks(text: str, max_len: int = TTS_CHUNK_MAX_CHARS) -> list[str]:
     if len(text) <= max_len:
         return [text]
     sentences = re.split(r"(?<=[.!?।॥؟।])\s+", text)
@@ -63,13 +66,13 @@ def split_tts_chunks(text: str, max_len: int = TTS_CHUNK_MAX_CHARS) -> list[str]
     return chunks or [text[:max_len]]
 
 
-def silence_frames(params: wave._wave_params, ms: int = 35) -> bytes:
+def silenceFrames(params: wave._wave_params, ms: int = 35) -> bytes:
     nchannels, sampwidth, framerate, _, _ = params
     nframes = int(framerate * ms / 1000)
     return b"\x00" * (nframes * nchannels * sampwidth)
 
 
-def concat_wav(wavs: list[bytes]) -> bytes:
+def concatWav(wavs: list[bytes]) -> bytes:
     if not wavs:
         return b""
     if len(wavs) == 1:
@@ -85,7 +88,7 @@ def concat_wav(wavs: list[bytes]) -> bytes:
                 params = chunk_params
             all_frames.append(wf.readframes(wf.getnframes()))
             if i < len(wavs) - 1:
-                all_frames.append(silence_frames(chunk_params))
+                all_frames.append(silenceFrames(chunk_params))
 
     with wave.open(out_buf, "wb") as out:
         out.setparams(params)
@@ -94,13 +97,31 @@ def concat_wav(wavs: list[bytes]) -> bytes:
     return out_buf.getvalue()
 
 
-def is_wav(audio_bytes: bytes) -> bool:
+SILENCE_PEAK = 500  # out of 32767: below this, the recording has no speech in it
+
+
+def isSilent(audio_bytes: bytes) -> bool:
+    """A 16-bit WAV with no sound loud enough to be speech. Speech-to-text "hears" a word in silence (it once
+    returned 'ಹಾಂ'), so silence is caught before it is sent."""
+    if not isWav(audio_bytes):
+        return False
+    try:
+        with wave.open(io.BytesIO(audio_bytes), "rb") as wf:
+            if wf.getsampwidth() != 2:
+                return False
+            samples = array.array("h", wf.readframes(wf.getnframes()))
+    except (wave.Error, EOFError):
+        return False
+    return not samples or max(abs(sample) for sample in samples) < SILENCE_PEAK
+
+
+def isWav(audio_bytes: bytes) -> bool:
     return len(audio_bytes) >= 4 and audio_bytes[:4] == b"RIFF"
 
 
-def split_wav_chunks(audio_bytes: bytes, chunk_seconds: int = STT_CHUNK_SECONDS) -> list[bytes]:
+def splitWavChunks(audio_bytes: bytes, chunk_seconds: int = STT_CHUNK_SECONDS) -> list[bytes]:
     """Split WAV into chunks for STT when answer exceeds API duration limit."""
-    if not is_wav(audio_bytes):
+    if not isWav(audio_bytes):
         return [audio_bytes]
 
     with wave.open(io.BytesIO(audio_bytes), "rb") as wf:
@@ -133,7 +154,7 @@ def split_wav_chunks(audio_bytes: bytes, chunk_seconds: int = STT_CHUNK_SECONDS)
 
 class SttTool:
     @staticmethod
-    def guess_filename(content_type: str) -> tuple[str, str]:
+    def guessFilename(content_type: str) -> tuple[str, str]:
         ct = (content_type or "audio/wav").lower()
         if "webm" in ct:
             return "audio.webm", "audio/webm"
@@ -143,11 +164,11 @@ class SttTool:
             return "audio.m4a", "audio/mp4"
         return "audio.wav", "audio/wav"
 
-    async def transcribe_chunk(
+    async def transcribeChunk(
         self, client: httpx.AsyncClient, audio_bytes: bytes, content_type: str = "audio/wav"
     ) -> str:
-        headers = {"api-subscription-key": get_sarvam_api_key()}
-        filename, mime = self.guess_filename(content_type)
+        headers = {"api-subscription-key": getSarvamApiKey()}
+        filename, mime = self.guessFilename(content_type)
         files = {"file": (filename, audio_bytes, mime)}
         data = {"model": SARVAM_STT_MODEL, "mode": SARVAM_STT_MODE}
         resp = await client.post(SARVAM_STT_URL, headers=headers, files=files, data=data)
@@ -158,14 +179,14 @@ class SttTool:
     async def transcribe(self, audio_bytes, content_type="audio/wav"):
         try:
             logger.info("SttTool started")
-            if not get_sarvam_api_key():
+            if not getSarvamApiKey():
                 return "[mock transcript — set SARVAM_API_KEY for real STT]"
 
-            chunks = split_wav_chunks(audio_bytes)
+            chunks = splitWavChunks(audio_bytes)
             parts: list[str] = []
             async with httpx.AsyncClient(timeout=120.0) as client:
                 for i, chunk in enumerate(chunks):
-                    text = await self.transcribe_chunk(client, chunk, content_type)
+                    text = await self.transcribeChunk(client, chunk, content_type)
                     if text:
                         parts.append(text)
                     logger.info(f"SttTool chunk {i + 1}/{len(chunks)}: {len(text)} chars")
@@ -179,10 +200,10 @@ class SttTool:
 
 
 class TtsTool:
-    async def synthesize_one(
+    async def synthesizeOne(
         self, text: str, client: httpx.AsyncClient, language_code: str
     ) -> bytes:
-        headers = {"api-subscription-key": get_sarvam_api_key(), "Content-Type": "application/json"}
+        headers = {"api-subscription-key": getSarvamApiKey(), "Content-Type": "application/json"}
         payload = {
             "text": text,
             "language_code": language_code,
@@ -199,28 +220,28 @@ class TtsTool:
         if not audios:
             raise ValueError("Sarvam TTS returned no audio")
         wavs = [base64.b64decode(a) for a in audios]
-        return concat_wav(wavs)
+        return concatWav(wavs)
 
     async def synthesize(self, text, language_code: str | None = None):
         try:
             tts_lang = language_code or SARVAM_TTS_LANGUAGE
             logger.info(f"TtsTool started ({tts_lang})")
-            if not get_sarvam_api_key():
+            if not getSarvamApiKey():
                 return b""
 
-            clean = prepare_tts_text(text)
+            clean = prepareTtsText(text)
             if not clean:
                 return b""
 
-            chunks = split_tts_chunks(clean)
+            chunks = splitTtsChunks(clean)
             async with httpx.AsyncClient(timeout=120.0) as client:
                 wavs: list[bytes] = []
                 for i, chunk in enumerate(chunks):
-                    wavs.append(await self.synthesize_one(chunk, client, tts_lang))
+                    wavs.append(await self.synthesizeOne(chunk, client, tts_lang))
                     if i < len(chunks) - 1:
                         await asyncio.sleep(0.25)
 
-            result = concat_wav(wavs)
+            result = concatWav(wavs)
             logger.info(
                 f"TtsTool completed ({len(chunks)} chunk(s), {len(result)} bytes, "
                 f"lang={tts_lang}, speaker={SARVAM_TTS_SPEAKER})"
@@ -230,21 +251,21 @@ class TtsTool:
             logger.error(f"Error in TtsTool: {str(e)}")
             raise CustomException("TtsTool Failed", e)
 
-    async def synthesize_stream(self, text: str, language_code: str | None = None):
+    async def synthesizeStream(self, text: str, language_code: str | None = None):
         """Async generator yielding base64 encoded wav audio chunks sentence by sentence for low-latency streaming."""
         try:
             tts_lang = language_code or SARVAM_TTS_LANGUAGE
-            if not get_sarvam_api_key():
+            if not getSarvamApiKey():
                 return
 
-            clean = prepare_tts_text(text)
+            clean = prepareTtsText(text)
             if not clean:
                 return
 
-            chunks = split_tts_chunks(clean, max_len=TTS_STREAM_CHUNK_MAX_CHARS)
+            chunks = splitTtsChunks(clean, max_len=TTS_STREAM_CHUNK_MAX_CHARS)
             async with httpx.AsyncClient(timeout=120.0) as client:
                 for i, chunk in enumerate(chunks):
-                    wav_bytes = await self.synthesize_one(chunk, client, tts_lang)
+                    wav_bytes = await self.synthesizeOne(chunk, client, tts_lang)
                     if wav_bytes:
                         yield {
                             "index": i,

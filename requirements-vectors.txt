@@ -1,0 +1,4 @@
+# Optional: vector search for the syllabus/news (needs ~2 GB with PyTorch). Off in deployment (RAG_VECTORS_ENABLED=false).
+# Install with: pip install -r requirements.txt -r requirements-vectors.txt
+langchain-huggingface
+sentence-transformers

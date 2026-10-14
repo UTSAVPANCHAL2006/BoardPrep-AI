@@ -1,7 +1,9 @@
+"""Shared logger setup."""
+
 import logging
 
 
-def get_logger(name):
+def getLogger(name):
     logger = logging.getLogger(name)
     if not logger.handlers:
         handler = logging.StreamHandler()

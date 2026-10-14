@@ -1,21 +1,24 @@
+"""Step 3 of every turn: ask the next question for the current phase (DAF, subject, current affairs, closing),
+with a fixed fallback question if the model is unavailable."""
+
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.agents.state import InterviewState
 from app.common.custom_exception import CustomException
-from app.common.logger import get_logger
+from app.common.logger import getLogger
 from app.common.utils import (
-    build_closing_angles,
-    build_daf_topic_stack,
-    ca_board_question_word_limits,
-    ca_grounding_score,
-    format_ca_article_for_prompt,
-    history_text,
-    is_ca_grounded,
-    llm_message_text,
-    parse_json_response,
-    profile_summary,
-    sanitize_board_question,
-    sanitize_ca_board_question,
+    buildClosingAngles,
+    buildDafTopicStack,
+    caBoardQuestionWordLimits,
+    caGroundingScore,
+    formatCaArticleForPrompt,
+    historyText,
+    isCaGrounded,
+    llmMessageText,
+    parseJsonResponse,
+    profileSummary,
+    sanitizeBoardQuestion,
+    sanitizeCaBoardQuestion,
 )
 from app.config.config import INTERVIEW_JSON_MODEL
 from app.prompts.question_prompt import (
@@ -30,7 +33,7 @@ from app.prompts.question_prompt import (
 from app.schema.interview import CASource, ChatTurn, EnrichedArticle, RetrievedChunk
 from app.tools.ca_briefing_tool import CaBriefingTool
 
-logger = get_logger(__name__)
+logger = getLogger(__name__)
 
 
 class GenerateQuestionNode:
@@ -39,11 +42,11 @@ class GenerateQuestionNode:
         self.retriever = retriever
         self.ca_briefing = CaBriefingTool(llm)
 
-    def chunk_preview(self, text: str, limit: int = 200) -> str:
+    def chunkPreview(self, text: str, limit: int = 200) -> str:
         cleaned = " ".join(text.split())
         return cleaned[:limit] + ("..." if len(cleaned) > limit else "")
 
-    def pick_focus_anchor(self, state: InterviewState, profile) -> tuple[str, list[str]]:
+    def pickFocusAnchor(self, state: InterviewState, profile) -> tuple[str, list[str]]:
         router_action = state.get("router_action", "pivot")
         topic_stack = list(state.get("topic_stack", []))
 
@@ -52,13 +55,13 @@ class GenerateQuestionNode:
             return anchor, topic_stack
 
         if not topic_stack:
-            topic_stack = build_daf_topic_stack(profile)
+            topic_stack = buildDafTopicStack(profile)
 
         anchor = topic_stack.pop(0)
         topic_stack.append(anchor)
         return anchor, topic_stack
 
-    def pick_ca_article(self, state: InterviewState) -> tuple[EnrichedArticle, int]:
+    def pickCaArticle(self, state: InterviewState) -> tuple[EnrichedArticle, int]:
         articles = list(state.get("ca_articles", []))
         if not articles:
             return EnrichedArticle(
@@ -69,7 +72,7 @@ class GenerateQuestionNode:
         cursor = state.get("ca_article_cursor", 0) % len(articles)
         return articles[cursor], (cursor + 1) % len(articles)
 
-    def fallback_question(self, phase: str, focus_anchor: str, closing_angle: str = "") -> dict:
+    def fallbackQuestion(self, phase: str, focus_anchor: str, closing_angle: str = "") -> dict:
         anchor = focus_anchor or "your background"
         if phase == "daf_opening":
             q = f"Good morning. You mentioned {anchor} in your DAF — please introduce yourself briefly."
@@ -99,15 +102,15 @@ class GenerateQuestionNode:
             voice = f"कृपया {anchor} पर थोड़ा विस्तार से बताइए।"
         return {"question": q, "question_voice": voice}
 
-    async def invoke_llm(self, user_prompt: str, session_id: str = "", run_name: str = "generate_question") -> dict:
-        from app.observability.langfuse_client import langchain_invoke_config
+    async def invokeLlm(self, user_prompt: str, session_id: str = "", run_name: str = "generate_question") -> dict:
+        from app.observability.langfuse_client import langchainInvokeConfig
 
-        llm = self.llm.get_llm(temperature=0.3, max_tokens=480, model=INTERVIEW_JSON_MODEL)
+        llm = self.llm.getLlm(temperature=0.3, max_tokens=480, model=INTERVIEW_JSON_MODEL)
         try:
             llm = llm.bind(response_format={"type": "json_object"})
         except Exception:
             pass
-        config = langchain_invoke_config(
+        config = langchainInvokeConfig(
             session_id,
             run_name=run_name,
             tags=["upsc-interview", "question"],
@@ -117,10 +120,10 @@ class GenerateQuestionNode:
         for attempt in range(2):
             try:
                 response = await llm.ainvoke(messages, config=config)
-                raw = llm_message_text(response)
+                raw = llmMessageText(response)
                 if not raw.strip():
                     logger.warning(f"GenerateQuestionNode empty LLM text (attempt {attempt + 1})")
-                return parse_json_response(raw)
+                return parseJsonResponse(raw)
             except Exception as e:
                 last_err = e
                 logger.warning(f"GenerateQuestionNode LLM parse failed (attempt {attempt + 1}): {e}")
@@ -128,7 +131,7 @@ class GenerateQuestionNode:
             raise last_err
         raise RuntimeError("GenerateQuestionNode LLM failed")
 
-    async def question_from_llm(
+    async def questionFromLlm(
         self,
         prompt: str,
         session_id: str,
@@ -139,12 +142,12 @@ class GenerateQuestionNode:
         closing_angle: str = "",
     ) -> dict:
         try:
-            return await self.invoke_llm(prompt, session_id, run_name=run_name)
+            return await self.invokeLlm(prompt, session_id, run_name=run_name)
         except Exception as e:
             logger.warning(f"GenerateQuestionNode using fallback question ({phase}): {e}")
-            return self.fallback_question(phase, focus_anchor, closing_angle)
+            return self.fallbackQuestion(phase, focus_anchor, closing_angle)
 
-    async def generate_question_node(self, state: InterviewState):
+    async def generateQuestionNode(self, state: InterviewState):
         try:
             logger.info("GenerateQuestionNode started")
             phase = state.get("current_phase", "daf_opening")
@@ -153,7 +156,7 @@ class GenerateQuestionNode:
             interview_mode = state.get("interview_mode", "full")
             router_action = state.get("router_action", "pivot")
             router_hint = ROUTER_HINTS.get(router_action, ROUTER_HINTS["pivot"])
-            focus_anchor, topic_stack = self.pick_focus_anchor(state, profile)
+            focus_anchor, topic_stack = self.pickFocusAnchor(state, profile)
 
             retrieved_chunks: list[RetrievedChunk] = []
             ca_source: CASource | None = None
@@ -165,70 +168,70 @@ class GenerateQuestionNode:
             if phase == "subject_probe":
                 optional = profile.optional_subject or "public administration"
                 focus_anchor = f"optional subject: {optional}"
-                chunks = await self.retriever.hybrid_retrieve_async(optional, session_id, doc_type="syllabus")
+                chunks = await self.retriever.hybridRetrieveAsync(optional, session_id, doc_type="syllabus")
                 retrieved_chunks = [
-                    RetrievedChunk(doc_type="syllabus", text=c, preview=self.chunk_preview(c))
+                    RetrievedChunk(doc_type="syllabus", text=c, preview=self.chunkPreview(c))
                     for c in chunks
                 ]
                 prompt = SUBJECT_QUESTION_TEMPLATE.format(
                     router_hint=router_hint,
                     optional_subject=optional,
-                    profile=profile_summary(profile),
-                    history=history_text(state.get("chat_history", [])),
+                    profile=profileSummary(profile),
+                    history=historyText(state.get("chat_history", [])),
                     context="\n\n".join(chunks) if chunks else "Use standard UPSC syllabus concepts.",
                 )
-                data = await self.question_from_llm(prompt, session_id, phase, focus_anchor)
-                question = sanitize_board_question(data.get("question", ""), max_words=28)
-                question_voice = sanitize_board_question(data.get("question_voice") or question, max_words=32)
+                data = await self.questionFromLlm(prompt, session_id, phase, focus_anchor)
+                question = sanitizeBoardQuestion(data.get("question", ""), max_words=28)
+                question_voice = sanitizeBoardQuestion(data.get("question_voice") or question, max_words=32)
                 if not question_voice.strip():
                     question_voice = question
 
             elif phase == "current_affairs":
-                ca_q_max = ca_board_question_word_limits(interview_mode)
-                ca_v_max = ca_board_question_word_limits(interview_mode, for_voice=True)
-                featured, ca_article_cursor = self.pick_ca_article(state)
+                ca_q_max = caBoardQuestionWordLimits(interview_mode)
+                ca_v_max = caBoardQuestionWordLimits(interview_mode, for_voice=True)
+                featured, ca_article_cursor = self.pickCaArticle(state)
                 focus_anchor = featured.daf_anchor or featured.title
                 query = f"{featured.title} {featured.daf_anchor}"
-                chunks = await self.retriever.hybrid_retrieve_async(query, session_id, doc_type="current_affairs")
+                chunks = await self.retriever.hybridRetrieveAsync(query, session_id, doc_type="current_affairs")
                 retrieved_chunks = [
                     RetrievedChunk(
                         doc_type="current_affairs",
                         text=c,
-                        preview=self.chunk_preview(c),
+                        preview=self.chunkPreview(c),
                         source_title=featured.title,
                     )
                     for c in chunks
                 ]
                 prompt = CA_QUESTION_USER_TEMPLATE.format(
                     router_hint=router_hint,
-                    featured_article=format_ca_article_for_prompt(featured),
-                    profile=profile_summary(profile),
-                    history=history_text(state.get("chat_history", [])),
+                    featured_article=formatCaArticleForPrompt(featured),
+                    profile=profileSummary(profile),
+                    history=historyText(state.get("chat_history", [])),
                     context="\n\n".join(chunks) if chunks else "None",
                     daf_anchor=featured.daf_anchor or "candidate profile",
                 )
-                data = await self.question_from_llm(prompt, session_id, phase, focus_anchor)
-                question = sanitize_ca_board_question(data.get("question", ""), max_words=ca_q_max)
-                question_voice = sanitize_ca_board_question(
+                data = await self.questionFromLlm(prompt, session_id, phase, focus_anchor)
+                question = sanitizeCaBoardQuestion(data.get("question", ""), max_words=ca_q_max)
+                question_voice = sanitizeCaBoardQuestion(
                     data.get("question_voice") or question, max_words=ca_v_max
                 )
 
-                score = ca_grounding_score(question, featured)
-                grounded = is_ca_grounded(question, featured)
+                score = caGroundingScore(question, featured)
+                grounded = isCaGrounded(question, featured)
                 if not grounded:
-                    data = await self.question_from_llm(
+                    data = await self.questionFromLlm(
                         prompt + CA_RETRY_SUFFIX.format(article_title=featured.title),
                         session_id,
                         phase,
                         focus_anchor,
                         run_name="generate_question_ca_retry",
                     )
-                    question = sanitize_ca_board_question(data.get("question", ""), max_words=ca_q_max)
-                    question_voice = sanitize_ca_board_question(
+                    question = sanitizeCaBoardQuestion(data.get("question", ""), max_words=ca_q_max)
+                    question_voice = sanitizeCaBoardQuestion(
                         data.get("question_voice") or question, max_words=ca_v_max
                     )
-                    score = ca_grounding_score(question, featured)
-                    grounded = is_ca_grounded(question, featured)
+                    score = caGroundingScore(question, featured)
+                    grounded = isCaGrounded(question, featured)
 
                 ca_source = CASource(
                     title=featured.title,
@@ -237,26 +240,26 @@ class GenerateQuestionNode:
                     grounded=grounded,
                     grounding_score=round(score, 3),
                 )
-                ca_briefing = await self.ca_briefing.generate_briefing(featured, session_id, use_llm=True)
+                ca_briefing = await self.ca_briefing.generateBriefing(featured, session_id, use_llm=True)
 
             elif phase == "closing":
-                closing_angles = build_closing_angles(profile)
+                closing_angles = buildClosingAngles(profile)
                 idx = state.get("closing_angle_index", 0) % len(closing_angles)
                 closing_angle = closing_angles[idx]
                 focus_anchor = closing_angle
                 prompt = CLOSING_QUESTION_TEMPLATE.format(
                     router_hint=router_hint,
                     closing_angle=closing_angle,
-                    profile=profile_summary(profile),
-                    history=history_text(state.get("chat_history", [])),
+                    profile=profileSummary(profile),
+                    history=historyText(state.get("chat_history", [])),
                 )
-                data = await self.question_from_llm(
+                data = await self.questionFromLlm(
                     prompt, session_id, phase, focus_anchor, closing_angle=closing_angle
                 )
-                question = sanitize_board_question(
+                question = sanitizeBoardQuestion(
                     data.get("question", "Why do you want to join the civil services?"), max_words=25
                 )
-                question_voice = sanitize_board_question(
+                question_voice = sanitizeBoardQuestion(
                     data.get("question_voice") or question, max_words=30
                 )
                 if not question_voice.strip():
@@ -267,14 +270,14 @@ class GenerateQuestionNode:
                     phase=phase,
                     router_hint=router_hint,
                     focus_anchor=focus_anchor,
-                    profile=profile_summary(profile),
-                    history=history_text(state.get("chat_history", [])),
+                    profile=profileSummary(profile),
+                    history=historyText(state.get("chat_history", [])),
                 )
-                data = await self.question_from_llm(prompt, session_id, phase, focus_anchor)
-                question = sanitize_board_question(
+                data = await self.questionFromLlm(prompt, session_id, phase, focus_anchor)
+                question = sanitizeBoardQuestion(
                     data.get("question", "Tell us briefly about yourself."), max_words=25
                 )
-                question_voice = sanitize_board_question(
+                question_voice = sanitizeBoardQuestion(
                     data.get("question_voice") or question, max_words=30
                 )
                 if not question_voice.strip():
