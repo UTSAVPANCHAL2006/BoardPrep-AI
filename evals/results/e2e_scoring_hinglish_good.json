@@ -1,0 +1,327 @@
+[
+  {
+    "scenario": "hinglish_good",
+    "session": "8e5c11dc-810a-420d-ae21-c362e23fc2c6",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 7,
+      "structure": 7,
+      "daf_consistency": 8,
+      "subject_depth": 6,
+      "current_affairs": 4,
+      "confidence": 6
+    },
+    "average": 6.3,
+    "coverage": {
+      "answered": 5,
+      "asked": 5,
+      "max_score": 10
+    },
+    "strengths": [
+      "Turn 1: \"Panchkula ki urban planning ne mujhe sikhaaya ki effective urban governance ke liye integrated approach zaroori hai\"",
+      "Turn 2: \"Playing badminton ne meri personal discipline aur teamwork skills ko bahut improve kiya hai\"",
+      "Turn 3: \"Social stratification ke karan urban India mein education access disparities badh jaate hain\"",
+      "Turn 4: \"India ke export trends GDP growth pe directly impact karte hain, kyunki exports se foreign exchange inflow badti hai\"",
+      "Turn 5: \"Mere liye IAS top choice isliye hai kyunki ye service directly governance aur development ke core mein hoti hai\""
+    ],
+    "daf_flags": null,
+    "summary": "You demonstrated strong clarity and relevance in your responses, especially with your well-structured answers on urban planning and IAS motivation. Your strongest answer was on Panchkula's urban planning, showing clear understanding and personal insight. Your main gap was in the current affairs question, where your answer lacked depth and specific data. Focusing on providing more detailed examples and recent facts will help strengthen your performance in future mocks.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban planning influenced your understanding of urban governance?",
+        "status": "answered",
+        "quote": "Panchkula ki urban planning ne mujhe sikhaaya ki effective urban governance ke liye integrated approach zaroori hai",
+        "what_worked": "The answer provides a structured and relevant response, linking Panchkula's urban planning to the principles of effective urban governance.",
+        "improve": "Add a brief personal reflection on how this experience has shaped your own approach or aspirations in urban governance.",
+        "better_answer": "A strong answer would include specific challenges faced in Panchkula, how urban planning addressed them, and your personal role or learning from that experience.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "effective urban governance ke liye integrated approach zaroori hai"
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": true,
+            "evidence": "Example ke liye, Panchkula ki planned layout aur green belts ne city ko pollution aur congestion se bachaya hai."
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": true,
+            "evidence": "Yeh experience mujhe motivate karta hai ki main bhi urban development aur governance mein contribute karun"
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "Overall, yeh experience mujhe motivate karta hai ki main bhi urban development aur governance mein contribute karun."
+          }
+        ],
+        "length": {
+          "words": 90,
+          "verdict": "good",
+          "note": "90 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "status": "answered",
+        "quote": "Playing badminton ne meri personal discipline aur teamwork skills ko bahut improve kiya hai",
+        "what_worked": "The answer links personal hobby to skill development with a specific example of college team practice.",
+        "improve": "Include a specific instance of how these skills helped you in a real-life situation or project.",
+        "better_answer": "A better answer would detail how discipline and teamwork from badminton translated into your academic or professional achievements.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "Playing badminton ne meri personal discipline aur teamwork skills ko bahut improve kiya hai"
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "Playing badminton ne meri personal discipline aur teamwork skills ko bahut improve kiya hai."
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": true,
+            "evidence": "Ek concrete example ke taur par, maine apne college ke team ke saath regularly practice kiya, jahan mujhe team coordination aur strategic …"
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": true,
+            "evidence": "Playing badminton ne meri personal discipline aur teamwork skills ko bahut improve kiya hai."
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "Overall, ye hobby meri holistic growth ke liye beneficial hai."
+          }
+        ],
+        "length": {
+          "words": 102,
+          "verdict": "good",
+          "note": "102 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to education in urban India?",
+        "status": "answered",
+        "quote": "Social stratification ke karan urban India mein education access disparities badh jaate hain",
+        "what_worked": "The answer clearly explains how social stratification affects education access, with a concrete example of elite schools in Delhi.",
+        "improve": "Add a brief mention of policy measures or solutions to address these disparities.",
+        "better_answer": "A strong answer would include suggestions like affirmative action, scholarship schemes, or policy reforms to reduce inequality.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "social stratification ke karan urban India mein education access disparities badh jaate hain"
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "Social stratification ke karan urban India mein education access disparities badh jaate hain."
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": true,
+            "evidence": "Delhi jaise shehron mein elite schools sirf privileged sections ke liye hi accessible hain"
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "Isliye, social stratification education ke access ko influence karti hai, jo overall development ke liye ek barrier hai"
+          }
+        ],
+        "length": {
+          "words": 93,
+          "verdict": "good",
+          "note": "93 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 4,
+        "question": "How do India's export trends impact GDP growth amid sectoral divergence?",
+        "status": "answered",
+        "quote": "India ke export trends GDP growth pe directly impact karte hain, kyunki exports se foreign exchange inflow badti hai aur domestic production …",
+        "what_worked": "The answer explains sectoral divergence and the importance of diversification with sector examples.",
+        "improve": "Include recent data or statistics to strengthen the analysis and credibility.",
+        "better_answer": "A better answer would analyze specific recent export figures, trends, and policy measures taken to address divergence.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "India ke export trends GDP growth pe directly impact karte hain"
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "exports se foreign exchange inflow badti hai aur domestic production bhi"
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": true,
+            "evidence": "recent data mein IT exports ne achha perform kiya, jiski wajah se GDP mein positive contribution hua"
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": true,
+            "evidence": "sectoral divergence ke karan kuch sectors jaise textiles ya agriculture struggle kar rahe hain"
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "Isliye, export policies ko diversified aur inclusive banane ki zaroorat hai"
+          }
+        ],
+        "length": {
+          "words": 95,
+          "verdict": "good",
+          "note": "95 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 5,
+        "question": "What makes IAS your top choice among all services for serving India?",
+        "status": "answered",
+        "quote": "Mere liye IAS top choice isliye hai kyunki ye service directly governance aur development ke core mein hoti hai",
+        "what_worked": "The answer clearly states the motivation and links it to personal experience and skills relevant to IAS.",
+        "improve": "Mention specific policies or initiatives you wish to work on or contribute to as an IAS officer.",
+        "better_answer": "A stronger answer would specify particular areas of interest, like rural development, urban planning, or digital governance, and how you aim to contribute.",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "Mere liye IAS top choice isliye hai kyunki ye service directly governance aur development ke core mein hoti hai"
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "Mere liye IAS top choice isliye hai kyunki ye service directly governance aur development ke core mein hoti hai."
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": true,
+            "evidence": "Example ke taur par, rural education NGO ke saath volunteering ke dauran maine dekha ki effective governance se rural areas mein sudhar …"
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": true,
+            "evidence": "Mere liye IAS top choice isliye hai kyunki ye service directly governance aur development ke core mein hoti hai."
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": false,
+            "evidence": ""
+          }
+        ],
+        "length": {
+          "words": 93,
+          "verdict": "good",
+          "note": "93 words — a good length for a board answer."
+        }
+      }
+    ],
+    "improvements": [
+      "Add personal reflections or specific roles you aspire to in urban governance in Turn 1.",
+      "Include concrete examples of how skills from hobbies have helped in real-life situations in Turn 2.",
+      "Suggest policy measures or solutions to address educational disparities in Turn 3.",
+      "Incorporate recent data or statistics to strengthen your analysis in Turn 4.",
+      "Mention specific policy areas or initiatives you want to focus on as an IAS officer in Turn 5."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban planning influenced your understanding of urban governance?",
+        "answer": "Panchkula ki urban planning ne mujhe sikhaaya ki effective urban governance ke liye integrated approach zaroori hai. Reason hai ki well-planned infrastructure, green spaces, aur connectivity se city ki livability badhti hai. Example ke liye, Panchkula ki planned layout aur green belts ne city ko pollution aur congestion se bachaya hai. Isse mujhe samajh aaya ki urban governance sirf policies nahi, balki unka implementation aur community engagement bhi utna hi important hai. Overall, yeh experience mujhe motivate karta hai ki main bhi urban development aur governance mein contribute karun."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "answer": "Playing badminton ne meri personal discipline aur teamwork skills ko bahut improve kiya hai. Reason ye hai ki, badminton ek fast-paced game hai jisme quick reflexes ke saath saath consistent practice zaroori hoti hai. Ek concrete example ke taur par, maine apne college ke team ke saath regularly practice kiya, jahan mujhe team coordination aur strategic planning seekhne ko mili. Is se mujhe discipline develop hua, kyunki regular practice aur punctuality zaroori hoti hai. In skills se mujhe professional life me bhi better teamwork aur time management me madad milti hai. Overall, ye hobby meri holistic growth ke liye beneficial hai."
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to education in urban India?",
+        "answer": "Social stratification ke karan urban India mein education access disparities badh jaate hain. Upper castes aur affluent families ke paas better schools, resources, aur opportunities hoti hain, jisse unka educational achievement high hota hai. For example, Delhi jaise shehron mein elite schools sirf privileged sections ke liye hi accessible hain. Iska reason hai economic aur social capital ki unequal distribution. Yeh inequality social mobility ko restrict karti hai, jisse society mein disparity badh jaati hai. Isliye, social stratification education ke access ko influence karti hai, jo overall development ke liye ek barrier hai."
+      },
+      {
+        "turn": 4,
+        "question": "How do India's export trends impact GDP growth amid sectoral divergence?",
+        "answer": "India ke export trends GDP growth pe directly impact karte hain, kyunki exports se foreign exchange inflow badti hai aur domestic production bhi. Agar export sectors jaise IT aur pharmaceuticals grow karte hain, toh overall GDP ko boost milta hai. For example, recent data mein IT exports ne achha perform kiya, jiski wajah se GDP mein positive contribution hua. Lekin, sectoral divergence ke karan kuch sectors jaise textiles ya agriculture struggle kar rahe hain, jisse growth uneven ho jata hai. Isliye, export policies ko diversified aur inclusive banane ki zaroorat hai, taaki sustainable growth ho."
+      },
+      {
+        "turn": 5,
+        "question": "What makes IAS your top choice among all services for serving India?",
+        "answer": "Mere liye IAS top choice isliye hai kyunki ye service directly governance aur development ke core mein hoti hai. Reason: IAS officers policy implementation, district administration, aur public welfare projects ke execution ke liye responsible hote hain. Example ke taur par, rural education NGO ke saath volunteering ke dauran maine dekha ki effective governance se rural areas mein sudhar aata hai. Conclusion: Is role mein mujhe apni skills, urban governance aur policy expertise ka istemal karke desh ke vikas mein yogdan dene ka mauka milega, jo ki IAS ke through hi sambhav hai."
+      }
+    ]
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "scenario": "gibberish",
+    "session": "62bdbf65-25ba-4a84-8521-c8491ff1e15e",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 5,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": null,
+    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This was not a readable answer, so this question scores 0. Prepare a brief, specific answer about how Panchkula's urban development influenced your interest, perhaps mentioning a particular project or policy aspect.",
+        "better_answer": "A strong candidate would mention a specific urban development initiative in Panchkula, how it sparked your interest in policy, and relate it to your academic or professional pursuits."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This was not a readable answer, so this question scores 0. Share a concrete example of how playing badminton taught you discipline or teamwork, linking it to your personal growth.",
+        "better_answer": "A good answer would describe a specific instance, like training for a tournament, and how it developed your skills relevant to public service."
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This was not a readable answer, so this question scores 0. Even if unsure, briefly outline how urbanization affects social stratification, perhaps mentioning slum development or gentrification.",
+        "better_answer": "A strong candidate would discuss how urbanization can lead to increased inequality but also opportunities for social mobility, citing specific urban trends."
+      },
+      {
+        "turn": 4,
+        "question": "India-Belgium defence and fintech ties ke baare mein aap kya jaante hain?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This was not a readable answer, so this question scores 0. Acknowledge limited knowledge and mention any related aspect you are aware of, such as India's engagement in international defense or fintech collaborations.",
+        "better_answer": "A good answer would briefly mention recent India-Belgium defense or fintech cooperation, or express willingness to learn more about it."
+      },
+      {
+        "turn": 5,
+        "question": "Can you share a personal failure that taught you an important lesson?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This was not a readable answer, so this question scores 0. Be honest about a personal failure, briefly describe what you learned, and how it helped your growth.",
+        "better_answer": "A strong candidate would share a specific failure, what it taught them, and how it improved their approach or skills."
+      }
+    ],
+    "improvements": [
+      "Focus on answering each question directly and briefly, especially in quick mode, to demonstrate clarity.",
+      "Practice linking your background explicitly to the questions asked, to improve coherence.",
+      "Develop a habit of preparing 2-3 key points for common topics like urban development, teamwork, and personal failures.",
+      "Work on articulating your thoughts clearly even when under pressure, avoiding gibberish responses.",
+      "In future, aim to connect your DAF details more explicitly to your answers to strengthen consistency."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "answer": "asdf qwer zxcv hjkl"
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "answer": "asdf qwer zxcv hjkl"
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "answer": "asdf qwer zxcv hjkl"
+      },
+      {
+        "turn": 4,
+        "question": "India-Belgium defence and fintech ties ke baare mein aap kya jaante hain?",
+        "answer": "asdf qwer zxcv hjkl"
+      },
+      {
+        "turn": 5,
+        "question": "Can you share a personal failure that taught you an important lesson?",
+        "answer": "asdf qwer zxcv hjkl"
+      }
+    ]
+  }
+]

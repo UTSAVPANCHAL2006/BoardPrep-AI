@@ -1,0 +1,106 @@
+[
+  {
+    "scenario": "skip_all",
+    "session": "c1314ee1-0e76-46f3-b20d-8b39f40b26f0",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 5,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": null,
+    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban planning influenced your interest in urban governance?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. In a real interview, try to briefly connect your background or interest to the question, even if you need a moment to think. Practice framing quick, relevant responses.",
+        "better_answer": "A strong candidate would briefly explain how Panchkula's urban planning inspired their interest in urban governance, perhaps citing a specific project or challenge they observed."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Prepare a quick example of how sports like badminton develop discipline and teamwork, and practice delivering it confidently in a few words.",
+        "better_answer": "A good answer would mention how playing badminton taught you about discipline, focus, and working as a team, linking it to your professional or personal growth."
+      },
+      {
+        "turn": 3,
+        "question": "How does urban social stratification influence access to public services in Indian cities?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Familiarize yourself with key concepts of urban social stratification and think of a brief example or implication you can mention quickly.",
+        "better_answer": "A strong candidate would briefly explain how social stratification affects access to services, perhaps citing urban slums or marginalized communities."
+      },
+      {
+        "turn": 4,
+        "question": "What is India's main goal in participating in the SCO summit in Bishkek?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Stay updated on current international summits and think of a one-line purpose or goal India might have in SCO meetings.",
+        "better_answer": "A good answer would mention India's aim to strengthen regional cooperation, counter-terrorism, or economic integration in the SCO context."
+      },
+      {
+        "turn": 5,
+        "question": "As an administrator, how would you handle a situation where you face an ethical dilemma involving conflicting public interests?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Reflect on common ethical dilemmas faced by administrators and think of a brief, principled approach you would take to resolve conflicting interests.",
+        "better_answer": "A strong candidate would say they would assess the situation transparently, consult stakeholders, and aim for a balanced solution respecting public interest."
+      }
+    ],
+    "improvements": [
+      "Always attempt to answer every question, even briefly, to demonstrate engagement and quick thinking.",
+      "Practice framing concise, relevant responses aligned with your background and current affairs.",
+      "Develop a habit of linking your answers to your DAF or personal experiences for coherence.",
+      "Work on staying calm and structured under pressure to improve clarity and confidence.",
+      "Stay updated on current affairs and practice quick summaries of key issues."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban planning influenced your interest in urban governance?",
+        "answer": "skip"
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "answer": "skip"
+      },
+      {
+        "turn": 3,
+        "question": "How does urban social stratification influence access to public services in Indian cities?",
+        "answer": "skip"
+      },
+      {
+        "turn": 4,
+        "question": "What is India's main goal in participating in the SCO summit in Bishkek?",
+        "answer": "skip"
+      },
+      {
+        "turn": 5,
+        "question": "As an administrator, how would you handle a situation where you face an ethical dilemma involving conflicting public interests?",
+        "answer": "skip"
+      }
+    ]
+  }
+]

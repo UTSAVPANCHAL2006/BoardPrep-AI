@@ -1,0 +1,125 @@
+[
+  {
+    "scenario": "false_daf",
+    "session": "9f2582fc-8e9c-4440-ad38-8d6ec1daa405",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 5,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": [
+      {
+        "field": "hometown",
+        "daf_says": "PANCHKULA",
+        "candidate_said": "Chennai",
+        "message": "You said you are from Chennai, but your DAF says PANCHKULA."
+      },
+      {
+        "field": "education",
+        "daf_says": "10th from Delhi Public School, Panchkula (2013) ; 12th from Delhi Public School, Panchkula (2015) ; Graduation in Sociology (Hons.) from University of Delhi (2019) ; Master of Arts in Public Policy from Jawaharlal Nehru University (2021)",
+        "candidate_said": "IIT Madras",
+        "message": "You said you studied at IIT Madras, which is not in your DAF's education."
+      },
+      {
+        "field": "hobbies",
+        "daf_says": "playing badminton ; reading on public policy and urban governance ; listening to hindustani classical music ; volunteering with a rural education NGO ; amateur photography ; blogging on governance and public administration topics",
+        "candidate_said": "competitive chess",
+        "message": "You named 'competitive chess' as your hobby, but it is not in your DAF."
+      }
+    ],
+    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "What specific social or urban challenges in Panchkula have influenced your academic or professional interests?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Focus on directly addressing the specific urban or social challenges in Panchkula, rather than unrelated background details.",
+        "better_answer": "A strong answer would identify issues like traffic congestion or sanitation in Panchkula and relate them to your interest in urban planning or policy solutions."
+      },
+      {
+        "turn": 2,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Mention specific aspects of Panchkula’s urban growth that inspired your policy interest, such as infrastructure projects or urban planning initiatives.",
+        "better_answer": "You could say, 'Panchkula’s rapid urban expansion and infrastructure development sparked my interest in sustainable urban policies.'"
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to urban public services in Indian cities?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Explain how social hierarchies or caste dynamics affect urban service access, perhaps with examples like slum settlements or disparities.",
+        "better_answer": "A better response would analyze how social stratification creates unequal access to sanitation, healthcare, or education in Indian cities."
+      },
+      {
+        "turn": 4,
+        "question": "What is the significance of Ladakh's autonomous hill councils?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Address the councils’ role in local governance, cultural preservation, or autonomy, with relevant context or examples.",
+        "better_answer": "A stronger answer would discuss how these councils enable local decision-making and protect regional identity."
+      },
+      {
+        "turn": 5,
+        "question": "How can public service initiatives in Panchkula enhance urban living and social equity?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Focus on specific initiatives like sanitation, affordable housing, or transport in Panchkula, and analyze how they improve urban living and equity.",
+        "better_answer": "You could mention programs like improving public transport or sanitation services and their impact on social equity."
+      }
+    ],
+    "improvements": [
+      "Answer each question directly, especially on topics like urban challenges and social issues, rather than unrelated background details.",
+      "Practice linking your personal background to specific policy issues in the questions asked.",
+      "Develop a habit of giving concrete examples or facts relevant to the question, even in brief responses.",
+      "Work on understanding and articulating the significance of specific topics like Ladakh councils or Panchkula initiatives.",
+      "Ensure consistency between your DAF and answers, avoiding contradictions about your background."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "What specific social or urban challenges in Panchkula have influenced your academic or professional interests?",
+        "answer": "I grew up in Chennai, near Marina beach, and did my B.Tech in mechanical engineering at IIT Madras. My main hobby is competitive chess; I played at the state level. That engineering background is why I look at every policy question as a systems problem, for example how Chennai's metro reduced travel time."
+      },
+      {
+        "turn": 2,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "answer": "I grew up in Chennai, near Marina beach, and did my B.Tech in mechanical engineering at IIT Madras. My main hobby is competitive chess; I played at the state level. That engineering background is why I look at every policy question as a systems problem, for example how Chennai's metro reduced travel time."
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to urban public services in Indian cities?",
+        "answer": "I grew up in Chennai, near Marina beach, and did my B.Tech in mechanical engineering at IIT Madras. My main hobby is competitive chess; I played at the state level. That engineering background is why I look at every policy question as a systems problem, for example how Chennai's metro reduced travel time."
+      },
+      {
+        "turn": 4,
+        "question": "What is the significance of Ladakh's autonomous hill councils?",
+        "answer": "I grew up in Chennai, near Marina beach, and did my B.Tech in mechanical engineering at IIT Madras. My main hobby is competitive chess; I played at the state level. That engineering background is why I look at every policy question as a systems problem, for example how Chennai's metro reduced travel time."
+      },
+      {
+        "turn": 5,
+        "question": "How can public service initiatives in Panchkula enhance urban living and social equity?",
+        "answer": "I grew up in Chennai, near Marina beach, and did my B.Tech in mechanical engineering at IIT Madras. My main hobby is competitive chess; I played at the state level. That engineering background is why I look at every policy question as a systems problem, for example how Chennai's metro reduced travel time."
+      }
+    ]
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "scenario": "rude",
+    "session": "6482cf27-28af-4938-9be0-3aa32394ac9d",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 5,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": null,
+    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Instead of dismissing, briefly mention how Panchkula's urban development has inspired your interest in public policy, perhaps citing a specific project or challenge you encountered.",
+        "better_answer": "A strong answer would link Panchkula's urban growth to your personal motivation, such as how urban planning challenges sparked your interest in governance and policy solutions."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal development?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Briefly explain how playing badminton has helped you develop qualities like discipline or teamwork, linking it to your personal growth or hobbies.",
+        "better_answer": "A good response would mention that playing badminton taught you teamwork and discipline, which are valuable in public administration."
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Attempt to define social stratification briefly and explain how it affects access to education, perhaps with an example from urban areas or your sociology background.",
+        "better_answer": "A strong answer would describe social stratification as unequal social layers and discuss how it creates disparities in educational opportunities, supported by an example."
+      },
+      {
+        "turn": 4,
+        "question": "India-Belgium ties have recently focused on which sectors like defence and fintech?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Briefly mention recent India-Belgium collaborations in sectors like defence or fintech, or acknowledge limited knowledge and state your interest in current affairs.",
+        "better_answer": "A better approach would be to mention recent agreements or sectors of cooperation, demonstrating awareness and analytical thinking."
+      },
+      {
+        "turn": 5,
+        "question": "If you face an ethical dilemma as an administrator, how would you prioritize transparency over confidentiality?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Explain briefly how transparency and confidentiality can be balanced, perhaps with an example of an ethical dilemma or your approach to integrity.",
+        "better_answer": "A strong answer would discuss prioritizing transparency in public interest while safeguarding sensitive information, illustrating with a hypothetical or real scenario."
+      }
+    ],
+    "improvements": [
+      "Develop a respectful, structured response to all questions, even if brief, linking answers to your background or interests.",
+      "Practice framing answers with a clear structure: introduction, main point, example, and conclusion.",
+      "Engage with current affairs and topics relevant to the questions to demonstrate awareness and analytical ability.",
+      "Avoid dismissive language; instead, acknowledge the question and provide a concise, relevant response.",
+      "Link your answers to your DAF and background to showcase consistency and depth."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "answer": "This is a pointless question and I am not going to waste my time on it."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal development?",
+        "answer": "This is a pointless question and I am not going to waste my time on it."
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
+        "answer": "This is a pointless question and I am not going to waste my time on it."
+      },
+      {
+        "turn": 4,
+        "question": "India-Belgium ties have recently focused on which sectors like defence and fintech?",
+        "answer": "This is a pointless question and I am not going to waste my time on it."
+      },
+      {
+        "turn": 5,
+        "question": "If you face an ethical dilemma as an administrator, how would you prioritize transparency over confidentiality?",
+        "answer": "This is a pointless question and I am not going to waste my time on it."
+      }
+    ]
+  }
+]

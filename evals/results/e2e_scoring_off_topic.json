@@ -1,0 +1,106 @@
+[
+  {
+    "scenario": "off_topic",
+    "session": "65c37446-8ca0-4ef4-9878-c914523eec2e",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 5,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": null,
+    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Focus on how Panchkula's urban development influenced your interest, perhaps mentioning specific projects or changes you observed.",
+        "better_answer": "I grew up witnessing Panchkula's rapid urban expansion, which sparked my interest in urban planning and policy to ensure sustainable development."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal development or skills relevant to public service?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Address how playing badminton has helped develop skills like teamwork, discipline, or strategic thinking relevant to public service.",
+        "better_answer": "Playing badminton has improved my teamwork, strategic planning, and discipline, which are essential qualities for effective public service."
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Structure your answer around how urbanization affects social hierarchies and community bonds, with specific examples from Indian cities.",
+        "better_answer": "Urbanization often leads to increased social stratification but can also foster diverse communities that strengthen social cohesion through inclusive policies."
+      },
+      {
+        "turn": 4,
+        "question": "How do India's export trends impact its GDP growth according to recent reports?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Briefly mention recent export trends and their impact on GDP, citing specific data or reports if possible.",
+        "better_answer": "Recent reports indicate that India's export growth has contributed positively to GDP, especially in sectors like IT and pharmaceuticals, boosting overall economic performance."
+      },
+      {
+        "turn": 5,
+        "question": "If you discover a colleague involved in unethical practices, how would you handle the situation as an administrator?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Discuss a clear, ethical approach: reporting misconduct, maintaining confidentiality, and upholding integrity.",
+        "better_answer": "If I discovered unethical practices, I would report them through proper channels, ensure confidentiality, and uphold integrity to maintain trust in the administration."
+      }
+    ],
+    "improvements": [
+      "Answer questions directly and stay on-topic, especially in the opening and closing rounds.",
+      "Develop structured responses with specific examples or analysis relevant to the question.",
+      "Link your background and experiences explicitly to the questions asked.",
+      "Practice articulating clear, concise, and relevant answers under time constraints.",
+      "Work on maintaining focus and avoiding unrelated anecdotes during the interview."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "answer": "I love cooking biryani; the secret is slow cooking with saffron, fried onions and good basmati rice, and resting it on dum for twenty minutes."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal development or skills relevant to public service?",
+        "answer": "I love cooking biryani; the secret is slow cooking with saffron, fried onions and good basmati rice, and resting it on dum for twenty minutes."
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "answer": "I love cooking biryani; the secret is slow cooking with saffron, fried onions and good basmati rice, and resting it on dum for twenty minutes."
+      },
+      {
+        "turn": 4,
+        "question": "How do India's export trends impact its GDP growth according to recent reports?",
+        "answer": "I love cooking biryani; the secret is slow cooking with saffron, fried onions and good basmati rice, and resting it on dum for twenty minutes."
+      },
+      {
+        "turn": 5,
+        "question": "If you discover a colleague involved in unethical practices, how would you handle the situation as an administrator?",
+        "answer": "I love cooking biryani; the secret is slow cooking with saffron, fried onions and good basmati rice, and resting it on dum for twenty minutes."
+      }
+    ]
+  }
+]

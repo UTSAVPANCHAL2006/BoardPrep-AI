@@ -1,0 +1,106 @@
+[
+  {
+    "scenario": "yes_sir",
+    "session": "011da58d-2049-4960-9a2f-0497da00aa78",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 5,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": null,
+    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "What aspects of Panchkula's urban development have influenced your academic interests?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Provide a brief, relevant answer that directly addresses the question about Panchkula's urban development and its influence on your interests.",
+        "better_answer": "A strong answer would mention specific aspects like urban planning, infrastructure, or governance in Panchkula that shaped your academic focus, supported by a personal insight or example."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your understanding of teamwork and discipline?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Answer with a specific example of how playing badminton taught you teamwork and discipline, linking it to your personal growth.",
+        "better_answer": "I play badminton regularly, which has helped me develop patience, strategic thinking, and team coordination—skills I find valuable in professional settings."
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Briefly discuss how social stratification affects access to education, perhaps with an example from Panchkula or urban India, and relate it to your sociology background.",
+        "better_answer": "Social stratification creates disparities in access to quality education, often influenced by economic status and social background, which I studied during my sociology coursework."
+      },
+      {
+        "turn": 4,
+        "question": "India-Belgium defence and fintech ties—what is the significance of this partnership?",
+        "status": "off_topic",
+        "quote": "",
+        "what_worked": "",
+        "improve": "This answer did not address the question, so it earns no marks. Provide a structured response discussing the strategic importance of India-Belgium defence and fintech cooperation, mentioning specific areas or benefits.",
+        "better_answer": "This partnership enhances India's technological capabilities and strategic ties in defence and fintech, fostering innovation and international collaboration, which can boost economic growth."
+      },
+      {
+        "turn": 5,
+        "question": "How will you ensure empathy does not compromise your firmness in decision-making as a civil servant?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "A reply like 'Yes sir' does not answer an open question, so this question scores 0. Share your understanding of balancing empathy with firmness, perhaps with a brief example or approach you would take as a civil servant.",
+        "better_answer": "I believe empathy helps in understanding people's issues, but firmness is essential for implementing policies effectively. I would listen actively but stand firm on principles of justice."
+      }
+    ],
+    "improvements": [
+      "Answer each question with specific, structured points rather than brief acknowledgments.",
+      "Develop your open-ended responses with examples, facts, or personal insights to demonstrate depth.",
+      "Practice linking your background and current affairs knowledge more explicitly to your answers.",
+      "Work on maintaining clarity and staying on-topic, especially in questions outside your immediate expertise.",
+      "Prepare concise but complete responses for open questions, avoiding silence or vague replies."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "What aspects of Panchkula's urban development have influenced your academic interests?",
+        "answer": "Yes sir."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your understanding of teamwork and discipline?",
+        "answer": "Yes sir."
+      },
+      {
+        "turn": 3,
+        "question": "How does social stratification influence access to education in urban areas like Panchkula?",
+        "answer": "Yes sir."
+      },
+      {
+        "turn": 4,
+        "question": "India-Belgium defence and fintech ties—what is the significance of this partnership?",
+        "answer": "Yes sir."
+      },
+      {
+        "turn": 5,
+        "question": "How will you ensure empathy does not compromise your firmness in decision-making as a civil servant?",
+        "answer": "Yes sir."
+      }
+    ]
+  }
+]

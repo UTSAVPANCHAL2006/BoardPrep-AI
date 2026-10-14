@@ -1,0 +1,194 @@
+[
+  {
+    "scenario": "half_skipped",
+    "session": "700e6260-3e44-4932-bad0-2030f92409d3",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 4,
+      "structure": 4,
+      "daf_consistency": 4,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 4
+    },
+    "average": 2.7,
+    "coverage": {
+      "answered": 2,
+      "asked": 5,
+      "max_score": 4
+    },
+    "strengths": [
+      "Turn 2: \"Playing badminton has significantly contributed to my personal and professional development\""
+    ],
+    "daf_flags": null,
+    "summary": "You answered 2 of 5 questions; the 3 you skipped or answered off-topic score 0, so no score here can go above 4/10. You demonstrated strong clarity and coherence in your responses, especially in explaining Panchkula’s urban development and its influence on your interest in urban governance. Your strongest answer was about Panchkula’s planned infrastructure, which was well-structured and linked to your motivation. However, your performance was limited by skipping several questions, particularly on social issues and current affairs, which are important for a well-rounded interview. Improving your ability to answer all questions briefly but effectively will boost your overall score and confidence.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in urban governance?",
+        "status": "answered",
+        "quote": "Panchkula’s urban development, characterized by planned infrastructure and green spaces, has significantly influenced my interest in urban governance.",
+        "what_worked": "You clearly linked Panchkula’s development to your interest in urban governance and provided specific aspects like infrastructure and green spaces.",
+        "improve": "Add a more personal insight or specific experience from Panchkula to make your answer stand out further.",
+        "better_answer": "You could say, 'Growing up in Panchkula, I saw firsthand how planned urban development can improve lives, inspiring me to pursue urban policy to replicate such success elsewhere.'",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "the city’s organized layout and focus on sustainable growth showcase effective urban planning"
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "This motivated me to study public policy and urban governance"
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": true,
+            "evidence": "Panchkula’s integrated approach to urban infrastructure has improved residents’ quality of life"
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": true,
+            "evidence": "This motivated me to study public policy and urban governance"
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "In short, Panchkula’s development highlights the importance of good governance in urban growth"
+          }
+        ],
+        "length": {
+          "words": 97,
+          "verdict": "good",
+          "note": "97 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal or professional development?",
+        "status": "answered",
+        "quote": "Playing badminton has significantly contributed to my personal and professional development.",
+        "what_worked": "You effectively linked badminton to qualities like discipline, strategic thinking, and resilience, with clear examples.",
+        "improve": "Include a specific personal achievement or memorable experience in badminton to add authenticity.",
+        "better_answer": "For example, 'Winning a local tournament taught me perseverance and strategic planning, skills I bring to my professional work.'",
+        "checklist": [
+          {
+            "item": "stand",
+            "label": "Clear stand",
+            "ok": true,
+            "evidence": "It teaches discipline, strategic thinking, and quick decision-making, which are essential in a career in public administration."
+          },
+          {
+            "item": "reason",
+            "label": "Reason given",
+            "ok": true,
+            "evidence": "It teaches discipline, strategic thinking, and quick decision-making, which are essential in a career in public administration."
+          },
+          {
+            "item": "example",
+            "label": "Specific example",
+            "ok": true,
+            "evidence": "For example, during matches, I learn to analyze opponents’ strengths and adapt my tactics accordingly, a skill useful in policy formulation and …"
+          },
+          {
+            "item": "balance",
+            "label": "Other side considered",
+            "ok": false,
+            "evidence": ""
+          },
+          {
+            "item": "daf_link",
+            "label": "Linked to your background",
+            "ok": true,
+            "evidence": "Playing badminton has significantly contributed to my personal and professional development."
+          },
+          {
+            "item": "conclusion",
+            "label": "Conclusion",
+            "ok": true,
+            "evidence": "Overall, this sport has enhanced my teamwork, time management, and mental agility, which are crucial qualities for a civil servant committed to …"
+          }
+        ],
+        "length": {
+          "words": 93,
+          "verdict": "good",
+          "note": "93 words — a good length for a board answer."
+        }
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. In future, try to give a brief, relevant response even if you are unsure. For example, 'Urbanization often leads to social stratification, but effective urban planning can mitigate disparities.'",
+        "better_answer": "A strong candidate would briefly explain how urbanization can increase social gaps but also promote integration through inclusive policies."
+      },
+      {
+        "turn": 4,
+        "question": "What is the significance of Ladakh's autonomous hill councils for federalism?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Prepare a brief overview of Ladakh’s autonomous councils and their role in federalism, even if you are not fully aware of all details. Practice giving a concise, informed reply.",
+        "better_answer": "A good response would mention that Ladakh’s autonomous councils allow local governance, balancing regional aspirations with national unity, exemplifying federalism in practice."
+      },
+      {
+        "turn": 5,
+        "question": "As an administrator, how would you handle an ethical dilemma where public interest conflicts with personal or political pressures?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Even if unsure, briefly state your approach: 'In ethical dilemmas, I would prioritize transparency and adherence to rules, seeking advice if needed.' Practice framing such responses quickly.",
+        "better_answer": "A strong answer would outline a principled approach, emphasizing integrity, public interest, and consulting colleagues or codes of conduct."
+      }
+    ],
+    "improvements": [
+      "Answer all questions briefly, even if unsure, to demonstrate composure and willingness to engage.",
+      "Add specific examples or personal experiences where possible to strengthen your responses.",
+      "Develop answers on current affairs and social issues, as these are crucial for a well-rounded profile.",
+      "Practice framing quick, relevant responses to ethical and policy dilemmas to avoid skipping.",
+      "Work on linking your DAF more explicitly to your answers, especially on social and current affairs topics."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in urban governance?",
+        "answer": "Panchkula’s urban development, characterized by planned infrastructure and green spaces, has significantly influenced my interest in urban governance. The city’s organized layout and focus on sustainable growth showcase effective urban planning, inspiring me to explore how governance can shape livable cities. For example, Panchkula’s integrated approach to urban infrastructure has improved residents’ quality of life. This motivated me to study public policy and urban governance, aiming to contribute to creating inclusive and sustainable urban spaces. In short, Panchkula’s development highlights the importance of good governance in urban growth, which I aspire to promote."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal or professional development?",
+        "answer": "Playing badminton has significantly contributed to my personal and professional development. It teaches discipline, strategic thinking, and quick decision-making, which are essential in a career in public administration. For example, during matches, I learn to analyze opponents’ strengths and adapt my tactics accordingly, a skill useful in policy formulation and implementation. Additionally, badminton promotes physical fitness and stress relief, helping me maintain focus and resilience. Overall, this sport has enhanced my teamwork, time management, and mental agility, which are crucial qualities for a civil servant committed to effective governance and public service."
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "answer": "skip"
+      },
+      {
+        "turn": 4,
+        "question": "What is the significance of Ladakh's autonomous hill councils for federalism?",
+        "answer": "skip"
+      },
+      {
+        "turn": 5,
+        "question": "As an administrator, how would you handle an ethical dilemma where public interest conflicts with personal or political pressures?",
+        "answer": "skip"
+      }
+    ]
+  }
+]

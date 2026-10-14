@@ -1,0 +1,204 @@
+[
+  {
+    "scenario": "skip_all_full",
+    "session": "49bcd7ea-a7a0-4e86-b022-a39dccbc7e3f",
+    "mode": "full",
+    "questions": 12,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 12,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": null,
+    "summary": "You did not answer any of the 12 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban planning influenced your interest in urban governance?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Prepare a brief, relevant answer that links Panchkula's urban planning to your interest in urban governance, even if just a few lines.",
+        "better_answer": "A strong candidate would briefly explain how Panchkula's urban planning inspired their interest in urban governance, perhaps citing specific planning features or challenges they observed."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Reflect on how playing badminton has helped you develop discipline and teamwork, and share a specific example if possible.",
+        "better_answer": "A good answer would mention how badminton taught you about strategic thinking and collaboration, linking it to qualities needed in public service."
+      },
+      {
+        "turn": 3,
+        "question": "How does your reading on urban governance influence your understanding of city development challenges?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Think about a key insight from your reading on urban governance and how it shapes your understanding of city development challenges.",
+        "better_answer": "A strong response would connect your reading to specific urban issues like infrastructure or governance reforms, demonstrating your engagement with the subject."
+      },
+      {
+        "turn": 4,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Prepare to discuss how urbanization influences social cohesion, perhaps with a recent example or policy measure.",
+        "better_answer": "A good answer would analyze how rapid urban growth affects community bonds and suggest ways to foster social integration."
+      },
+      {
+        "turn": 5,
+        "question": "How does urbanization impact social stratification and mobility in Indian cities?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Think about the link between urbanization and mobility, and prepare a brief point on how policy can address disparities.",
+        "better_answer": "A strong answer would highlight how urban growth can either hinder or enhance social mobility, with examples of inclusive policies."
+      },
+      {
+        "turn": 6,
+        "question": "How does social stratification influence access to education in urban India?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Reflect on how social stratification affects access to education and think of policy measures to reduce disparities.",
+        "better_answer": "A good answer would link social stratification to educational inequality and suggest reforms like affirmative action or improved infrastructure."
+      },
+      {
+        "turn": 7,
+        "question": "What measures has the Union Home Secretary directed Himalayan states to improve after Nepal floods?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Familiarize yourself with recent disaster management directives and be ready to discuss specific measures.",
+        "better_answer": "A strong candidate would mention specific initiatives like strengthening early warning systems or infrastructure resilience."
+      },
+      {
+        "turn": 8,
+        "question": "Why does Anil Kakodkar advocate early adoption of thorium fuels in India?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Read about India's nuclear energy policies and be prepared to discuss the potential of thorium fuels.",
+        "better_answer": "A good answer would briefly explain the advantages of thorium and India's interest in adopting it for energy security."
+      },
+      {
+        "turn": 9,
+        "question": "What is India's main goal in participating in the SCO summit in Bishkek?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Understand India's strategic goals in SCO and be ready to articulate how participation benefits national interests.",
+        "better_answer": "A strong candidate would mention regional cooperation, economic integration, or security collaborations as India's main goals."
+      },
+      {
+        "turn": 10,
+        "question": "How can public service initiatives in Panchkula be enhanced to improve urban living standards?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Think about specific public service reforms that could improve urban standards, such as smart city initiatives or citizen engagement.",
+        "better_answer": "A good answer would suggest concrete reforms like digital governance, waste management, or participatory planning."
+      },
+      {
+        "turn": 11,
+        "question": "What specific public service reforms can make Panchkula a model city for urban sustainability?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Research urban sustainability models and think of reforms that could make Panchkula a model city.",
+        "better_answer": "A strong answer would include specific policies like renewable energy adoption, green spaces, or inclusive infrastructure."
+      },
+      {
+        "turn": 12,
+        "question": "What innovative public service approach can transform Panchkula into a more inclusive city?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "No answer was given, so this question scores 0. Consider innovative approaches like participatory budgeting or inclusive urban planning for Panchkula.",
+        "better_answer": "A good answer would propose specific inclusive policies, community engagement strategies, or smart city technologies."
+      }
+    ],
+    "improvements": [
+      "Answer every question briefly, even if unsure, to demonstrate engagement and composure.",
+      "Develop structured, relevant responses that connect your background to the question.",
+      "Enhance your current affairs knowledge to answer questions on recent government initiatives.",
+      "Practice articulating your ideas clearly and confidently under exam conditions.",
+      "Work on linking your DAF details more explicitly to your answers for consistency."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban planning influenced your interest in urban governance?",
+        "answer": "skip"
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "answer": "skip"
+      },
+      {
+        "turn": 3,
+        "question": "How does your reading on urban governance influence your understanding of city development challenges?",
+        "answer": "skip"
+      },
+      {
+        "turn": 4,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "answer": "skip"
+      },
+      {
+        "turn": 5,
+        "question": "How does urbanization impact social stratification and mobility in Indian cities?",
+        "answer": "skip"
+      },
+      {
+        "turn": 6,
+        "question": "How does social stratification influence access to education in urban India?",
+        "answer": "skip"
+      },
+      {
+        "turn": 7,
+        "question": "What measures has the Union Home Secretary directed Himalayan states to improve after Nepal floods?",
+        "answer": "skip"
+      },
+      {
+        "turn": 8,
+        "question": "Why does Anil Kakodkar advocate early adoption of thorium fuels in India?",
+        "answer": "skip"
+      },
+      {
+        "turn": 9,
+        "question": "What is India's main goal in participating in the SCO summit in Bishkek?",
+        "answer": "skip"
+      },
+      {
+        "turn": 10,
+        "question": "How can public service initiatives in Panchkula be enhanced to improve urban living standards?",
+        "answer": "skip"
+      },
+      {
+        "turn": 11,
+        "question": "What specific public service reforms can make Panchkula a model city for urban sustainability?",
+        "answer": "skip"
+      },
+      {
+        "turn": 12,
+        "question": "What innovative public service approach can transform Panchkula into a more inclusive city?",
+        "answer": "skip"
+      }
+    ]
+  }
+]

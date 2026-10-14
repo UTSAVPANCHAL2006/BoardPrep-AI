@@ -1,0 +1,106 @@
+[
+  {
+    "scenario": "repeat_question",
+    "session": "c4418152-0b70-4395-80d6-c66b8c714be1",
+    "mode": "quick",
+    "questions": 5,
+    "scores": {
+      "clarity": 0,
+      "structure": 0,
+      "daf_consistency": 0,
+      "subject_depth": 0,
+      "current_affairs": 0,
+      "confidence": 0
+    },
+    "average": 0.0,
+    "coverage": {
+      "answered": 0,
+      "asked": 5,
+      "max_score": 0
+    },
+    "strengths": [],
+    "daf_flags": null,
+    "summary": "You did not answer any of the 5 questions, so there is nothing to assess yet. A board scores what you say: even a short, honest answer earns more than a skip.",
+    "question_feedback": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "Repeating the question is not an answer, so this question scores 0. Practice giving brief, relevant responses instead of repeating the question. Prepare a quick opening statement about Panchkula's urban development to answer such questions confidently.",
+        "better_answer": "A strong candidate would briefly explain how Panchkula's planned urban layout inspired your interest in urban policy, perhaps mentioning specific development features or challenges."
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "Repeating the question is not an answer, so this question scores 0. Prepare a concise example of how playing badminton taught you discipline and teamwork, linking it to your personal growth.",
+        "better_answer": "A good answer would mention how regular practice improved your discipline and how teamwork on the court enhanced your collaborative skills, relating it to your professional life."
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "Repeating the question is not an answer, so this question scores 0. Familiarize yourself with urbanization's social impacts and prepare a brief, structured response. Think of a specific example or trend you can mention.",
+        "better_answer": "A strong candidate would explain how urbanization can lead to increased social stratification but also opportunities for social integration, citing specific urban policies or examples."
+      },
+      {
+        "turn": 4,
+        "question": "What are the key focus areas of the Govt. to modernise the police force under the?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "Repeating the question is not an answer, so this question scores 0. Stay updated on government initiatives for police modernization. Prepare a brief overview of key focus areas like technology, training, and community policing.",
+        "better_answer": "A good answer would mention specific focus areas such as use of technology, training programs, community engagement, and infrastructure upgrades, linking them to your interest in governance."
+      },
+      {
+        "turn": 5,
+        "question": "How would you ensure empathy does not compromise firmness in your administrative decisions?",
+        "status": "skipped",
+        "quote": "",
+        "what_worked": "",
+        "improve": "Repeating the question is not an answer, so this question scores 0. Reflect on how empathy and firmness can be balanced in administration. Practice framing a brief, practical approach or example.",
+        "better_answer": "A strong candidate would say that maintaining clear communication, setting firm boundaries, and understanding people's perspectives helps balance empathy with firmness."
+      }
+    ],
+    "improvements": [
+      "Answer every question briefly and directly, even if it's just a sentence, to demonstrate confidence.",
+      "Prepare specific examples or facts for common topics like urban development, police reforms, and governance initiatives.",
+      "Work on structuring your responses with a clear beginning, middle, and end, even in quick replies.",
+      "Avoid repeating questions; instead, use the opportunity to give a concise, relevant answer.",
+      "Enhance your current affairs awareness by staying updated on recent government policies and initiatives."
+    ],
+    "transcript": [
+      {
+        "turn": 1,
+        "question": "How has Panchkula's urban development influenced your interest in public policy?",
+        "answer": "How has Panchkula's urban development influenced your interest in public policy?"
+      },
+      {
+        "turn": 2,
+        "question": "How has playing badminton contributed to your personal discipline and teamwork skills?",
+        "answer": "How has playing badminton contributed to your personal discipline and teamwork skills?"
+      },
+      {
+        "turn": 3,
+        "question": "How does urbanization influence social stratification and community cohesion in Indian cities?",
+        "answer": "How does urbanization influence social stratification and community cohesion in Indian cities?"
+      },
+      {
+        "turn": 4,
+        "question": "What are the key focus areas of the Govt. to modernise the police force under the?",
+        "answer": "What are the key focus areas of the Govt. to modernise the police force under the?"
+      },
+      {
+        "turn": 5,
+        "question": "How would you ensure empathy does not compromise firmness in your administrative decisions?",
+        "answer": "How would you ensure empathy does not compromise firmness in your administrative decisions?"
+      }
+    ]
+  }
+]
