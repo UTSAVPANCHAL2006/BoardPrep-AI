@@ -8,15 +8,13 @@ and every word of praise quotes what the candidate actually said.
 
 ---
 
-## Demo
+## Try it live
 
-| Step | Action |
-|------|--------|
-| 1 | Start backend + frontend (see below) |
-| 2 | Open [http://localhost:3000](http://localhost:3000) |
-| 3 | Upload demo DAF: `data/sample_daf_upsc_format_1.pdf` |
-| 4 | Complete voice interview (or use `?dev=1` for text answers) |
-| 5 | Read the report: scores, question-by-question feedback, DAF flags |
+**https://board-prep-ai.vercel.app** — no sign-up. No DAF? Click **Try a sample candidate** (a fictional DAF), pick
+**Quick Drill** (5 questions) and answer by voice in Hindi, English or Hinglish. No microphone, or it is
+blocked? Click **Type your answer instead**. Try answering "skip" to everything: the report scores it 0.
+
+Runs on free tiers: if the server was asleep, the first load can take up to a minute.
 
 ---
 

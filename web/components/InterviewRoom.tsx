@@ -37,6 +37,8 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const devMode = searchParams.get("dev") === "1";
+  // Typing is the fallback for a blocked or missing microphone (an office, a laptop without a mic); ?dev=1 opens it.
+  const [isTyping, setIsTyping] = useState(devMode);
 
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -247,7 +249,8 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
       setRecording(true);
       setError("");
     } catch {
-      setError("Microphone access denied. Please allow mic permission and try again.");
+      setError("The microphone is blocked, so you can type your answer below. Allow the mic to speak instead.");
+      setIsTyping(true);
     }
   }
 
@@ -362,14 +365,23 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
             </div>
           </div>
 
-          {devMode && (
+          {!isTyping && (
+            <p className="text-center text-sm text-slate-500">
+              Can&apos;t speak right now?{" "}
+              <button type="button" onClick={() => setIsTyping(true)} className="text-saffron underline-offset-4 hover:underline">
+                Type your answer instead
+              </button>
+            </p>
+          )}
+
+          {isTyping && (
             <div className="glass-card space-y-3 border-dashed !border-amber-500/30">
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">Dev mode</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-400">Type your answer</p>
               <textarea
                 value={textAnswer}
                 onChange={(e) => setTextAnswer(e.target.value)}
                 rows={3}
-                placeholder="Type answer instead of speaking..."
+                placeholder="Type your answer to the board..."
                 className="w-full rounded-xl border border-white/10 bg-navy-deep/60 p-3 text-sm focus:border-saffron/40 focus:outline-none"
               />
               <button
@@ -378,7 +390,7 @@ export function InterviewRoom({ sessionId }: { sessionId: string }) {
                 disabled={busy || !textAnswer.trim()}
                 onClick={() => void handleRespond(undefined, undefined, textAnswer)}
               >
-                Submit text answer
+                Submit answer
               </button>
             </div>
           )}

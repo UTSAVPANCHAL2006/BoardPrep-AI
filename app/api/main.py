@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from app.agents.graph import InterviewGraph
+from app.api.limits import limitRequests
 from app.agents.state import InterviewState
 from app.common.logger import getLogger
 from app.common.timing import getMetrics, recordTurn, trackStep
@@ -207,6 +208,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="UPSC Mock Interview Agent", lifespan=lifespan)
+app.middleware("http")(limitRequests)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
