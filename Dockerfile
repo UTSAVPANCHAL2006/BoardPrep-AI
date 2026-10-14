@@ -1,3 +1,4 @@
+# BoardPrep API image (FastAPI + LangGraph). Light by default: vector search is an optional build argument.
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -9,8 +10,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-ARG PRELOAD_EMBEDDINGS=false
-RUN if [ "$PRELOAD_EMBEDDINGS" = "true" ]; then python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-small')"; fi
+# Vector search is optional and heavy (PyTorch). Build with --build-arg VECTORS=true to include it.
+ARG VECTORS=false
+COPY requirements-vectors.txt .
+RUN if [ "$VECTORS" = "true" ]; then pip install --no-cache-dir -r requirements-vectors.txt && python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-small')"; fi
 
 COPY app/ app/
 COPY data/chroma/.gitkeep data/chroma/

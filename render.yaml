@@ -1,0 +1,25 @@
+# Render blueprint: the BoardPrep API (Docker). Render dashboard -> New -> Blueprint -> pick this repo,
+# then fill in the keys marked "sync: false". Sessions use Redis if REDIS_URL is set, otherwise memory.
+services:
+  - type: web
+    name: boardprep-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY # any OpenAI-compatible key
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-nano
+      - key: INTERVIEW_JSON_MODEL
+        value: gpt-4.1-nano
+      - key: CA_BRIEFING_MODEL
+        value: gpt-4.1-nano
+      - key: SARVAM_API_KEY # Indian-accent voice
+        sync: false
+      - key: REDIS_URL # optional, e.g. an Upstash Redis URL
+        sync: false
+      - key: RAG_VECTORS_ENABLED
+        value: "false"

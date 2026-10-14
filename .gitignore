@@ -55,3 +55,9 @@ logs/
 
 # HuggingFace cache (optional local)
 .cache/
+
+# Build info, deploy and local tool settings
+*.tsbuildinfo
+web/next-env.d.ts
+.vercel/
+.claude/
