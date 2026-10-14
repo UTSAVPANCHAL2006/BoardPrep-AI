@@ -51,6 +51,18 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // No DAF at hand (a recruiter, a first-time visitor): load the fictional sample candidate instead.
+  async function loadSampleDaf() {
+    setError("");
+    try {
+      const response = await fetch("/sample-daf.pdf");
+      const blob = await response.blob();
+      setFile(new File([blob], "sample-daf-anirudh-verma.pdf", { type: "application/pdf" }));
+    } catch {
+      setError("Could not load the sample DAF. Please upload your own.");
+    }
+  }
+
   async function onSubmit() {
     if (!file) {
       setError("Please upload your DAF PDF to continue.");
@@ -147,6 +159,20 @@ export default function HomePage() {
               </p>
               <p className="mt-1 text-xs text-slate-500">{file ? "Ready" : "PDF up to 10 MB"}</p>
             </div>
+
+            {!file && (
+              <p className="-mt-2 text-center text-sm text-slate-400">
+                No DAF?{" "}
+                <button
+                  type="button"
+                  onClick={() => void loadSampleDaf()}
+                  className="font-medium text-saffron underline-offset-4 hover:underline"
+                >
+                  Try a sample candidate
+                </button>{" "}
+                <span className="text-slate-500">(fictional)</span>
+              </p>
+            )}
 
             <div>
               <p className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-slate-500">
