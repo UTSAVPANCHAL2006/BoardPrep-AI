@@ -13,9 +13,11 @@ from app.common.utils import (
     caGroundingScore,
     formatCaArticleForPrompt,
     historyText,
+    isAboutAnswer,
     isCaGrounded,
     llmMessageText,
     parseJsonResponse,
+    pickAnswerQuote,
     profileSummary,
     sanitizeBoardQuestion,
     sanitizeCaBoardQuestion,
@@ -26,6 +28,7 @@ from app.prompts.question_prompt import (
     CA_RETRY_SUFFIX,
     CLOSING_QUESTION_TEMPLATE,
     DAF_QUESTION_TEMPLATE,
+    FOLLOW_UP_QUESTION_TEMPLATE,
     PANEL_PERSONA,
     ROUTER_HINTS,
     SUBJECT_QUESTION_TEMPLATE,
@@ -50,7 +53,7 @@ class GenerateQuestionNode:
         router_action = state.get("router_action", "pivot")
         topic_stack = list(state.get("topic_stack", []))
 
-        if router_action in ("probe", "daf_probe"):
+        if router_action in ("probe", "daf_probe", "deepen"):
             anchor = state.get("current_focus_anchor") or (topic_stack[0] if topic_stack else "your background")
             return anchor, topic_stack
 
@@ -147,6 +150,33 @@ class GenerateQuestionNode:
             logger.warning(f"GenerateQuestionNode using fallback question ({phase}): {e}")
             return self.fallbackQuestion(phase, focus_anchor, closing_angle)
 
+    async def followUpQuestion(self, state: InterviewState, session_id: str) -> dict:
+        """A question that builds on the candidate's last answer, checked by code to use their words. If the model
+        fails or drifts to a new topic twice, a fixed question quotes their own words back."""
+        answer = state.get("last_answer", "")
+        prompt = FOLLOW_UP_QUESTION_TEMPLATE.format(
+            phase=state.get("current_phase", "daf_opening"),
+            question=state.get("current_question", ""),
+            answer=answer,
+            profile=profileSummary(state["daf_profile"]),
+        )
+        for attempt in range(2):
+            try:
+                data = await self.invokeLlm(prompt, session_id, run_name="generate_follow_up")
+            except Exception as e:
+                logger.warning(f"GenerateQuestionNode follow-up failed: {e}")
+                break
+            question = sanitizeBoardQuestion(data.get("question", ""), max_words=30)
+            if question and isAboutAnswer(question, answer):
+                voice = sanitizeBoardQuestion(data.get("question_voice") or question, max_words=34)
+                return {"question": question, "question_voice": voice or question}
+            prompt += "\nCRITICAL: your question did not use the candidate's own words. Quote them."
+        quote = pickAnswerQuote(answer)
+        return {
+            "question": f'You said "{quote}". Why do you think so, and what would you do about it as an officer?',
+            "question_voice": f'आपने कहा "{quote}"। आप ऐसा क्यों मानते हैं, और एक अधिकारी के रूप में आप इस पर क्या करेंगे?',
+        }
+
     async def generateQuestionNode(self, state: InterviewState):
         try:
             logger.info("GenerateQuestionNode started")
@@ -165,7 +195,11 @@ class GenerateQuestionNode:
             question = ""
             question_voice = ""
 
-            if phase == "subject_probe":
+            if router_action == "deepen":
+                data = await self.followUpQuestion(state, session_id)
+                question, question_voice = data["question"], data["question_voice"]
+
+            elif phase == "subject_probe":
                 optional = profile.optional_subject or "public administration"
                 focus_anchor = f"optional subject: {optional}"
                 chunks = await self.retriever.hybridRetrieveAsync(optional, session_id, doc_type="syllabus")

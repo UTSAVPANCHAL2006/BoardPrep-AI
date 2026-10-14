@@ -303,3 +303,33 @@ def formatCaArticleForPrompt(article: EnrichedArticle) -> str:
         f"Key highlights:\n{highlights}\n"
         f"Summary: {article.detailed_insights[:400]}"
     )
+
+
+# ---------- follow-up questions: they must build on what the candidate actually said ----------
+
+COMMON_WORDS = {
+    "about", "after", "again", "also", "because", "being", "believe", "could", "every", "first", "from", "have",
+    "into", "just", "like", "many", "more", "most", "much", "other", "really", "should", "since", "some", "such",
+    "that", "their", "them", "then", "there", "these", "they", "think", "this", "those", "very", "were", "what",
+    "when", "where", "which", "while", "will", "with", "would", "your", "sir", "madam",
+}
+
+
+def answerKeyWords(answer: str) -> set[str]:
+    """The words that carry the answer's content ('zoning', 'panchkula'), not glue words."""
+    words = re.findall(r"[a-zA-Z]{5,}", answer.lower())
+    return {word for word in words if word not in COMMON_WORDS}
+
+
+def isAboutAnswer(question: str, answer: str) -> bool:
+    """A follow-up must use at least one content word of the answer; otherwise it is a new topic, not a follow-up."""
+    return bool(answerKeyWords(question) & answerKeyWords(answer))
+
+
+def pickAnswerQuote(answer: str, maxWords: int = 8) -> str:
+    """A short phrase of the answer to quote back: the first clause with real content, cut to a few words."""
+    for clause in re.split(r"[.;,!?]|\bbut\b|\bhowever\b", answer, flags=re.IGNORECASE):
+        words = clause.split()
+        if len(answerKeyWords(clause)) >= 1 and len(words) >= 3:
+            return " ".join(words[:maxWords])
+    return " ".join(answer.split()[:maxWords])

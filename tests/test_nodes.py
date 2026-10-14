@@ -104,3 +104,54 @@ def testAFailingModelNeverEndsTheInterviewOrLosesTheReport() -> None:
     assert report["scores"]["clarity"] > 0 and report["question_feedback"][1]["status"] == "skipped"
     built = {row["item"]: row["ok"] for row in report["question_feedback"][0]["checklist"]}
     assert built["reason"] and built["example"] and built["balance"] and built["conclusion"]
+
+
+# ---------- follow-ups: a real board digs into a good answer once, using the candidate's own words ----------
+
+from app.agents.nodes.follow_up_router_node import FollowUpRouterNode  # noqa: E402
+from app.agents.nodes.generate_question_node import GenerateQuestionNode  # noqa: E402
+from app.schema.interview import AnswerEvaluation  # noqa: E402
+
+PANCHKULA = (
+    "Growing up in Panchkula showed me that planned sectors and green belts make services easy to reach, "
+    "but informal settlements on the edges still lack water."
+)
+
+
+def routeAfter(clarity: str, previous: str, phase: str = "daf_opening", answered: bool = True) -> str:
+    state = {"current_phase": phase, "phase_exchange_count": 1, "follow_up_count": 1, "exchanges_per_phase": 3,
+             "router_action": previous, "last_evaluation": AnswerEvaluation(answered=answered, clarity=clarity)}  # fmt: skip
+    return FollowUpRouterNode().followUpRouterNode(state)["router_action"]
+
+
+def testAGoodAnswerIsFollowedUpOnceThenTheBoardMovesOn() -> None:
+    assert routeAfter("clear", "pivot") == "deepen"
+    assert routeAfter("clear", "deepen") == "pivot"  # never a follow-up of a follow-up
+    assert routeAfter("clear", "pivot", phase="closing") == "pivot"  # the closing round keeps its themes
+    assert routeAfter("off_topic", "pivot", answered=False) == "pivot"  # a skip is never dug into
+
+
+class QuestionLlm(FakeLlm):
+    def __init__(self, question: str) -> None:
+        super().__init__()
+        self.reply = {"question": question, "question_voice": "आपने कहा..."}
+
+
+def followUp(llm: object) -> str:
+    node = GenerateQuestionNode(llm, retriever=None)
+    state = {"current_phase": "daf_opening", "current_question": "How did Panchkula shape you?", "last_answer": PANCHKULA,
+             "daf_profile": DAFProfile(hometown="Panchkula"), "session_id": "t", "router_action": "deepen",
+             "chat_history": [], "topic_stack": ["hometown: Panchkula"], "current_focus_anchor": "hometown: Panchkula"}  # fmt: skip
+    return asyncio.run(node.generateQuestionNode(state))["current_question"]
+
+
+def testAFollowUpBuildsOnTheCandidatesOwnWords() -> None:
+    asked = 'You said "informal settlements on the edges still lack water". As a DM, what would you do first?'
+    assert followUp(QuestionLlm(asked)) == asked
+
+
+def testAFollowUpThatChangesTopicIsReplacedByTheirOwnWords() -> None:
+    llm = QuestionLlm("What is your view on India's foreign policy towards China?")  # a new topic, not a follow-up
+    question = followUp(llm)
+    assert llm.calls == 2 and question.startswith('You said "Growing up in Panchkula showed me that')
+    assert followUp(BrokenLlm()).startswith('You said "')  # no model at all: the board still follows up

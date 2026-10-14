@@ -8,6 +8,8 @@ from app.schema.interview import AnswerEvaluation
 logger = getLogger(__name__)
 
 PHASE_ORDER = ["daf_opening", "subject_probe", "current_affairs", "closing"]
+# Actions whose question already stays on the last topic: the answer to it is not followed up again.
+FOLLOW_UP_ACTIONS = ("probe", "daf_probe", "deepen")
 
 
 def phaseExchangeLimit(state: InterviewState, phase: str) -> int:
@@ -37,7 +39,10 @@ class FollowUpRouterNode:
             elif evaluation.clarity in ("vague", "off_topic"):
                 router_action = "probe"
             elif evaluation.clarity == "clear":
-                router_action = "pivot"
+                # A real board digs into a good answer once ("You said X — why?") before changing topic. The closing
+                # round keeps its own themes, and a follow-up is never followed up again.
+                isFollowUp = state.get("router_action") in FOLLOW_UP_ACTIONS
+                router_action = "pivot" if phase == "closing" or isFollowUp else "deepen"
 
             if router_action == "probe" and phase_count >= 1:
                 router_action = "pivot"

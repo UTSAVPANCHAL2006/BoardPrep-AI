@@ -81,7 +81,11 @@ flowchart LR
 | Current affairs | A saved, curated news story linked to the DAF (no live news fetch, so nothing can stall the mock) |
 | Closing | Motivation, ethics, service preference |
 
-- **LangGraph** state machine: evaluate → route (probe / pivot / advance) → generate question
+- **LangGraph** state machine: evaluate → route (deepen / probe / pivot / advance) → generate question
+- **Follow-ups like a real board:** after a clear answer the board digs into ONE thing the candidate said, once, then
+  moves on (*"You mentioned 'planning must include people at the margins.' Why are informal settlements often left
+  out?"*). Code checks the follow-up uses the candidate's own words; if the model drifts or fails, the board quotes
+  them back itself. A skipped or vague answer is never dug into.
 - **STT:** Sarvam `saaras:v3` codemix (Hindi/English/Hinglish)
 - **TTS:** Sarvam `bulbul:v3` — screen English, spoken Hindi/Hinglish for questions
 - **Modes:** `quick` (4 Q) or `full` (12 Q) via upload form

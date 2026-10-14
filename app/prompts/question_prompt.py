@@ -10,6 +10,7 @@ ROUTER_HINTS = {
     "probe": "Last answer was vague. Probe the SAME topic — one clarifying question.",
     "daf_probe": "Candidate may contradict DAF. Ask ONE polite reconciliation question.",
     "pivot": "Answer was clear. Ask ONE new follow-up on a fresh single angle.",
+    "deepen": "Answer was clear. Dig into ONE specific thing the candidate just said.",
     "advance_phase": "New phase begins. Ask ONE short opening question for this phase.",
 }
 
@@ -107,5 +108,24 @@ STRICT RULES:
 - question_voice: HINDI/HINGLISH for spoken voice (max 30 words, NOT English)
 - Do NOT default to generic "why civil services" unless that is the closing theme
 - No compound questions
+
+Return JSON: {{"question": "...", "question_voice": "..."}}"""
+
+FOLLOW_UP_QUESTION_TEMPLATE = """Phase: {phase}
+The board just asked: {question}
+The candidate answered: "{answer}"
+
+Candidate DAF profile (context only): {profile}
+
+Like a real UPSC board member, ask ONE follow-up that builds on what the candidate JUST said.
+Pick ONE specific claim, example or opinion from their answer, then do ONE of these:
+(a) ask why, or for evidence; (b) put a fair counter-view and ask them to respond;
+(c) ask what they would do about it as a district officer.
+
+STRICT RULES:
+- Use the candidate's own words: quote 2-6 words from the answer, e.g. You said "..."
+- Stay on this topic; do not repeat the earlier question
+- question: ENGLISH for screen (max 30 words, ONE "?")
+- question_voice: HINDI/HINGLISH for spoken voice (max 34 words, NOT English)
 
 Return JSON: {{"question": "...", "question_voice": "..."}}"""
