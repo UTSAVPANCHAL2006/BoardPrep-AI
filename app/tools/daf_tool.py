@@ -115,7 +115,8 @@ def parseDafText(text: str) -> DAFProfile:
         if row:
             places = [near for near in lines[max(0, index - 2): index + 3] if re.search(r"SCHOOL|COLLEGE|UNIVERSITY|INSTITUTE", near)]
             detail = " ".join([row.group(3)] + [place for place in places if place != line])
-            education.append(f"{row.group(1)} ({row.group(2)}): {re.sub(r'\s+', ' ', detail).strip(' ,')}")
+            detail = re.sub(r"\s+", " ", detail).strip(" ,")  # outside the f-string: Python 3.11 allows no backslash there
+            education.append(f"{row.group(1)} ({row.group(2)}): {detail}")
 
     work = []
     employment = section(text, r"Details of your employment", r"\(b\) Your present Employment").splitlines()
